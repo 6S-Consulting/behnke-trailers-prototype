@@ -1,0 +1,696 @@
+@import "tailwindcss";
+@reference "./index.css";
+
+/* ============================================================
+   HYDRAULIC pumps Dark Gradient Theme — Global Admin CSS
+   ============================================================ */
+
+/* Global overscroll fix - prevents white background on overscroll */
+html {
+    background-color: #0b1626;
+    overscroll-behavior: none;
+}
+
+html:has(.admin-theme) {
+    background-color: #0b1626;
+}
+
+html,
+body {
+    min-height: 100%;
+    min-height: 100dvh;
+}
+
+body:has(.admin-theme) {
+    background-color: #0b1626;
+}
+
+/* Apply admin theme to Radix portaled elements (Dialog, Select, Popover) */
+body:has(.admin-theme) [data-radix-portal],
+body:has(.admin-theme) [role="dialog"],
+body:has(.admin-theme) [data-radix-popper-content-wrapper] {
+    /* Use card surface as dialog background so it stands out from the page */
+    --background: #1b2a3a;
+    --foreground: #e5e5e5;
+    --popover: #233548;
+    --popover-foreground: #e5e5e5;
+    --card: #233548;
+    --card-foreground: #e5e5e5;
+    --border: rgba(255, 255, 255, 0.09);
+    --input: #243547;
+    --muted: #1f2e40;
+    --muted-foreground: #a0b3c2;
+    --accent: #564899;
+    --accent-foreground: #e5e5e5;
+    /* Use brand purple so primary icons/buttons look correct in portal */
+    --primary: #a879c6;
+    --primary-foreground: #ffffff;
+    --secondary: #9b5796;
+    --secondary-foreground: #e5e5e5;
+    --ring: #007bce;
+    color: var(--foreground);
+}
+
+/* Dialog panel background + border */
+body:has(.admin-theme) [role="dialog"] {
+    background-color: #1b2a3a !important;
+    border: 1px solid rgba(255, 255, 255, 0.09) !important;
+    border-radius: 16px !important;
+}
+
+/* Inputs / textareas / selects inside portal dialogs */
+body:has(.admin-theme) [role="dialog"] input,
+body:has(.admin-theme) [role="dialog"] textarea {
+    background-color: #243547 !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #e5e5e5 !important;
+    border-radius: 10px !important;
+}
+
+body:has(.admin-theme) [role="dialog"] input::placeholder,
+body:has(.admin-theme) [role="dialog"] textarea::placeholder {
+    color: #a0b3c2 !important;
+}
+
+body:has(.admin-theme) [role="dialog"] input:focus,
+body:has(.admin-theme) [role="dialog"] textarea:focus {
+    border-color: rgba(0, 123, 206, 0.5) !important;
+    box-shadow: 0 0 0 2px rgba(0, 123, 206, 0.25) !important;
+    outline: none !important;
+}
+
+/* Override browser autofill background */
+body:has(.admin-theme) [role="dialog"] input:-webkit-autofill,
+body:has(.admin-theme) [role="dialog"] input:-webkit-autofill:hover,
+body:has(.admin-theme) [role="dialog"] input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px #243547 inset !important;
+    -webkit-text-fill-color: #e5e5e5 !important;
+    caret-color: #e5e5e5 !important;
+}
+
+/* Select trigger inside portal */
+body:has(.admin-theme) [role="dialog"] [data-radix-select-trigger],
+body:has(.admin-theme) [role="dialog"] button[role="combobox"] {
+    background-color: #243547 !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #e5e5e5 !important;
+    border-radius: 10px !important;
+}
+
+/* Outline buttons inside portal */
+body:has(.admin-theme) [role="dialog"] button[data-variant="outline"],
+body:has(.admin-theme) [role="dialog"] .border-border {
+    border-color: rgba(255, 255, 255, 0.12) !important;
+}
+
+/* Primary (Save & Connect) button inside portal */
+body:has(.admin-theme) [role="dialog"] button.bg-primary {
+    background: linear-gradient(90deg, #9b5796, #a879c6, #4f6aaf) !important;
+    color: #ffffff !important;
+    border: none !important;
+    border-radius: 10px !important;
+}
+
+/* Switch toggles inside portal */
+body:has(.admin-theme) [role="dialog"] [data-state="checked"][role="switch"] {
+    background: linear-gradient(90deg, #9b5796, #a879c6) !important;
+}
+
+body:has(.admin-theme) [role="dialog"] [data-state="unchecked"][role="switch"] {
+    background-color: #1f2e40 !important;
+}
+
+/* Labels inside portal */
+body:has(.admin-theme) [role="dialog"] label {
+    color: #a0b3c2 !important;
+}
+
+/* Section heading text inside portal */
+body:has(.admin-theme) [role="dialog"] h4 {
+    color: #e5e5e5 !important;
+}
+
+/* Close (X) button inside portal */
+body:has(.admin-theme) [role="dialog"] [data-radix-dialog-close] {
+    color: #a0b3c2 !important;
+    background: transparent !important;
+    border: none !important;
+}
+
+/* ============================================================
+   HYDRAULIC pumps Dark Gradient Theme — Admin Theme Token System
+   ============================================================ */
+
+.admin-theme {
+    /* Primary Brand */
+    --primary: #ebeded;
+    --primary-foreground: #5e5e5e;
+
+    /* Deep Navy Background */
+    --background: #0b1626;
+    --foreground: #e5e5e5;
+
+    /* Background system */
+    --bg-main: #0b1626;
+    --bg-card: #1b2a3a;
+    --bg-hover: #233548;
+
+    /* Card surfaces */
+    --card: #1b2a3a;
+    --card-foreground: #e5e5e5;
+
+    /* Popover */
+    --popover: #1b2a3a;
+    --popover-foreground: #e5e5e5;
+
+    /* Secondary Gradient tokens */
+    --secondary: #9b5796;
+    --secondary-start: #9b5796;
+    --secondary-end: #a879c6;
+    --secondary-foreground: #e5e5e5;
+
+    /* Muted */
+    --muted: #1f2e40;
+    --muted-foreground: #a0b3c2;
+
+    /* Accent Gradient tokens */
+    --accent: #564899;
+    --accent-start: #564899;
+    --accent-end: #766dc4;
+    --accent-foreground: #e5e5e5;
+
+    /* Status Colors */
+    --success: #4ade80;
+    --success-foreground: #0b1626;
+    --warning: #ffc107;
+    --warning-foreground: #0b1626;
+    --destructive: #c64242;
+    --destructive-foreground: #e5e5e5;
+
+    /* Borders (gradient tokens) */
+    --border: rgba(255, 255, 255, 0.05);
+    --border-start: #007bce;
+    --border-end: #cc43c4;
+
+    /* Input */
+    --input: #1f2e40;
+
+    /* Focus Ring (gradient tokens) */
+    --ring: #007bce;
+    --ring-start: #007bce;
+    --ring-end: #cc43c4;
+    --radius: 0.75rem;
+
+    /* Sidebar */
+    --sidebar: #0b1626;
+    --sidebar-foreground: #e5e5e5;
+    --sidebar-primary: #a879c6;
+    --sidebar-primary-foreground: #e5e5e5;
+    --sidebar-accent: #233548;
+    --sidebar-accent-foreground: #e5e5e5;
+    --sidebar-border: rgba(255, 255, 255, 0.05);
+    --sidebar-ring: #007bce;
+
+    /* Charts */
+    --chart-1: #a879c6;
+    --chart-2: #975fc4;
+    --chart-3: #4f6aaf;
+    --chart-4: #5551af;
+    --chart-5: #766dc4;
+
+    /* Base Overrides */
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: linear-gradient(180deg, #0b1626 0%, #0f1e33 100%);
+    color: var(--foreground);
+    min-height: 100vh;
+}
+
+.dark .admin-theme {
+    /* Same as default — already dark */
+    --primary: #ebeded;
+    --primary-foreground: #5e5e5e;
+    --background: #0b1626;
+    --foreground: #e5e5e5;
+    --card: #1b2a3a;
+    --card-foreground: #e5e5e5;
+    --popover: #1b2a3a;
+    --popover-foreground: #e5e5e5;
+    --secondary: #9b5796;
+    --secondary-foreground: #e5e5e5;
+    --muted: #1f2e40;
+    --muted-foreground: #a0b3c2;
+    --accent: #564899;
+    --accent-foreground: #e5e5e5;
+    --destructive: #c64242;
+    --destructive-foreground: #e5e5e5;
+    --border: rgba(255, 255, 255, 0.05);
+    --input: #1f2e40;
+    --ring: #007bce;
+    --sidebar: #0b1626;
+    --sidebar-foreground: #e5e5e5;
+    --sidebar-primary: #a879c6;
+    --sidebar-primary-foreground: #e5e5e5;
+    --sidebar-accent: #233548;
+    --sidebar-accent-foreground: #e5e5e5;
+    --sidebar-border: rgba(255, 255, 255, 0.05);
+    --sidebar-ring: #007bce;
+}
+
+/* ============================================================
+   SIDEBAR STYLES
+   ============================================================ */
+
+.admin-theme aside,
+.admin-theme [data-sidebar="sidebar"] {
+    background-color: #0b1626 !important;
+}
+
+/* Sidebar nav items hover */
+.admin-theme aside nav a:hover,
+.admin-theme [data-sidebar="menu-button"]:hover {
+    background-color: #233548 !important;
+}
+
+/* Sidebar active item with gradient */
+.admin-theme aside nav a.active,
+.admin-theme aside nav a[aria-current="page"],
+.admin-theme [data-active="true"] {
+    background: linear-gradient(90deg, #9b5796, #a879c6, #4f6aaf) !important;
+    color: #ffffff !important;
+}
+
+/* Sidebar icons & text */
+.admin-theme aside nav a svg,
+.admin-theme aside nav a span {
+    color: #e5e5e5;
+}
+
+.admin-theme aside nav a.active svg,
+.admin-theme aside nav a.active span,
+.admin-theme aside nav a[aria-current="page"] svg,
+.admin-theme aside nav a[aria-current="page"] span {
+    color: #ffffff !important;
+}
+
+/* ============================================================
+   CARD STYLES (Dashboard Widgets)
+   ============================================================ */
+
+.admin-theme .kpi-card {
+    background-color: #1b2a3a;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 1rem;
+    transition: all 0.3s ease;
+}
+
+.admin-theme .kpi-card:hover {
+    box-shadow: 0px 10px 30px rgba(0, 0, 0, 0.4);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Generic card overrides within admin */
+.admin-theme .bg-card,
+.admin-theme [class*="bg-card"] {
+    background-color: #1b2a3a !important;
+    border-color: rgba(255, 255, 255, 0.05) !important;
+    border-radius: 16px;
+}
+
+/* ============================================================
+   BUTTON STYLES
+   ============================================================ */
+
+/* Primary button — gradient */
+.admin-theme button.bg-primary,
+.admin-theme [class*="bg-primary"]:is(button, a, [role="button"]),
+.admin-theme .btn-primary {
+    background: linear-gradient(90deg, #9b5796, #a879c6, #4f6aaf) !important;
+    color: #ffffff !important;
+    border-radius: 12px !important;
+    border: none !important;
+}
+
+.admin-theme button.bg-primary:hover,
+.admin-theme [class*="bg-primary"]:is(button, a, [role="button"]):hover {
+    opacity: 0.9;
+    box-shadow: 0 4px 20px rgba(155, 87, 150, 0.3);
+}
+
+/* ============================================================
+   INPUT FIELD STYLES
+   ============================================================ */
+
+.admin-theme input,
+.admin-theme textarea,
+.admin-theme select {
+    background-color: #1f2e40 !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    color: #e5e5e5 !important;
+    border-radius: 12px;
+}
+
+.admin-theme input:focus,
+.admin-theme textarea:focus,
+.admin-theme select:focus {
+    box-shadow: 0 0 0 2px rgba(0, 123, 206, 0.4) !important;
+    border-color: rgba(0, 123, 206, 0.5) !important;
+    outline: none !important;
+}
+
+.admin-theme input::placeholder,
+.admin-theme textarea::placeholder {
+    color: #a0b3c2 !important;
+}
+
+/* ============================================================
+   AI SEARCH BAR — Gradient border glow
+   ============================================================ */
+
+.admin-theme .ai-search-input,
+.admin-theme input[type="search"] {
+    border: 2px solid transparent !important;
+    background:
+        linear-gradient(#1b2a3a, #1b2a3a) padding-box,
+        linear-gradient(90deg, #007bce, #cc43c4) border-box !important;
+    border-radius: 16px !important;
+}
+
+/* ============================================================
+   ALERT STYLES
+   ============================================================ */
+
+/* Error Alert */
+.admin-theme .alert-error,
+.admin-theme [data-variant="destructive"],
+.admin-theme .border-destructive {
+    background: rgba(198, 66, 66, 0.1) !important;
+    border: 1px solid #c64242 !important;
+    color: #ff6b6b !important;
+}
+
+/* Warning Alert */
+.admin-theme .alert-warning,
+.admin-theme .border-warning {
+    background: rgba(255, 193, 7, 0.1) !important;
+    border: 1px solid #ffc107 !important;
+}
+
+/* ============================================================
+   PROGRESS BAR STYLES
+   ============================================================ */
+
+.admin-theme [role="progressbar"]>div,
+.admin-theme .progress-indicator {
+    background: linear-gradient(90deg, #9b5796, #a879c6, #4f6aaf) !important;
+}
+
+/* ============================================================
+   STATUS BADGES
+   ============================================================ */
+
+.admin-theme .status-badge {
+    @apply inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium;
+}
+
+.admin-theme .status-new {
+    background-color: rgba(168, 121, 198, 0.2);
+    color: #a879c6;
+}
+
+.admin-theme .status-review {
+    background-color: rgba(255, 193, 7, 0.15);
+    color: #ffc107;
+}
+
+.admin-theme .status-quoted {
+    background-color: rgba(74, 222, 128, 0.15);
+    color: #4ade80;
+}
+
+.admin-theme .text-success {
+    color: #4ade80;
+}
+
+.admin-theme .text-warning {
+    color: #ffc107;
+}
+
+.admin-theme .status-closed {
+    background-color: rgba(160, 179, 194, 0.1);
+    color: #a0b3c2;
+}
+
+/* ============================================================
+   TABLE STYLES
+   ============================================================ */
+
+.admin-theme .admin-table {
+    @apply w-full text-sm;
+}
+
+.admin-theme .admin-table th {
+    @apply text-left font-medium px-4 py-3 border-b;
+    color: #a0b3c2;
+    border-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(31, 46, 64, 0.5);
+}
+
+.admin-theme .admin-table td {
+    @apply px-4 py-3 border-b;
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+.admin-theme .admin-table tr:hover td {
+    background-color: #233548;
+}
+
+/* ============================================================
+   FORM SECTIONS
+   ============================================================ */
+
+.admin-theme .form-section {
+    background-color: #1b2a3a;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 1.5rem;
+}
+
+.admin-theme .form-section>*:not(:last-child) {
+    margin-bottom: 1rem;
+}
+
+.admin-theme .form-section-title {
+    @apply text-sm font-semibold uppercase tracking-wide mb-4 pb-2;
+    color: #e5e5e5;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* ============================================================
+   HEADER STYLES
+   ============================================================ */
+
+.admin-theme header {
+    background-color: rgba(11, 22, 38, 0.95) !important;
+    backdrop-filter: blur(12px);
+    border-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+/* ============================================================
+   TYPOGRAPHY
+   ============================================================ */
+
+.admin-theme .text-foreground,
+.admin-theme h1,
+.admin-theme h2,
+.admin-theme h3,
+.admin-theme h4 {
+    color: #e5e5e5;
+}
+
+.admin-theme .text-muted-foreground,
+.admin-theme .text-secondary {
+    color: #a0b3c2;
+}
+
+/* ============================================================
+   DIVIDE/BORDER OVERRIDES
+   ============================================================ */
+
+.admin-theme .divide-border>*+*,
+.admin-theme .border-border,
+.admin-theme .border-b,
+.admin-theme .border-sidebar-border {
+    border-color: rgba(255, 255, 255, 0.05);
+}
+
+/* ============================================================
+   DROPDOWN MENUS
+   ============================================================ */
+
+.admin-theme [data-radix-popper-content-wrapper] [role="menuitem"] {
+    color: #e5e5e5;
+}
+
+.admin-theme [data-radix-popper-content-wrapper] [role="menuitem"]:hover {
+    background-color: #233548;
+}
+
+/* ============================================================
+   SWITCH / TOGGLE OVERRIDES
+   ============================================================ */
+
+.admin-theme [data-state="checked"][role="switch"] {
+    background: linear-gradient(90deg, #9b5796, #a879c6) !important;
+}
+
+.admin-theme [data-state="unchecked"][role="switch"] {
+    background-color: #1f2e40 !important;
+}
+
+/* ============================================================
+   TAB STYLES
+   ============================================================ */
+
+.admin-theme [role="tablist"] {
+    background-color: #1f2e40;
+    border-radius: 12px;
+}
+
+.admin-theme [role="tab"][data-state="active"] {
+    background-color: #1b2a3a;
+    color: #e5e5e5;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.admin-theme [role="tab"] {
+    color: #a0b3c2;
+    border-radius: 10px;
+}
+
+/* ============================================================
+   NOTIFICATION BADGE
+   ============================================================ */
+
+.admin-theme .bg-primary:not(button):not(a):not([role="button"]) {
+    background-color: #ebeded;
+}
+
+/* Notification dot — use gradient for active indicator */
+.admin-theme .rounded-full.bg-primary {
+    background: linear-gradient(90deg, #9b5796, #a879c6) !important;
+    color: #ffffff !important;
+}
+
+/* ============================================================
+   CHART TOOLTIP OVERRIDES
+   ============================================================ */
+
+.admin-theme .recharts-tooltip-wrapper .recharts-default-tooltip {
+    background-color: #1b2a3a !important;
+    border-color: rgba(255, 255, 255, 0.05) !important;
+    border-radius: 12px !important;
+}
+
+/* ============================================================
+   SCROLLBAR STYLES
+   ============================================================ */
+
+.admin-theme ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.admin-theme ::-webkit-scrollbar-track {
+    background-color: rgba(31, 46, 64, 0.3);
+}
+
+.admin-theme ::-webkit-scrollbar-thumb {
+    background-color: rgba(160, 179, 194, 0.3);
+    border-radius: 9999px;
+}
+
+.admin-theme ::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(160, 179, 194, 0.5);
+}
+
+/* ============================================================
+   ICON CATEGORY COLORS (Pastel)
+   ============================================================ */
+
+/* Yellow icons for notifications */
+.admin-theme .icon-notification,
+.admin-theme .text-warning svg {
+    color: #ffc107;
+}
+
+/* Blue icons for analytics */
+.admin-theme .icon-analytics {
+    color: #007bce;
+}
+
+/* Purple icons for modules */
+.admin-theme .icon-module {
+    color: #a879c6;
+}
+
+/* ============================================================
+   COLLAPSE TOGGLE BUTTON
+   ============================================================ */
+
+.admin-theme .rounded-full.border.border-border {
+    background-color: #1b2a3a !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* ============================================================
+   LINKS & HOVER STATES
+   ============================================================ */
+
+.admin-theme a.text-primary:hover {
+    color: #a879c6;
+}
+
+/* ============================================================
+   GHOST BUTTON HOVER
+   ============================================================ */
+
+.admin-theme button:hover:not(.bg-primary):not([class*="bg-"]) {
+    background-color: #233548;
+}
+
+/* ============================================================
+   DIALOG / SHEET OVERRIDES
+   ============================================================ */
+
+.admin-theme [role="dialog"],
+.admin-theme [data-state="open"][role="dialog"] {
+    background-color: #1b2a3a !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    border-radius: 16px;
+}
+
+/* ============================================================
+   SELECT DROPDOWN OVERRIDES
+   ============================================================ */
+
+.admin-theme [role="listbox"],
+.admin-theme [data-radix-select-content] {
+    background-color: #1b2a3a !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.admin-theme [role="option"]:hover,
+.admin-theme [role="option"][data-highlighted] {
+    background-color: #233548 !important;
+}
+
+/* ============================================================
+   BADGE OVERRIDES (for gradient look)
+   ============================================================ */
+
+.admin-theme .badge-gradient {
+    background: linear-gradient(90deg, #9b5796, #a879c6, #4f6aaf);
+    color: #ffffff;
+    border-radius: 12px;
+}
