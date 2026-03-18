@@ -84,7 +84,7 @@ export function DirectionalDrillTiltTrailerDetails() {
             transition={{ duration: 0.6 }}
             className="mb-8"
           >
-            <h1 className="text-4xl lg:text-6xl font-black text-[#bf1e2e] leading-tight">
+            <h1 className="font-display text-4xl lg:text-6xl font-black text-[#bf1e2e] leading-tight">
               {directionalDrillTiltTrailer.title}
             </h1>
           </motion.div>
@@ -135,7 +135,7 @@ export function DirectionalDrillTiltTrailerDetails() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.6, delay: 0.15 }}
             >
-              <p className="text-muted-foreground text-lg leading-relaxed mb-5">
+              <p className="font-body text-muted-foreground text-lg leading-relaxed mb-5">
                 {directionalDrillTiltTrailer.description}
               </p>
 
@@ -144,7 +144,7 @@ export function DirectionalDrillTiltTrailerDetails() {
                   href="#"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="inline-flex items-center gap-2 bg-card text-foreground px-4 py-3 font-bold hover:bg-card/80 transition-colors border border-border"
+                  className="inline-flex items-center gap-2 bg-card text-foreground px-4 py-3 font-display font-bold hover:bg-card/80 transition-colors border border-border"
                 >
                   <MapPin size={18} className="text-[#bf1e2e]" />
                   Find a Dealer
@@ -154,7 +154,7 @@ export function DirectionalDrillTiltTrailerDetails() {
                   onClick={handleDownloadBrochure}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="inline-flex items-center gap-2 bg-card text-foreground px-4 py-3 font-bold hover:bg-card/80 transition-colors border border-border"
+                  className="inline-flex items-center gap-2 bg-card text-foreground px-4 py-3 font-display font-bold hover:bg-card/80 transition-colors border border-border"
                 >
                   <FileText size={18} className="text-[#bf1e2e]" />
                   Download Brochure
@@ -165,7 +165,7 @@ export function DirectionalDrillTiltTrailerDetails() {
                 >
                   <Link
                     to="/trailers/directional-drill-tilt-trailer/3d"
-                    className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-3 font-bold hover:brightness-110 transition-colors w-full justify-center sm:w-auto"
+                    className="inline-flex items-center gap-2 bg-primary text-primary-foreground px-4 py-3 font-display font-bold hover:brightness-110 transition-colors w-full justify-center sm:w-auto"
                   >
                     <Shield size={18} className="text-[#f03e4f]" />
                     3D Model Option
@@ -182,7 +182,9 @@ export function DirectionalDrillTiltTrailerDetails() {
             transition={{ duration: 0.6 }}
             className="bg-gradient-to-r from-black via-slate-900 to-slate-700 text-white border-4 border-black p-5 mb-8 rounded-sm"
           >
-            <h2 className="text-3xl font-black mb-4">Product Features</h2>
+            <h2 className="font-display text-3xl font-black mb-4">
+              Product Features
+            </h2>
             <div className="grid md:grid-cols-2 gap-6">
               <div className="space-y-3">
                 {directionalDrillTiltTrailer.specs
@@ -196,8 +198,10 @@ export function DirectionalDrillTiltTrailerDetails() {
                       transition={{ delay: idx * 0.05 }}
                       className="grid grid-cols-2 gap-3 border-b border-white/20 pb-2"
                     >
-                      <div className="font-bold text-sm">{spec.label}</div>
-                      <div className="text-sm">{spec.value}</div>
+                      <div className="font-display font-bold text-sm">
+                        {spec.label}
+                      </div>
+                      <div className="font-body text-sm">{spec.value}</div>
                     </motion.div>
                   ))}
               </div>
@@ -211,8 +215,10 @@ export function DirectionalDrillTiltTrailerDetails() {
                     transition={{ delay: idx * 0.05 + 0.35 }}
                     className="grid grid-cols-2 gap-3 border-b border-white/20 pb-2"
                   >
-                    <div className="font-bold text-sm">{spec.label}</div>
-                    <div className="text-sm">{spec.value}</div>
+                    <div className="font-display font-bold text-sm">
+                      {spec.label}
+                    </div>
+                    <div className="font-body text-sm">{spec.value}</div>
                   </motion.div>
                 ))}
               </div>
@@ -226,7 +232,7 @@ export function DirectionalDrillTiltTrailerDetails() {
             transition={{ duration: 0.6 }}
             className="mb-8"
           >
-            <h3 className="text-4xl font-black text-foreground mb-4">
+            <h3 className="font-display text-4xl font-black text-foreground mb-4">
               Details
             </h3>
             <ul className="space-y-2 text-muted-foreground">
@@ -242,7 +248,7 @@ export function DirectionalDrillTiltTrailerDetails() {
                   <span className="text-[#bf1e2e] text-xl leading-none flex-shrink-0">
                     &#8857;
                   </span>
-                  <span>{item}</span>
+                  <span className="font-body">{item}</span>
                 </motion.li>
               ))}
             </ul>
