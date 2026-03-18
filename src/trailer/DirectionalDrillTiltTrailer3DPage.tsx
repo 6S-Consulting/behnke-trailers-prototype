@@ -255,6 +255,35 @@ export function DirectionalDrillTiltTrailer3DPage() {
           </div>
         </section>
 
+        <section className="bg-white border border-slate-200 rounded-lg p-5 mb-8">
+          <h2 className="text-xl font-black text-slate-900 mb-3">
+            Reference Images Used For Model Polish
+          </h2>
+          <p className="text-slate-600 mb-4">
+            Geometry refinements were aligned to these photos: dual-deck split,
+            rear beavertail/ramp shape, toolbox position, blue reel placement,
+            side reflector striping, and overall wheel/fender stance.
+          </p>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {directionalDrillTiltTrailer.gallery.map((image, idx) => (
+              <figure
+                key={image}
+                className="border border-slate-200 rounded overflow-hidden bg-slate-50"
+              >
+                <img
+                  src={image}
+                  alt={`Directional drill trailer reference ${idx + 1}`}
+                  className="w-full h-36 object-cover"
+                  loading="lazy"
+                />
+                <figcaption className="text-xs font-semibold text-slate-600 px-2 py-1.5">
+                  Reference {idx + 1}
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </section>
+
         <div className="mt-8 flex gap-3">
           <Link
             to="/trailers/directional-drill-tilt-trailer"
