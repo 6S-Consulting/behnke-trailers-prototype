@@ -54,6 +54,19 @@ const SupportChat = lazy(() =>
 const Compare = lazy(() =>
   import("@/pages/Compare").then((m) => ({ default: m.Compare })),
 );
+const TrailersPage = lazy(() =>
+  import("@/trailer/TrailersPage").then((m) => ({ default: m.TrailersPage })),
+);
+const DirectionalDrillTiltTrailerDetails = lazy(() =>
+  import("@/trailer/DirectionalDrillTiltTrailerDetails").then((m) => ({
+    default: m.DirectionalDrillTiltTrailerDetails,
+  })),
+);
+const DirectionalDrillTiltTrailer3DPage = lazy(() =>
+  import("@/trailer/DirectionalDrillTiltTrailer3DPage").then((m) => ({
+    default: m.DirectionalDrillTiltTrailer3DPage,
+  })),
+);
 
 // Admin Imports
 import "@/App.css"; // Import Admin scoped styles
@@ -83,7 +96,9 @@ const Customers = lazy(() => import("@/admin/pages/Customers"));
 const Reports = lazy(() => import("@/admin/pages/Reports"));
 const Settings = lazy(() => import("@/admin/pages/Settings"));
 const IntelligenceLayer = lazy(() => import("@/admin/pages/IntelligenceLayer"));
-const MultiChannelIngestion = lazy(() => import("@/admin/pages/MultiChannelIngestion"));
+const MultiChannelIngestion = lazy(
+  () => import("@/admin/pages/MultiChannelIngestion"),
+);
 const AddCustomChannel = lazy(() => import("@/admin/pages/AddCustomChannel"));
 const ChannelDetail = lazy(() => import("@/admin/pages/ChannelDetail"));
 
@@ -260,6 +275,30 @@ function App() {
                                           </PublicLayout>
                                         }
                                       />
+                                      <Route
+                                        path="/trailers"
+                                        element={
+                                          <PublicLayout>
+                                            <TrailersPage />
+                                          </PublicLayout>
+                                        }
+                                      />
+                                      <Route
+                                        path="/trailers/directional-drill-tilt-trailer"
+                                        element={
+                                          <PublicLayout>
+                                            <DirectionalDrillTiltTrailerDetails />
+                                          </PublicLayout>
+                                        }
+                                      />
+                                      <Route
+                                        path="/trailers/directional-drill-tilt-trailer/3d"
+                                        element={
+                                          <PublicLayout>
+                                            <DirectionalDrillTiltTrailer3DPage />
+                                          </PublicLayout>
+                                        }
+                                      />
 
                                       {/* Under Construction Pages */}
                                       <Route
@@ -333,7 +372,9 @@ function App() {
                                           path="/admin/inventory/legacy"
                                           element={<Inventory />}
                                         />
-                                        <Route element={<MultiChannelWrapper />}>
+                                        <Route
+                                          element={<MultiChannelWrapper />}
+                                        >
                                           <Route
                                             path="/admin/multi-channel"
                                             element={<MultiChannelIngestion />}

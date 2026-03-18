@@ -16,6 +16,7 @@ import { ResponsiveImage } from "@/components/ResponsiveImage";
 import { products } from "@/data/products";
 import type { Product } from "@/data/products";
 import { BulkOrderUpload } from "@/components/BulkOrderUpload";
+import TrailerViewer from "@/trailer/DirectionalDrillTrailer";
 import bestSellerImg from "@/assets/images/pumps/best-seller-removebg-preview.png";
 import heroImg from "@/assets/images/pumps/home/hero.png";
 import brandImg from "@/assets/images/pumps/home/brand.png";
@@ -23,7 +24,6 @@ import pvpImg from "@/assets/images/pumps/products/pvp.png";
 import pgp505Img from "@/assets/images/pumps/products/pgp505.png";
 import f1Img from "@/assets/images/pumps/products/f1.png";
 import pgp315Img from "@/assets/images/pumps/products/pgp315.png";
-
 
 interface DiscountProduct extends Product {
   originalPrice: number;
@@ -55,7 +55,6 @@ export function Home() {
       discount: p.discountPercentage!,
     }))
     .slice(0, 9);
-
 
   const reviews: Review[] = [
     {
@@ -89,7 +88,9 @@ export function Home() {
               <h1 className="text-4xl lg:text-5xl font-black text-slate-900 mb-4 leading-tight">
                 YOUR HYDRAULIC
                 <br />
-                <span className="bg-gradient-to-r from-[#da789b] from-0% via-[#cb44a8] via-20% via-[#4567a4] via-50% to-[#00a1d0] to-100% font-bold bg-clip-text text-transparent">SOLUTION IS HERE</span>
+                <span className="bg-gradient-to-r from-[#da789b] from-0% via-[#cb44a8] via-20% via-[#4567a4] via-50% to-[#00a1d0] to-100% font-bold bg-clip-text text-transparent">
+                  SOLUTION IS HERE
+                </span>
               </h1>
               <p className="text-xl lg:text-2xl text-slate-700 font-bold mb-3">
                 Premium Industrial & Mobile Pumps
@@ -98,7 +99,9 @@ export function Home() {
                 <span className="text-base text-slate-600 font-semibold">
                   Starting at
                 </span>
-                <span className="text-4xl font-black bg-gradient-to-r from-[#da789b] from-0% via-[#cb44a8] via-20% via-[#4567a4] via-50% to-[#00a1d0] to-100% bg-clip-text text-transparent">$49</span>
+                <span className="text-4xl font-black bg-gradient-to-r from-[#da789b] from-0% via-[#cb44a8] via-20% via-[#4567a4] via-50% to-[#00a1d0] to-100% bg-clip-text text-transparent">
+                  $49
+                </span>
               </div>
               <Button
                 size="lg"
@@ -121,6 +124,22 @@ export function Home() {
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 3D Trailer Viewer */}
+      <section className="bg-white py-16 border-b border-gray-200">
+        <div className="container mx-auto px-4 lg:px-8">
+          <div className="text-center mb-10">
+            <h2 className="text-4xl lg:text-5xl font-black text-black mb-4">
+              Directional Drill Tilt Trailer (3D Interactive)
+            </h2>
+            <p className="text-lg text-slate-600 mb-8">
+              Explore the engineering model in Imperial scale (inches) showing
+              accurate components.
+            </p>
+            <TrailerViewer />
           </div>
         </div>
       </section>
@@ -177,7 +196,8 @@ export function Home() {
               Hydraulic Pump Categories
             </h2>
             <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-              Choose from our comprehensive range of industrial-grade hydraulic pumps
+              Choose from our comprehensive range of industrial-grade hydraulic
+              pumps
             </p>
           </div>
 
@@ -189,8 +209,6 @@ export function Home() {
           </div>
         </div>
       </section>
-
-
 
       {/* Best Sellers Carousel */}
       <section className="bg-gradient-to-br from-slate-100 to-slate-200 py-16">
@@ -206,9 +224,7 @@ export function Home() {
 
           <Carousel
             items={bestSellers}
-            renderItem={(product) => (
-              <ProductCard product={product} />
-            )}
+            renderItem={(product) => <ProductCard product={product} />}
             itemsPerView={5}
             autoPlay
             autoPlayInterval={2500}
@@ -231,9 +247,7 @@ export function Home() {
 
           <Carousel
             items={discountedProducts}
-            renderItem={(product) => (
-              <DiscountCard product={product} />
-            )}
+            renderItem={(product) => <DiscountCard product={product} />}
             itemsPerView={5}
             autoPlay
             autoPlayInterval={3500}
@@ -242,8 +256,6 @@ export function Home() {
         </div>
       </section>
 
-
-
       {/* Brand Information - HYDRAULIC pumps */}
       <section className="bg-gradient-to-br from-slate-100 to-slate-200 py-16 ">
         <div className="container mx-auto px-4 lg:px-8">
@@ -251,7 +263,10 @@ export function Home() {
             {/* Left Content */}
             <div>
               <h2 className="text-4xl lg:text-5xl font-black  mb-8">
-                <span className="bg-gradient-to-r from-[#da789b] from-0% via-[#cb44a8] via-30% via-[#4567a4] via-50% to-[#00a1d0] to-100% bg-clip-text text-transparent">HYDRAULIC</span> Pumps
+                <span className="bg-gradient-to-r from-[#da789b] from-0% via-[#cb44a8] via-30% via-[#4567a4] via-50% to-[#00a1d0] to-100% bg-clip-text text-transparent">
+                  HYDRAULIC
+                </span>{" "}
+                Pumps
               </h2>
               <ul className="space-y-4">
                 <BrandFeature text="Reliable Performance" />
@@ -453,10 +468,11 @@ function Carousel<T>({
           prev();
           resetTimer();
         }}
-        className={`hidden md:block absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 p-3 rounded-full shadow-xl focus:outline-none opacity-0 group-hover/carousel:opacity-100 transition-opacity ${darkArrows
+        className={`hidden md:block absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 z-10 p-3 rounded-full shadow-xl focus:outline-none opacity-0 group-hover/carousel:opacity-100 transition-opacity ${
+          darkArrows
             ? "bg-slate-900 text-white hover:bg-slate-800"
             : "bg-gradient-to-r from-[#da789b] from-0% via-[#cb44a8] via-50% via-[#4567a4] via-80% to-[#00a1d0] to-100% text-white hover:opacity-90"
-          }`}
+        }`}
         aria-label="Previous item"
       >
         <ChevronLeft className="w-6 h-6" />
@@ -493,10 +509,11 @@ function Carousel<T>({
           next();
           resetTimer();
         }}
-        className={`hidden md:block absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 p-3 rounded-full shadow-xl focus:outline-none opacity-0 group-hover/carousel:opacity-100 transition-opacity ${darkArrows
+        className={`hidden md:block absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 z-10 p-3 rounded-full shadow-xl focus:outline-none opacity-0 group-hover/carousel:opacity-100 transition-opacity ${
+          darkArrows
             ? "bg-slate-900 text-white hover:bg-slate-800"
             : "bg-gradient-to-r from-[#da789b] from-0% via-[#cb44a8] via-50% via-[#4567a4] via-80% to-[#00a1d0] to-100% text-white hover:opacity-90"
-          }`}
+        }`}
         aria-label="Next item"
       >
         <ChevronRight className="w-6 h-6" />
@@ -510,10 +527,11 @@ function Carousel<T>({
             i < 10 && (
               <div
                 key={i}
-                className={`h-1.5 rounded-full transition-all cursor-pointer ${currentIndex % items.length === i
+                className={`h-1.5 rounded-full transition-all cursor-pointer ${
+                  currentIndex % items.length === i
                     ? `w-8 ${darkArrows ? "bg-slate-900" : "bg-gradient-to-r from-[#da789b] from-0% via-[#cb44a8] via-50% via-[#4567a4] via-80% to-[#00a1d0] to-100%"}`
                     : `w-2 ${darkArrows ? "bg-slate-400" : "bg-gray-700"}`
-                  }`}
+                }`}
                 onClick={() => {
                   setCurrentIndex(i);
                   setIsTransitioning(true);
@@ -594,7 +612,10 @@ function ProductCard({ product }: { product: Product }) {
     >
       {/* Best Seller ribbon */}
       {product.isBestSeller && (
-        <div className="absolute top-5 -left-6 z-20 pointer-events-none" style={{ width: 100, height: 52 }}>
+        <div
+          className="absolute top-5 -left-6 z-20 pointer-events-none"
+          style={{ width: 100, height: 52 }}
+        >
           <img
             src={bestSellerImg}
             alt="Best Seller"
@@ -680,8 +701,12 @@ function DiscountCard({ product }: { product: DiscountProduct }) {
         </div>
         <div className="mt-auto space-y-2">
           <div>
-            <span className="font-bold text-lg text-red-600">${product.price.toFixed(2)}</span>
-            <span className="text-xs text-slate-400 line-through ml-1.5">${product.originalPrice.toFixed(2)}</span>
+            <span className="font-bold text-lg text-red-600">
+              ${product.price.toFixed(2)}
+            </span>
+            <span className="text-xs text-slate-400 line-through ml-1.5">
+              ${product.originalPrice.toFixed(2)}
+            </span>
           </div>
           <button
             onClick={(e) => {

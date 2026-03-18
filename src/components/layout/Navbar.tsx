@@ -106,7 +106,11 @@ export function Navbar() {
                 className="hidden lg:flex flex-col items-center text-slate-700 hover:text-[#4567a4] transition-colors group"
                 aria-label="Discover products"
               >
-                <Compass size={22} strokeWidth={2.5} className="group-hover:rotate-45 transition-transform duration-500" />
+                <Compass
+                  size={22}
+                  strokeWidth={2.5}
+                  className="group-hover:rotate-45 transition-transform duration-500"
+                />
                 <span className="text-[10px] font-bold mt-0.5 uppercase">
                   Discover
                 </span>
@@ -287,7 +291,8 @@ export function Navbar() {
                     {activeSubmenu && (
                       <div className="w-60 border-l border-gray-100 bg-white">
                         {/* Series label */}
-                        {(categories.find((c) => c.name === activeSubmenu)?.subcategories?.length ?? 0) > 0 && (
+                        {(categories.find((c) => c.name === activeSubmenu)
+                          ?.subcategories?.length ?? 0) > 0 && (
                           <div className="px-4 py-1.5 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
                             Series
                           </div>
@@ -330,6 +335,12 @@ export function Navbar() {
                   className={`text-xs font-bold uppercase tracking-normal transition-colors hover:text-[#da789b] ${isActive("/catalog") ? "text-[#da789b]" : "text-black"}`}
                 >
                   Shop
+                </Link>
+                <Link
+                  to="/trailers"
+                  className={`text-xs font-bold uppercase tracking-normal transition-colors hover:text-[#da789b] ${isActive("/trailers") ? "text-[#da789b]" : "text-black"}`}
+                >
+                  Trailers
                 </Link>
 
                 <Link
@@ -429,8 +440,6 @@ export function Navbar() {
               <span>Discover Your Pump</span>
             </button>
 
-
-
             {/* Mobile Categories */}
             <div className="border-b border-gray-100 pb-4">
               <div className="text-xs font-bold uppercase tracking-widest text-gray-400 mb-3">
@@ -485,7 +494,9 @@ export function Navbar() {
                       >
                         All {category.name}
                       </button>
-                      <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest pt-1">Series</div>
+                      <div className="text-[10px] font-black text-gray-400 uppercase tracking-widest pt-1">
+                        Series
+                      </div>
                       {category.subcategories?.map((series, subIndex) => (
                         <button
                           key={subIndex}
@@ -520,6 +531,13 @@ export function Navbar() {
               onClick={() => setIsMenuOpen(false)}
             >
               Shop
+            </Link>
+            <Link
+              to="/trailers"
+              className="text-sm font-bold uppercase tracking-normal"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Trailers
             </Link>
 
             <Link
@@ -563,7 +581,6 @@ export function Navbar() {
           </div>
         </div>
       )}
-
 
       <DiscoveryModal
         isOpen={isDiscoverOpen}
