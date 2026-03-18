@@ -9,6 +9,7 @@ const navLinks = [
   { label: "Custom Builds", href: "#custom-builds" },
   { label: "Dealers", href: "#dealers" },
   { label: "Contact", href: "#contact" },
+  { label: "Partner Portal", href: "/login", isRoute: true },
 ];
 
 const Header = () => {
@@ -57,7 +58,13 @@ const Header = () => {
           ))}
         </nav>
 
-        <div className="hidden md:block">
+        <div className="hidden md:flex items-center gap-4">
+          <Link
+            to="/login"
+            className="text-sm font-body text-foreground hover:text-primary transition-colors duration-300"
+          >
+            Portal Login
+          </Link>
           <a
             href="#contact"
             className="inline-flex items-center px-5 py-2.5 bg-primary text-primary-foreground font-display text-sm font-semibold rounded-sm hover:brightness-110 transition-all duration-300"
@@ -101,9 +108,17 @@ const Header = () => {
               </a>
             )
           ))}
+          <Link
+            to="/login"
+            onClick={() => setMobileOpen(false)}
+            className="block mt-4 text-center px-5 py-2.5 border border-primary text-primary font-display text-sm font-semibold rounded-sm"
+          >
+            Portal Login
+          </Link>
           <a
             href="#contact"
-            className="block mt-4 text-center px-5 py-2.5 bg-primary text-primary-foreground font-display text-sm font-semibold rounded-sm"
+            onClick={() => setMobileOpen(false)}
+            className="block mt-2 text-center px-5 py-2.5 bg-primary text-primary-foreground font-display text-sm font-semibold rounded-sm"
           >
             Get Quote
           </a>
