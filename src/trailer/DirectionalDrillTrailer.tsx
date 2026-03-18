@@ -1,7 +1,8 @@
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { ContactShadows, Environment, OrbitControls } from "@react-three/drei";
 import * as THREE from "three";
+import { Maximize2, X } from "lucide-react";
 
 export type LengthOption = 4 | 6 | 8;
 export type AxleRating = 8000 | 10000 | 12000;
@@ -780,72 +781,161 @@ export default function TrailerViewer({
     [frontDeckLengthFt, axleRating, deckWood],
   );
 
+  const [isFullscreen, setIsFullscreen] = useState(false);
+
   return (
-    <div className="w-full h-[700px] bg-gradient-to-b from-sky-100 to-emerald-100 rounded-lg overflow-hidden border border-slate-300">
-      <Canvas
-        camera={{ position: [230, 105, 330], fov: 40, near: 1, far: 3200 }}
-        shadows
-      >
-        <CameraRig cameraView={cameraView} deckLength={dims.deckLength} />
-        <color attach="background" args={["#b9dcff"]} />
-
-        <ambientLight intensity={0.55} />
-        <hemisphereLight
-          intensity={0.33}
-          groundColor="#4b8a43"
-          color="#f8fcff"
-        />
-        <directionalLight
-          position={[180, 230, 140]}
-          intensity={1.1}
-          castShadow
-          shadow-mapSize={[2048, 2048]}
-        />
-
-        <Environment preset="city" />
-
-        <group position={[0, 0, 0]}>
-          <TrailerModel
-            frontDeckLengthFt={frontDeckLengthFt}
-            axleRating={axleRating}
-            deckWood={deckWood}
-            hitchType={hitchType}
-            tiltSide={tiltSide}
-            tiltAngleDeg={tiltAngleDeg}
-            showOptionalEquipment={showOptionalEquipment}
-            autoRotate={autoRotate}
-          />
-        </group>
-
-        <mesh
-          position={[0, -0.4, 0]}
-          rotation={[-Math.PI / 2, 0, 0]}
-          receiveShadow
+    <>
+      <div className="relative w-full h-[700px] bg-gray-200 rounded-lg overflow-hidden border border-slate-300">
+        <Canvas
+          camera={{ position: [230, 105, 330], fov: 40, near: 1, far: 3200 }}
+          shadows
         >
-          <planeGeometry args={[1200, 1200]} />
-          <meshStandardMaterial
-            color="#67a95e"
-            roughness={0.96}
-            metalness={0.02}
+          <CameraRig cameraView={cameraView} deckLength={dims.deckLength} />
+          <color attach="background" args={["#9ca3af"]} />
+
+          <ambientLight intensity={0.55} />
+          <hemisphereLight
+            intensity={0.33}
+            groundColor="#4b8a43"
+            color="#f8fcff"
           />
-        </mesh>
+          <directionalLight
+            position={[180, 230, 140]}
+            intensity={1.1}
+            castShadow
+            shadow-mapSize={[2048, 2048]}
+          />
 
-        <ContactShadows
-          position={[0, 0, 0]}
-          opacity={0.42}
-          scale={Math.max(560, dims.deckLength + 250)}
-          blur={2.7}
-          far={240}
-        />
+          <Environment preset="city" />
 
-        <OrbitControls
-          enablePan={true}
-          enableZoom={true}
-          enableRotate={cameraView === "perspective"}
-          minPolarAngle={0.01}
-          maxPolarAngle={Math.PI / 2 - 0.02}
-        />
-      </Canvas>
-    </div>
+          <group position={[0, 0, 0]}>
+            <TrailerModel
+              frontDeckLengthFt={frontDeckLengthFt}
+              axleRating={axleRating}
+              deckWood={deckWood}
+              hitchType={hitchType}
+              tiltSide={tiltSide}
+              tiltAngleDeg={tiltAngleDeg}
+              showOptionalEquipment={showOptionalEquipment}
+              autoRotate={autoRotate}
+            />
+          </group>
+
+          <mesh
+            position={[0, -0.4, 0]}
+            rotation={[-Math.PI / 2, 0, 0]}
+            receiveShadow
+          >
+            <planeGeometry args={[1200, 1200]} />
+            <meshStandardMaterial
+              color="#6b7280"
+              roughness={0.96}
+              metalness={0.02}
+            />
+          </mesh>
+
+          <ContactShadows
+            position={[0, 0, 0]}
+            opacity={0.42}
+            scale={Math.max(560, dims.deckLength + 250)}
+            blur={2.7}
+            far={240}
+          />
+
+          <OrbitControls
+            enablePan={true}
+            enableZoom={true}
+            enableRotate={cameraView === "perspective"}
+            minPolarAngle={0.01}
+            maxPolarAngle={Math.PI / 2 - 0.02}
+          />
+        </Canvas>
+        
+        <button
+          onClick={() => setIsFullscreen(true)}
+          className="absolute top-4 right-4 bg-white/90 hover:bg-white p-2 rounded-lg shadow-lg transition-colors"
+          title="Fullscreen"
+        >
+          <Maximize2 className="w-5 h-5 text-slate-700" />
+        </button>
+      </div>
+
+      {isFullscreen && (
+        <div className="fixed inset-0 z-50 bg-gray-300">
+          <Canvas
+            camera={{ position: [230, 105, 330], fov: 40, near: 1, far: 3200 }}
+            shadows
+          >
+            <CameraRig cameraView="perspective" deckLength={dims.deckLength} />
+            <color attach="background" args={["#9ca3af"]} />
+
+            <ambientLight intensity={0.55} />
+            <hemisphereLight
+              intensity={0.33}
+              groundColor="#6b7280"
+              color="#f8fcff"
+            />
+            <directionalLight
+              position={[180, 230, 140]}
+              intensity={1.1}
+              castShadow
+              shadow-mapSize={[2048, 2048]}
+            />
+
+            <Environment preset="city" />
+
+            <group position={[0, 0, 0]} rotation={[0, Math.PI / 2, 0]}>
+              <TrailerModel
+                frontDeckLengthFt={frontDeckLengthFt}
+                axleRating={axleRating}
+                deckWood={deckWood}
+                hitchType={hitchType}
+                tiltSide={tiltSide}
+                tiltAngleDeg={tiltAngleDeg}
+                showOptionalEquipment={showOptionalEquipment}
+                autoRotate={true}
+              />
+            </group>
+
+            <mesh
+              position={[0, -0.4, 0]}
+              rotation={[-Math.PI / 2, 0, 0]}
+              receiveShadow
+            >
+              <planeGeometry args={[1200, 1200]} />
+              <meshStandardMaterial
+                color="#6b7280"
+                roughness={0.96}
+                metalness={0.02}
+              />
+            </mesh>
+
+            <ContactShadows
+              position={[0, 0, 0]}
+              opacity={0.42}
+              scale={Math.max(560, dims.deckLength + 250)}
+              blur={2.7}
+              far={240}
+            />
+
+            <OrbitControls
+              enablePan={true}
+              enableZoom={true}
+              enableRotate={true}
+              minPolarAngle={0}
+              maxPolarAngle={Math.PI}
+            />
+          </Canvas>
+          
+          <button
+            onClick={() => setIsFullscreen(false)}
+            className="absolute top-4 right-4 bg-white/90 hover:bg-white p-3 rounded-lg shadow-lg transition-colors"
+            title="Exit Fullscreen"
+          >
+            <X className="w-6 h-6 text-slate-700" />
+          </button>
+        </div>
+      )}
+    </>
   );
 }
