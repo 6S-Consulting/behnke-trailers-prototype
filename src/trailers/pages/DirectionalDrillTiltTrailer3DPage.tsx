@@ -1,5 +1,6 @@
 import { useState } from "react";
-import TrailerViewer, { CameraView } from "@/trailers/DirectionalDrillTrailer";
+import TrailerViewer, { CameraView } from "@/trailers/old/DirectionalDrillTrailer";
+import TrailerScene from "@/trailers/new/TrailerScene";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -78,6 +79,21 @@ export function DirectionalDrillTiltTrailer3DPage() {
                 </label>
               </div>
             </aside>
+          </div>
+
+          {/* Second 3D model — enhanced prototype scene */}
+          <div className="mt-12">
+            <div className="mb-4">
+              <h2 className="font-display text-2xl font-black text-foreground">
+                Enhanced Prototype Model
+              </h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                Next-generation render — animated tilt, interactive controls
+              </p>
+            </div>
+            <div className="h-[700px] rounded-lg overflow-hidden border border-border">
+              <TrailerScene />
+            </div>
           </div>
 
           <div className="mt-8 flex gap-3">

@@ -7,9 +7,9 @@ import { AuthProvider, useAuth } from "@/context/AuthContext";
 import Index from "./pages/Index.tsx";
 import Login from "./pages/Login.tsx";
 import NotFound from "./pages/NotFound.tsx";
-import { TrailersPage } from "./trailers/TrailersPage.tsx";
-import { DirectionalDrillTiltTrailerDetails } from "./trailers/DirectionalDrillTiltTrailerDetails.tsx";
-import { DirectionalDrillTiltTrailer3DPage } from "./trailers/DirectionalDrillTiltTrailer3DPage.tsx";
+import { TrailersPage } from "./trailers/pages/TrailersPage.tsx";
+import { DirectionalDrillTiltTrailerDetails } from "./trailers/pages/DirectionalDrillTiltTrailerDetails.tsx";
+import { DirectionalDrillTiltTrailer3DPage } from "./trailers/pages/DirectionalDrillTiltTrailer3DPage.tsx";
 
 // Admin Pages
 import AdminDashboard from "./admin/AdminDashboard";

@@ -3,7 +3,7 @@ import { jsPDF } from "jspdf";
 import { FileText, MapPin, Shield } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { directionalDrillTiltTrailer } from "@/trailers/trailerData";
+import { directionalDrillTiltTrailer } from "@/trailers/data/trailerData";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
