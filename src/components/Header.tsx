@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
+import logo from "@/assets/logo/logo.png";
 
 const navLinks = [
   { label: "Industries", href: "#industries" },
@@ -28,16 +29,18 @@ const Header = () => {
       animate={{ y: 0 }}
       transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled ? "bg-background/95 backdrop-blur-md border-b border-border" : "bg-transparent"
+        scrolled
+          ? "bg-background/95 backdrop-blur-md border-b border-border"
+          : "bg-transparent"
       }`}
     >
       <div className="container mx-auto flex items-center justify-between h-20 px-6">
-        <Link to="/" className="font-display text-xl font-bold tracking-tight text-foreground">
-          BEHNKE<span className="text-primary">.</span>
+        <Link to="/" className="flex items-center">
+          <img src={logo} alt="Behnke Trailers" className="h-14 w-auto" />
         </Link>
 
         <nav className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) => (
+          {navLinks.map((link) =>
             link.isRoute ? (
               <Link
                 key={link.label}
@@ -54,8 +57,8 @@ const Header = () => {
               >
                 {link.label}
               </a>
-            )
-          ))}
+            ),
+          )}
         </nav>
 
         <div className="hidden md:flex items-center gap-4">
@@ -87,7 +90,7 @@ const Header = () => {
           animate={{ opacity: 1, y: 0 }}
           className="md:hidden bg-background/98 backdrop-blur-md border-b border-border px-6 pb-6"
         >
-          {navLinks.map((link) => (
+          {navLinks.map((link) =>
             link.isRoute ? (
               <Link
                 key={link.label}
@@ -106,8 +109,8 @@ const Header = () => {
               >
                 {link.label}
               </a>
-            )
-          ))}
+            ),
+          )}
           <Link
             to="/login"
             onClick={() => setMobileOpen(false)}
