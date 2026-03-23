@@ -51,21 +51,23 @@ const InventoryManagement = () => {
         </div>
 
         {view === 'table' ? (
-          <DataTable
+          <DataTable<Trailer>
             columns={[
-              { key: 'modelNumber', label: 'Model #', sortable: true, render: (t: any) => <span className="font-mono text-xs font-medium">{t.modelNumber}</span> },
+              { key: 'modelNumber', label: 'Model #', sortable: true, render: (t) => <span className="font-mono text-xs font-medium">{t.modelNumber}</span> },
               { key: 'name', label: 'Name', sortable: true },
-              { key: 'category', label: 'Category', render: (t: any) => <StatusBadge status={t.category} /> },
-              { key: 'subType', label: 'Sub-Type', render: (t: any) => <span className="text-xs">{t.subType}</span> },
-              { key: 'gvw', label: 'GVW', sortable: true, render: (t: any) => <span className="font-mono text-xs">{t.gvw.toLocaleString()} lb</span> },
-              { key: 'price', label: 'Price', sortable: true, render: (t: any) => <span className="font-mono text-xs">${t.price.toLocaleString()}</span> },
-              { key: 'inStock', label: 'Stock', sortable: true, render: (t: any) => <span className="font-mono text-xs">{t.inStock}</span> },
-              { key: 'status', label: 'Status', render: (t: any) => <StatusBadge status={t.status} /> },
-              { key: 'actions', label: '', render: (t: any) => (
-                <button onClick={(e) => { e.stopPropagation(); setDetailTrailer(t); }} className="text-xs text-primary hover:underline font-display uppercase tracking-wide">
-                  View
-                </button>
-              )},
+              { key: 'category', label: 'Category', render: (t) => <StatusBadge status={t.category} /> },
+              { key: 'subType', label: 'Sub-Type', render: (t) => <span className="text-xs">{t.subType}</span> },
+              { key: 'gvw', label: 'GVW', sortable: true, render: (t) => <span className="font-mono text-xs">{t.gvw.toLocaleString()} lb</span> },
+              { key: 'price', label: 'Price', sortable: true, render: (t) => <span className="font-mono text-xs">${t.price.toLocaleString()}</span> },
+              { key: 'inStock', label: 'Stock', sortable: true, render: (t) => <span className="font-mono text-xs">{t.inStock}</span> },
+              { key: 'status', label: 'Status', render: (t) => <StatusBadge status={t.status} /> },
+              {
+                key: 'actions', label: '', render: (t) => (
+                  <button onClick={(e) => { e.stopPropagation(); setDetailTrailer(t); }} className="text-xs text-primary hover:underline font-display uppercase tracking-wide">
+                    View
+                  </button>
+                )
+              },
             ]}
             data={filtered}
             searchable

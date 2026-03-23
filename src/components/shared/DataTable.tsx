@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { ChevronUp, ChevronDown, Search } from 'lucide-react';
 
-interface Column<T = any> {
+export interface Column<T> {
   key: string;
   label: string;
   sortable?: boolean;
@@ -19,7 +19,7 @@ interface DataTableProps<T> {
   pageSize?: number;
 }
 
-export function DataTable<T extends Record<string, any>>({
+export function DataTable<T extends object>({
   columns, data, onRowClick, searchable = false, searchPlaceholder = 'Search...', pageSize = 10
 }: DataTableProps<T>) {
   const [sortKey, setSortKey] = useState<string | null>(null);
@@ -33,10 +33,10 @@ export function DataTable<T extends Record<string, any>>({
 
   const sorted = sortKey
     ? [...filtered].sort((a, b) => {
-        const av = a[sortKey], bv = b[sortKey];
-        const cmp = typeof av === 'number' ? av - bv : String(av).localeCompare(String(bv));
-        return sortDir === 'asc' ? cmp : -cmp;
-      })
+      const av = a[sortKey], bv = b[sortKey];
+      const cmp = typeof av === 'number' ? av - bv : String(av).localeCompare(String(bv));
+      return sortDir === 'asc' ? cmp : -cmp;
+    })
     : filtered;
 
   const totalPages = Math.ceil(sorted.length / pageSize);

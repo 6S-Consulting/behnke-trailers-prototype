@@ -138,6 +138,9 @@ export interface Order {
   updatedDate: string;
   estimatedDelivery?: string;
   notes: string;
+  // Optional linkage used by the prototype to keep lifecycle synced.
+  quoteId?: string;
+  customerId?: string;
 }
 
 export interface QuoteItem {

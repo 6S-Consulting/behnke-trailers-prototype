@@ -3,24 +3,35 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { DataTable } from '@/components/shared/DataTable';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { Modal } from '@/components/shared/Modal';
-import { quotes } from '@/data/quotes';
-import { dealers } from '@/data/dealers';
 import { Quote } from '@/types';
 import { toast } from 'sonner';
-
-const customerId = 'c1';
-const myQuotes = quotes.filter(q => q.toId === customerId);
+import { useAuth } from '@/context/AuthContext';
+import { useAppData } from '@/context/AppDataContext';
 
 const CustomerQuotes = () => {
   const [detail, setDetail] = useState<Quote | null>(null);
   const [modOpen, setModOpen] = useState(false);
+  const { user } = useAuth();
+  const { state, actions } = useAppData();
+
+  const myQuotes = state.quotes.filter(q => q.toId === (user?.id ?? ''));
 
   const handleAccept = (q: Quote) => {
+    const updated = actions.updateQuoteStatus(q.id, 'Accepted');
+    if (!updated) {
+      toast.error('Could not accept quote');
+      return;
+    }
     setDetail(null);
     toast.success('Quote accepted! Your dealer will be in touch to finalize your order.');
   };
 
   const handleReject = (q: Quote) => {
+    const updated = actions.updateQuoteStatus(q.id, 'Rejected');
+    if (!updated) {
+      toast.error('Could not reject quote');
+      return;
+    }
     setDetail(null);
     toast.info('Quote rejected.');
   };
@@ -31,20 +42,22 @@ const CustomerQuotes = () => {
         <h1 className="font-display text-2xl font-bold uppercase tracking-wide">My Quotes</h1>
 
         <div className="bg-card rounded-lg shadow-industrial p-4">
-          <DataTable
+          <DataTable<Quote>
             columns={[
-              { key: 'quoteNumber', label: 'Quote #', sortable: true, render: (q: any) => <span className="font-mono text-xs">{q.quoteNumber}</span> },
-              { key: 'trailer', label: 'Trailer', render: (q: any) => <span className="text-xs">{q.items[0]?.name}</span> },
-              { key: 'createdDate', label: 'Created', render: (q: any) => <span className="text-xs">{q.createdDate}</span> },
-              { key: 'validUntil', label: 'Valid Until', render: (q: any) => <span className="text-xs">{q.validUntil}</span> },
-              { key: 'total', label: 'Total', sortable: true, render: (q: any) => <span className="font-mono text-xs font-medium">${q.total.toLocaleString()}</span> },
-              { key: 'status', label: 'Status', render: (q: any) => <StatusBadge status={q.status} /> },
-              { key: 'actions', label: '', render: (q: any) => (
-                <button onClick={(e) => { e.stopPropagation(); setDetail(q); }} className="text-xs text-primary hover:underline font-display uppercase tracking-wide">View</button>
-              )},
+              { key: 'quoteNumber', label: 'Quote #', sortable: true, render: (q) => <span className="font-mono text-xs">{q.quoteNumber}</span> },
+              { key: 'trailer', label: 'Trailer', render: (q) => <span className="text-xs">{q.items[0]?.name}</span> },
+              { key: 'createdDate', label: 'Created', render: (q) => <span className="text-xs">{q.createdDate}</span> },
+              { key: 'validUntil', label: 'Valid Until', render: (q) => <span className="text-xs">{q.validUntil}</span> },
+              { key: 'total', label: 'Total', sortable: true, render: (q) => <span className="font-mono text-xs font-medium">${q.total.toLocaleString()}</span> },
+              { key: 'status', label: 'Status', render: (q) => <StatusBadge status={q.status} /> },
+              {
+                key: 'actions', label: '', render: (q) => (
+                  <button onClick={(e) => { e.stopPropagation(); setDetail(q); }} className="text-xs text-primary hover:underline font-display uppercase tracking-wide">View</button>
+                )
+              },
             ]}
             data={myQuotes}
-            onRowClick={(q: any) => setDetail(q)}
+            onRowClick={(q) => setDetail(q)}
           />
         </div>
 
@@ -64,7 +77,7 @@ const CustomerQuotes = () => {
                 </div>
                 <div className="mb-4 text-sm">
                   <span className="text-[10px] font-mono uppercase text-muted-foreground block">From</span>
-                  {dealers.find(d => d.id === detail.fromId)?.name}
+                  {state.dealers.find(d => d.id === detail.fromId)?.name}
                 </div>
                 <table className="w-full text-sm mb-4">
                   <thead><tr className="border-b border-border">

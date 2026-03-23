@@ -3,18 +3,23 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { DataTable } from '@/components/shared/DataTable';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { Modal } from '@/components/shared/Modal';
-import { quotes } from '@/data/quotes';
-import { customers } from '@/data/customers';
-import { trailers } from '@/data/trailers';
 import { Quote } from '@/types';
 import { toast } from 'sonner';
-
-const dealerId = 'd1';
-const myQuotes = quotes.filter(q => q.fromId === dealerId);
+import { useAuth } from '@/context/AuthContext';
+import { useAppData } from '@/context/AppDataContext';
 
 const DealerQuotes = () => {
   const [detailQuote, setDetailQuote] = useState<Quote | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
+  const { user } = useAuth();
+  const { state, actions } = useAppData();
+
+  const dealerId = user?.id ?? '';
+  const myQuotes = state.quotes.filter(q => q.fromId === dealerId);
+
+  const [selectedCustomerId, setSelectedCustomerId] = useState('');
+  const [selectedTrailerId, setSelectedTrailerId] = useState('');
+  const [notes, setNotes] = useState('');
 
   return (
     <DashboardLayout>
@@ -27,19 +32,19 @@ const DealerQuotes = () => {
         </div>
 
         <div className="bg-card rounded-lg shadow-industrial p-4">
-          <DataTable
+          <DataTable<Quote>
             columns={[
-              { key: 'quoteNumber', label: 'Quote #', sortable: true, render: (q: any) => <span className="font-mono text-xs">{q.quoteNumber}</span> },
-              { key: 'customer', label: 'Customer', render: (q: any) => <span className="text-xs">{customers.find(c => c.id === q.toId)?.name}</span> },
-              { key: 'items', label: 'Trailer', render: (q: any) => <span className="text-xs">{q.items[0]?.name}</span> },
-              { key: 'total', label: 'Total', sortable: true, render: (q: any) => <span className="font-mono text-xs font-medium">${q.total.toLocaleString()}</span> },
-              { key: 'createdDate', label: 'Created', render: (q: any) => <span className="text-xs">{q.createdDate}</span> },
-              { key: 'validUntil', label: 'Valid Until', render: (q: any) => <span className="text-xs">{q.validUntil}</span> },
-              { key: 'status', label: 'Status', render: (q: any) => <StatusBadge status={q.status} /> },
+              { key: 'quoteNumber', label: 'Quote #', sortable: true, render: (q) => <span className="font-mono text-xs">{q.quoteNumber}</span> },
+              { key: 'customer', label: 'Customer', render: (q) => <span className="text-xs">{state.customers.find(c => c.id === q.toId)?.name}</span> },
+              { key: 'items', label: 'Trailer', render: (q) => <span className="text-xs">{q.items[0]?.name}</span> },
+              { key: 'total', label: 'Total', sortable: true, render: (q) => <span className="font-mono text-xs font-medium">${q.total.toLocaleString()}</span> },
+              { key: 'createdDate', label: 'Created', render: (q) => <span className="text-xs">{q.createdDate}</span> },
+              { key: 'validUntil', label: 'Valid Until', render: (q) => <span className="text-xs">{q.validUntil}</span> },
+              { key: 'status', label: 'Status', render: (q) => <StatusBadge status={q.status} /> },
             ]}
             data={myQuotes}
             searchable
-            onRowClick={(q: any) => setDetailQuote(q)}
+            onRowClick={(q) => setDetailQuote(q)}
           />
         </div>
 
@@ -63,7 +68,7 @@ const DealerQuotes = () => {
                 <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
                   <div>
                     <span className="text-[10px] font-mono uppercase text-muted-foreground block">Customer</span>
-                    {customers.find(c => c.id === detailQuote.toId)?.name}
+                    {state.customers.find(c => c.id === detailQuote.toId)?.name}
                   </div>
                   <div>
                     <span className="text-[10px] font-mono uppercase text-muted-foreground block">Valid Until</span>
@@ -111,8 +116,32 @@ const DealerQuotes = () => {
               </div>
 
               <div className="flex gap-2">
-                <button onClick={() => { setDetailQuote(null); toast.success('Quote resent'); }} className="px-3 py-1.5 bg-primary text-primary-foreground rounded-sm text-xs font-display uppercase tracking-wide">Resend</button>
-                <button onClick={() => { setDetailQuote(null); toast.success('Converted to order'); }} className="px-3 py-1.5 border border-border rounded-sm text-xs font-display uppercase tracking-wide hover:bg-muted">Convert to Order</button>
+                <button
+                  onClick={() => {
+                    if (!detailQuote) return;
+                    actions.updateQuoteStatus(detailQuote.id, 'Sent');
+                    setDetailQuote(null);
+                    toast.success('Quote re-sent to customer');
+                  }}
+                  className="px-3 py-1.5 bg-primary text-primary-foreground rounded-sm text-xs font-display uppercase tracking-wide"
+                >
+                  Resend
+                </button>
+                <button
+                  onClick={() => {
+                    if (!detailQuote) return;
+                    const order = actions.convertQuoteToOrder({ quoteId: detailQuote.id });
+                    if (!order) {
+                      toast.error('Quote must be Accepted to convert.');
+                      return;
+                    }
+                    setDetailQuote(null);
+                    toast.success(`Converted to order ${order.orderNumber}`);
+                  }}
+                  className="px-3 py-1.5 border border-border rounded-sm text-xs font-display uppercase tracking-wide hover:bg-muted"
+                >
+                  Convert to Order
+                </button>
               </div>
             </div>
           )}
@@ -123,23 +152,59 @@ const DealerQuotes = () => {
           <div className="space-y-3">
             <div>
               <label className="text-[10px] font-mono uppercase text-muted-foreground block mb-1">Customer</label>
-              <select className="w-full border border-border rounded-md p-2 text-sm bg-card">
-                {customers.filter(c => c.assignedDealerId === dealerId).map(c => (
+              <select
+                className="w-full border border-border rounded-md p-2 text-sm bg-card"
+                value={selectedCustomerId}
+                onChange={e => setSelectedCustomerId(e.target.value)}
+              >
+                {state.customers.filter(c => c.assignedDealerId === dealerId).map(c => (
                   <option key={c.id} value={c.id}>{c.name} — {c.company}</option>
                 ))}
               </select>
             </div>
             <div>
               <label className="text-[10px] font-mono uppercase text-muted-foreground block mb-1">Trailer</label>
-              <select className="w-full border border-border rounded-md p-2 text-sm bg-card">
-                {trailers.map(t => <option key={t.id} value={t.id}>{t.modelNumber} — {t.name} — ${t.price.toLocaleString()}</option>)}
+              <select
+                className="w-full border border-border rounded-md p-2 text-sm bg-card"
+                value={selectedTrailerId}
+                onChange={e => setSelectedTrailerId(e.target.value)}
+              >
+                {state.trailers.map(t => (
+                  <option key={t.id} value={t.id}>{t.modelNumber} — {t.name} — ${t.price.toLocaleString()}</option>
+                ))}
               </select>
             </div>
             <div>
               <label className="text-[10px] font-mono uppercase text-muted-foreground block mb-1">Notes</label>
-              <textarea rows={3} className="w-full border border-border rounded-md p-2 text-sm bg-card" />
+              <textarea
+                rows={3}
+                value={notes}
+                onChange={e => setNotes(e.target.value)}
+                className="w-full border border-border rounded-md p-2 text-sm bg-card"
+              />
             </div>
-            <button onClick={() => { setCreateOpen(false); toast.success('Quote created'); }} className="px-4 py-2 bg-primary text-primary-foreground rounded-sm text-xs font-display uppercase tracking-wide">
+            <button
+              onClick={() => {
+                if (!user) return;
+                if (!selectedCustomerId || !selectedTrailerId) {
+                  toast.error('Select a customer and trailer');
+                  return;
+                }
+                actions.createQuoteFromDealer({
+                  dealerId: user.id,
+                  customerId: selectedCustomerId,
+                  trailerId: selectedTrailerId,
+                  quantity: 1,
+                  notes,
+                });
+                setCreateOpen(false);
+                setNotes('');
+                setSelectedTrailerId('');
+                setSelectedCustomerId('');
+                toast.success('Quote created and sent to customer');
+              }}
+              className="px-4 py-2 bg-primary text-primary-foreground rounded-sm text-xs font-display uppercase tracking-wide"
+            >
               Send to Customer
             </button>
           </div>

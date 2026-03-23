@@ -3,22 +3,25 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { DataTable } from '@/components/shared/DataTable';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { Modal } from '@/components/shared/Modal';
-import { orders } from '@/data/orders';
-import { trailers } from '@/data/trailers';
-import { customers } from '@/data/customers';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-
-const dealerId = 'd1';
+import { useAuth } from '@/context/AuthContext';
+import { useAppData } from '@/context/AppDataContext';
+import { Order } from '@/types';
 
 const DealerOrders = () => {
+  const { user } = useAuth();
+  const { state, actions } = useAppData();
   const [tab, setTab] = useState<'behnke' | 'customer'>('behnke');
   const [wizardOpen, setWizardOpen] = useState(false);
   const [wizardStep, setWizardStep] = useState(1);
   const [selectedTrailer, setSelectedTrailer] = useState<string | null>(null);
+  const [quantity, setQuantity] = useState(1);
+  const [orderNotes, setOrderNotes] = useState('');
 
-  const myOrders = orders.filter(o => o.fromId === dealerId && o.fromType === 'Dealer');
-  const custOrders = orders.filter(o => o.toId === dealerId && o.toType === 'Dealer');
+  const dealerId = user?.id ?? '';
+  const myOrders = state.orders.filter(o => o.fromId === dealerId && o.fromType === 'Dealer');
+  const custOrders = state.orders.filter(o => o.toId === dealerId && o.toType === 'Dealer');
 
   const statusSteps = ['Draft', 'Submitted', 'Under Review', 'Approved', 'In Production', 'Shipped', 'Delivered'];
 
@@ -42,15 +45,15 @@ const DealerOrders = () => {
         </div>
 
         <div className="bg-card rounded-lg shadow-industrial p-4">
-          <DataTable
+          <DataTable<Order>
             columns={[
-              { key: 'orderNumber', label: 'Order #', sortable: true, render: (o: any) => <span className="font-mono text-xs">{o.orderNumber}</span> },
-              { key: 'trailerName', label: 'Trailer', render: (o: any) => <span className="text-xs">{o.trailerName}</span> },
-              { key: 'type', label: 'Type', render: (o: any) => <StatusBadge status={o.type} /> },
-              { key: 'quantity', label: 'Qty', render: (o: any) => <span className="font-mono text-xs">{o.quantity}</span> },
-              { key: 'totalPrice', label: 'Total', sortable: true, render: (o: any) => <span className="font-mono text-xs">${o.totalPrice.toLocaleString()}</span> },
-              { key: 'status', label: 'Status', render: (o: any) => <StatusBadge status={o.status} /> },
-              { key: 'createdDate', label: 'Date', render: (o: any) => <span className="text-xs">{o.createdDate}</span> },
+              { key: 'orderNumber', label: 'Order #', sortable: true, render: (o) => <span className="font-mono text-xs">{o.orderNumber}</span> },
+              { key: 'trailerName', label: 'Trailer', render: (o) => <span className="text-xs">{o.trailerName}</span> },
+              { key: 'type', label: 'Type', render: (o) => <StatusBadge status={o.type} /> },
+              { key: 'quantity', label: 'Qty', render: (o) => <span className="font-mono text-xs">{o.quantity}</span> },
+              { key: 'totalPrice', label: 'Total', sortable: true, render: (o) => <span className="font-mono text-xs">${o.totalPrice.toLocaleString()}</span> },
+              { key: 'status', label: 'Status', render: (o) => <StatusBadge status={o.status} /> },
+              { key: 'createdDate', label: 'Date', render: (o) => <span className="text-xs">{o.createdDate}</span> },
             ]}
             data={tab === 'behnke' ? myOrders : custOrders}
             searchable
@@ -78,7 +81,7 @@ const DealerOrders = () => {
               <div className="space-y-2">
                 <p className="text-sm text-muted-foreground">Select a trailer from the catalog:</p>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-60 overflow-y-auto">
-                  {trailers.slice(0, 8).map(t => (
+                  {state.trailers.slice(0, 8).map(t => (
                     <button
                       key={t.id}
                       onClick={() => setSelectedTrailer(t.id)}
@@ -101,11 +104,23 @@ const DealerOrders = () => {
                 <p className="text-sm text-muted-foreground">Customize your order:</p>
                 <div>
                   <label className="text-[10px] font-mono uppercase text-muted-foreground block mb-1">Quantity</label>
-                  <input type="number" defaultValue={1} min={1} className="w-20 border border-border rounded-md p-2 text-sm bg-card" />
+                  <input
+                    type="number"
+                    value={quantity}
+                    min={1}
+                    onChange={e => setQuantity(Math.max(1, Number(e.target.value)))}
+                    className="w-20 border border-border rounded-md p-2 text-sm bg-card"
+                  />
                 </div>
                 <div>
                   <label className="text-[10px] font-mono uppercase text-muted-foreground block mb-1">Notes</label>
-                  <textarea rows={3} className="w-full border border-border rounded-md p-2 text-sm bg-card" placeholder="Special requirements..." />
+                  <textarea
+                    rows={3}
+                    value={orderNotes}
+                    onChange={e => setOrderNotes(e.target.value)}
+                    className="w-full border border-border rounded-md p-2 text-sm bg-card"
+                    placeholder="Special requirements..."
+                  />
                 </div>
                 <div className="flex gap-2">
                   <button onClick={() => setWizardStep(1)} className="px-4 py-2 border border-border rounded-sm text-xs font-display uppercase tracking-wide">← Back</button>
@@ -118,7 +133,7 @@ const DealerOrders = () => {
               <div className="space-y-3">
                 <p className="text-sm font-medium">Order Summary</p>
                 {selectedTrailer && (() => {
-                  const t = trailers.find(tr => tr.id === selectedTrailer);
+                  const t = state.trailers.find(tr => tr.id === selectedTrailer);
                   return t ? (
                     <div className="bg-muted/30 rounded-md p-3">
                       <p className="font-mono text-xs">{t.modelNumber}</p>
@@ -129,7 +144,27 @@ const DealerOrders = () => {
                 })()}
                 <div className="flex gap-2">
                   <button onClick={() => setWizardStep(2)} className="px-4 py-2 border border-border rounded-sm text-xs font-display uppercase tracking-wide">← Back</button>
-                  <button onClick={() => { setWizardOpen(false); toast.success('Order submitted to Behnke!'); }} className="px-4 py-2 bg-primary text-primary-foreground rounded-sm text-xs font-display uppercase tracking-wide">Submit Order</button>
+                  <button
+                    onClick={() => {
+                      if (!selectedTrailer) return;
+                      if (!user) return;
+                      const newOrder = actions.submitDealerOrderToBehnke({
+                        dealerId: user.id,
+                        trailerId: selectedTrailer,
+                        quantity,
+                        notes: orderNotes,
+                      });
+                      setWizardOpen(false);
+                      setWizardStep(1);
+                      setSelectedTrailer(null);
+                      setQuantity(1);
+                      setOrderNotes('');
+                      toast.success(`Order submitted: ${newOrder.orderNumber}`);
+                    }}
+                    className="px-4 py-2 bg-primary text-primary-foreground rounded-sm text-xs font-display uppercase tracking-wide"
+                  >
+                    Submit Order
+                  </button>
                 </div>
               </div>
             )}

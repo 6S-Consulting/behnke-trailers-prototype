@@ -4,17 +4,9 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { MetricCard } from '@/components/shared/MetricCard';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { DataTable } from '@/components/shared/DataTable';
-import { soldTrailers } from '@/data/soldTrailers';
-import { customers } from '@/data/customers';
-import { dealers } from '@/data/dealers';
 import { CheckCircle, AlertTriangle, XCircle, Calendar } from 'lucide-react';
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
-
-const healthCounts = {
-  Good: soldTrailers.filter(t => t.sensorData.overallHealth === 'Good').length,
-  Warning: soldTrailers.filter(t => t.sensorData.overallHealth === 'Warning').length,
-  Critical: soldTrailers.filter(t => t.sensorData.overallHealth === 'Critical').length,
-};
+import { useAppData } from '@/context/AppDataContext';
 
 const radarData = [
   { subject: 'Axle Temp', A: 75 },
@@ -27,6 +19,20 @@ const radarData = [
 
 const TrailerHealthOverview = () => {
   const navigate = useNavigate();
+  const { state } = useAppData();
+
+  const healthCounts = {
+    Good: state.soldTrailers.filter(t => t.sensorData.overallHealth === 'Good').length,
+    Warning: state.soldTrailers.filter(t => t.sensorData.overallHealth === 'Warning').length,
+    Critical: state.soldTrailers.filter(t => t.sensorData.overallHealth === 'Critical').length,
+  };
+
+  const dueSoonCount = state.soldTrailers.filter(st => {
+    const due = new Date(st.nextMaintenanceDue + 'T00:00:00').getTime();
+    const now = Date.now();
+    const diffDays = (due - now) / (1000 * 60 * 60 * 24);
+    return diffDays >= 0 && diffDays <= 30;
+  }).length;
 
   return (
     <DashboardLayout>
@@ -40,7 +46,7 @@ const TrailerHealthOverview = () => {
           <MetricCard title="Healthy" value={healthCounts.Good} icon={CheckCircle} />
           <MetricCard title="Warning" value={healthCounts.Warning} icon={AlertTriangle} />
           <MetricCard title="Critical" value={healthCounts.Critical} icon={XCircle} />
-          <MetricCard title="Maint. Due Soon" value={14} icon={Calendar} />
+          <MetricCard title="Maint. Due Soon" value={dueSoonCount} icon={Calendar} />
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
@@ -58,9 +64,9 @@ const TrailerHealthOverview = () => {
 
           <div className="lg:col-span-2 bg-card rounded-lg shadow-industrial p-4">
             <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-3">Alert Feed</h3>
-            {soldTrailers.filter(t => t.sensorData.overallHealth !== 'Good').map(t => {
-              const cust = customers.find(c => c.id === t.customerId);
-              const dlr = dealers.find(d => d.id === t.dealerId);
+              {state.soldTrailers.filter(t => t.sensorData.overallHealth !== 'Good').map(t => {
+                const cust = state.customers.find(c => c.id === t.customerId);
+                const dlr = state.dealers.find(d => d.id === t.dealerId);
               return (
                 <div key={t.id} className="flex items-center justify-between py-2 border-b border-border last:border-0">
                   <div className="flex items-center gap-3">
@@ -88,12 +94,12 @@ const TrailerHealthOverview = () => {
               { key: 'vin', label: 'VIN', sortable: true, render: (t) => <span className="font-mono text-xs">{t.vin}</span> },
               { key: 'modelNumber', label: 'Model', sortable: true },
               { key: 'category', label: 'Category', render: (t) => <StatusBadge status={t.category} /> },
-              { key: 'customer', label: 'Customer', render: (t) => <span className="text-xs">{customers.find(c => c.id === t.customerId)?.name}</span> },
-              { key: 'dealer', label: 'Dealer', render: (t) => <span className="text-xs">{dealers.find(d => d.id === t.dealerId)?.name}</span> },
+              { key: 'customer', label: 'Customer', render: (t) => <span className="text-xs">{state.customers.find(c => c.id === t.customerId)?.name}</span> },
+              { key: 'dealer', label: 'Dealer', render: (t) => <span className="text-xs">{state.dealers.find(d => d.id === t.dealerId)?.name}</span> },
               { key: 'mileage', label: 'Mileage', sortable: true, render: (t) => <span className="font-mono text-xs">{t.sensorData.mileage.toLocaleString()}</span> },
               { key: 'health', label: 'Health', render: (t) => <StatusBadge status={t.sensorData.overallHealth} breathing /> },
             ]}
-            data={soldTrailers}
+            data={state.soldTrailers}
             searchable
             onRowClick={(t) => navigate(`/admin/health/${t.vin}`)}
           />

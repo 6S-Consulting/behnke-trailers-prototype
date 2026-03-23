@@ -1,41 +1,63 @@
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { DataTable } from '@/components/shared/DataTable';
 import { StatusBadge } from '@/components/shared/StatusBadge';
-import { trailers } from '@/data/trailers';
 import { toast } from 'sonner';
-
-// Simulated dealer stock (subset of trailers with quantities)
-const dealerStock = trailers.slice(0, 10).map(t => ({
-  ...t,
-  dealerQty: Math.floor(Math.random() * 5) + 1,
-  dealerStatus: Math.random() > 0.7 ? 'Low Stock' as const : 'In Stock' as const,
-}));
+import { useAuth } from '@/context/AuthContext';
+import { useAppData } from '@/context/AppDataContext';
+import { Trailer } from '@/types';
 
 const DealerStock = () => {
+  const { user } = useAuth();
+  const { state, actions } = useAppData();
+
+  const dealerQtyRows = state.trailers.slice(0, 12).map(t => ({
+    ...t,
+    dealerQty: t.inStock,
+    dealerStatus: t.inStock < 3 ? ('Low Stock' as const) : ('In Stock' as const),
+  }));
+
   return (
     <DashboardLayout>
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h1 className="font-display text-2xl font-bold uppercase tracking-wide">My Inventory</h1>
-          <button onClick={() => toast.info('Restock request form — coming soon')} className="px-3 py-1.5 bg-primary text-primary-foreground rounded-sm text-xs font-display uppercase tracking-wide">
+          <button onClick={() => toast.info('Use Restock per row to request inventory')} className="px-3 py-1.5 bg-primary text-primary-foreground rounded-sm text-xs font-display uppercase tracking-wide">
             Request Restock
           </button>
         </div>
-
+// Inside DealerStock:
         <div className="bg-card rounded-lg shadow-industrial p-4">
-          <DataTable
+          <DataTable<Trailer & { dealerQty: number; dealerStatus: string }>
             columns={[
-              { key: 'modelNumber', label: 'Model #', sortable: true, render: (t: any) => <span className="font-mono text-xs font-medium">{t.modelNumber}</span> },
+              { key: 'modelNumber', label: 'Model #', sortable: true, render: (t) => <span className="font-mono text-xs font-medium">{t.modelNumber}</span> },
               { key: 'name', label: 'Name', sortable: true },
-              { key: 'category', label: 'Category', render: (t: any) => <StatusBadge status={t.category} /> },
-              { key: 'price', label: 'Price', sortable: true, render: (t: any) => <span className="font-mono text-xs">${t.price.toLocaleString()}</span> },
-              { key: 'dealerQty', label: 'Qty', sortable: true, render: (t: any) => <span className="font-mono text-xs">{t.dealerQty}</span> },
-              { key: 'dealerStatus', label: 'Status', render: (t: any) => <StatusBadge status={t.dealerStatus === 'Low Stock' ? 'Low Stock' : 'Available'} /> },
-              { key: 'actions', label: '', render: () => (
-                <button onClick={() => toast.success('Restock request submitted')} className="text-xs text-primary hover:underline font-display uppercase tracking-wide">Restock</button>
-              )},
+              { key: 'category', label: 'Category', render: (t) => <StatusBadge status={t.category} /> },
+              { key: 'price', label: 'Price', sortable: true, render: (t) => <span className="font-mono text-xs">${t.price.toLocaleString()}</span> },
+              { key: 'dealerQty', label: 'Qty', sortable: true, render: (t) => <span className="font-mono text-xs">{t.dealerQty}</span> },
+              { key: 'dealerStatus', label: 'Status', render: (t) => <StatusBadge status={t.dealerStatus === 'Low Stock' ? 'Low Stock' : 'Available'} /> },
+              {
+                key: 'actions', label: '', render: (row) => (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      const dealerId = user?.id;
+                      if (!dealerId) return;
+                      const newOrder = actions.submitDealerOrderToBehnke({
+                        dealerId,
+                        trailerId: row.id,
+                        quantity: 1,
+                        notes: 'Restock requested from inventory page.',
+                      });
+                      toast.success(`Restock requested: ${newOrder.orderNumber}`);
+                    }}
+                    className="text-xs text-primary hover:underline font-display uppercase tracking-wide"
+                  >
+                    Restock
+                  </button>
+                )
+              },
             ]}
-            data={dealerStock}
+            data={dealerQtyRows}
             searchable
           />
         </div>

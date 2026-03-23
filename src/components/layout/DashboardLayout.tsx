@@ -2,10 +2,10 @@ import { ReactNode, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { UserRole } from '@/types';
-import { notifications } from '@/data/notifications';
+import { useAppData } from '@/context/AppDataContext';
 import {
   BarChart3, Package, Store, Heart, Wrench, ClipboardList, Bell, Settings2,
-  ShoppingCart, MessageSquare, Boxes, Home, Phone, LogOut, ChevronDown, Menu, X
+  ShoppingCart, MessageSquare, Boxes, Home, Phone, LogOut, ChevronDown, Menu, X, Truck
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -33,6 +33,7 @@ const dealerNav: NavItem[] = [
 
 const customerNav: NavItem[] = [
   { label: 'My Dashboard', path: '/customer', icon: Home },
+  { label: 'My Orders', path: '/customer/orders', icon: Truck },
   { label: 'Trailer Health', path: '/customer/health', icon: Heart },
   { label: 'My Quotes', path: '/customer/quotes', icon: MessageSquare },
   { label: 'Contact Dealer', path: '/customer/contact', icon: Phone },
@@ -56,6 +57,7 @@ const getBrandTitle = (role: UserRole) => {
 
 export const DashboardLayout = ({ children }: { children: ReactNode }) => {
   const { user, role, switchRole, logout } = useAuth();
+  const { state, actions } = useAppData();
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -65,7 +67,7 @@ export const DashboardLayout = ({ children }: { children: ReactNode }) => {
   if (!user || !role) return null;
 
   const nav = getNav(role);
-  const userNotifs = notifications.filter(n =>
+  const userNotifs = state.notifications.filter(n =>
     (n.recipientId === user.id) || (role === 'admin' && n.recipientType === 'Admin')
   );
   const unread = userNotifs.filter(n => !n.read).length;
@@ -139,7 +141,16 @@ export const DashboardLayout = ({ children }: { children: ReactNode }) => {
         {/* Header */}
         <header className="h-14 bg-card/50 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-4 lg:px-8 shrink-0">
           <div className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.2em] pl-10 lg:pl-0">
-            {location.pathname.split('/').filter(Boolean).join(' / ')}
+            {location.pathname.split('/').filter(Boolean).map(seg => {
+              const labels: Record<string, string> = {
+                admin: 'Admin', dealer: 'Dealer', customer: 'Customer',
+                inventory: 'Inventory', dealers: 'Dealers', health: 'Health',
+                maintenance: 'Maintenance', orders: 'Orders', quotes: 'Quotes',
+                stock: 'Stock', contact: 'Contact', notifications: 'Notifications',
+                settings: 'Settings',
+              };
+              return labels[seg] ?? seg;
+            }).join(' / ')}
           </div>
           <div className="flex items-center gap-3">
             {/* Role switcher */}
@@ -188,11 +199,33 @@ export const DashboardLayout = ({ children }: { children: ReactNode }) => {
                     <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Notifications</span>
                   </div>
                   {userNotifs.slice(0, 8).map(n => (
-                    <div key={n.id} className={cn('px-3 py-2 border-b border-border last:border-0', !n.read && 'bg-primary/5')}>
+                    <button
+                      key={n.id}
+                      onClick={() => {
+                        actions.markNotificationRead(n.id);
+                        if (n.actionUrl) navigate(n.actionUrl);
+                        setNotifDrop(false);
+                      }}
+                      className={cn(
+                        'w-full text-left px-3 py-2 border-b border-border last:border-0 transition-colors',
+                        !n.read ? 'bg-primary/5 hover:bg-primary/10' : 'hover:bg-white/5'
+                      )}
+                    >
                       <p className="text-xs font-medium">{n.title}</p>
                       <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">{n.message}</p>
-                    </div>
+                    </button>
                   ))}
+                  <div className="px-3 py-2 border-t border-border">
+                    <button
+                      onClick={() => {
+                        setNotifDrop(false);
+                        navigate(`/${role}/notifications`);
+                      }}
+                      className="w-full text-xs font-display uppercase tracking-wide text-primary hover:underline"
+                    >
+                      View All
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -212,7 +245,7 @@ export const DashboardLayout = ({ children }: { children: ReactNode }) => {
         {/* Footer */}
         <footer className="h-8 border-t border-white/5 flex items-center justify-center shrink-0">
           <span className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-widest">
-            © 2025 Behnke Enterprises, Inc. | Farley, IA | (563) 744-3246
+            © 2026 Behnke Enterprises, Inc. | Farley, IA | (563) 744-3246
           </span>
         </footer>
       </div>

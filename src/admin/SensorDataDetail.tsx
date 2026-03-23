@@ -4,25 +4,28 @@ import { SensorGauge } from '@/components/shared/SensorGauge';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { DataTable } from '@/components/shared/DataTable';
 import { Modal } from '@/components/shared/Modal';
-import { soldTrailers } from '@/data/soldTrailers';
-import { customers } from '@/data/customers';
-import { dealers } from '@/data/dealers';
 import { useState } from 'react';
 import { ArrowLeft, Bell, Wrench, Download } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { toast } from 'sonner';
+import { useAppData } from '@/context/AppDataContext';
 
 const SensorDataDetail = () => {
   const { vin } = useParams();
   const navigate = useNavigate();
+  const { state, actions } = useAppData();
   const [notifModal, setNotifModal] = useState(false);
   const [notifMsg, setNotifMsg] = useState('');
+  const [scheduleModalOpen, setScheduleModalOpen] = useState(false);
+  const [scheduleType, setScheduleType] = useState<'Scheduled' | 'Inspection' | 'Emergency'>('Inspection');
+  const [scheduleDate, setScheduleDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [scheduleNotes, setScheduleNotes] = useState('');
 
-  const trailer = soldTrailers.find(t => t.vin === vin);
+  const trailer = state.soldTrailers.find(t => t.vin === vin);
   if (!trailer) return <DashboardLayout><p>Trailer not found</p></DashboardLayout>;
 
-  const customer = customers.find(c => c.id === trailer.customerId);
-  const dealer = dealers.find(d => d.id === trailer.dealerId);
+  const customer = state.customers.find(c => c.id === trailer.customerId);
+  const dealer = state.dealers.find(d => d.id === trailer.dealerId);
   const sd = trailer.sensorData;
 
   const tempHistory = Array.from({ length: 30 }, (_, i) => ({
@@ -37,6 +40,14 @@ const SensorDataDetail = () => {
 
   const handleSendNotif = () => {
     setNotifModal(false);
+    const created = actions.pushHealthWarning({
+      soldTrailerId: trailer.id,
+      message: notifMsg,
+    });
+    if (!created) {
+      toast.error('Failed to send notification');
+      return;
+    }
     toast.success('Notification sent to ' + customer?.name);
   };
 
@@ -61,7 +72,13 @@ const SensorDataDetail = () => {
             <button onClick={() => { setNotifMsg(`Your B-B Trailer ${trailer.modelNumber} (${trailer.vin}) requires attention. Please contact your dealer to schedule service.`); setNotifModal(true); }} className="flex items-center gap-1 px-3 py-1.5 bg-primary text-primary-foreground rounded-sm text-xs font-display uppercase tracking-wide">
               <Bell size={14} /> Push Notification
             </button>
-            <button className="flex items-center gap-1 px-3 py-1.5 border border-border rounded-sm text-xs font-display uppercase tracking-wide hover:bg-muted">
+            <button
+              onClick={() => {
+                setScheduleNotes(`Recommended due to sensor alerts on ${trailer.modelNumber}.`);
+                setScheduleModalOpen(true);
+              }}
+              className="flex items-center gap-1 px-3 py-1.5 border border-border rounded-sm text-xs font-display uppercase tracking-wide hover:bg-muted"
+            >
               <Wrench size={14} /> Schedule Maintenance
             </button>
             <button className="flex items-center gap-1 px-3 py-1.5 border border-border rounded-sm text-xs font-display uppercase tracking-wide hover:bg-muted">
@@ -164,6 +181,73 @@ const SensorDataDetail = () => {
               </button>
               <button onClick={() => setNotifModal(false)} className="px-4 py-2 border border-border rounded-sm text-xs font-display uppercase tracking-wide hover:bg-muted">
                 Cancel
+              </button>
+            </div>
+          </div>
+        </Modal>
+
+        {/* Schedule maintenance request (creates a Requested slot in the shared store) */}
+        <Modal isOpen={scheduleModalOpen} onClose={() => setScheduleModalOpen(false)} title="Schedule Maintenance Request">
+          <div className="space-y-3">
+            <div>
+              <span className="text-[10px] font-mono uppercase text-muted-foreground block">Customer</span>
+              <p className="text-sm">{customer?.name} ({customer?.email})</p>
+            </div>
+            <div>
+              <label className="text-[10px] font-mono uppercase text-muted-foreground block mb-1">Service Type</label>
+              <select
+                value={scheduleType}
+                onChange={e => setScheduleType(e.target.value as 'Scheduled' | 'Inspection' | 'Emergency')}
+                className="w-full border border-border rounded-md p-2 text-sm bg-card"
+              >
+                <option value="Scheduled">Scheduled</option>
+                <option value="Inspection">Inspection</option>
+                <option value="Emergency">Emergency</option>
+              </select>
+            </div>
+            <div>
+              <label className="text-[10px] font-mono uppercase text-muted-foreground block mb-1">Preferred Date</label>
+              <input
+                type="date"
+                value={scheduleDate}
+                onChange={e => setScheduleDate(e.target.value)}
+                className="w-full border border-border rounded-md p-2 text-sm bg-card"
+              />
+            </div>
+            <div>
+              <label className="text-[10px] font-mono uppercase text-muted-foreground block mb-1">Notes</label>
+              <textarea
+                rows={3}
+                value={scheduleNotes}
+                onChange={e => setScheduleNotes(e.target.value)}
+                className="w-full border border-border rounded-md p-2 text-sm bg-card"
+              />
+            </div>
+            <div className="flex gap-2">
+              <button
+                onClick={() => setScheduleModalOpen(false)}
+                className="px-4 py-2 border border-border rounded-sm text-xs font-display uppercase tracking-wide hover:bg-muted"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => {
+                  const finalNotes = scheduleNotes || `Recommended due to sensor alerts on ${trailer.modelNumber}.`;
+                  actions.requestMaintenanceSlot({
+                    customerId: customer!.id,
+                    dealerId: dealer!.id,
+                    soldTrailerId: trailer.id,
+                    trailerId: trailer.trailerId,
+                    requestedDate: scheduleDate,
+                    type: scheduleType,
+                    notes: finalNotes,
+                  });
+                  setScheduleModalOpen(false);
+                  toast.success('Maintenance request submitted');
+                }}
+                className="px-4 py-2 bg-primary text-primary-foreground rounded-sm text-xs font-display uppercase tracking-wide hover:opacity-90"
+              >
+                Submit Request
               </button>
             </div>
           </div>

@@ -1,38 +1,40 @@
 import { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { StatusBadge } from '@/components/shared/StatusBadge';
-import { maintenanceSlots } from '@/data/maintenanceSlots';
-import { soldTrailers } from '@/data/soldTrailers';
-import { customers } from '@/data/customers';
-import { dealers } from '@/data/dealers';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { useAppData } from '@/context/AppDataContext';
 
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 const MaintenanceSlotManager = () => {
-  const [slots, setSlots] = useState(maintenanceSlots);
+  const { state, actions } = useAppData();
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
   const confirm = (id: string) => {
-    setSlots(s => s.map(sl => sl.id === id ? { ...sl, status: 'Confirmed', confirmedDate: sl.requestedDate } : sl));
     toast.success('Slot confirmed — notification sent to customer');
+    actions.confirmMaintenanceSlot({
+      slotId: id,
+      message: undefined,
+      priority: 'Normal',
+    });
   };
 
   const complete = (id: string) => {
-    setSlots(s => s.map(sl => sl.id === id ? { ...sl, status: 'Completed' } : sl));
     toast.success('Slot marked as completed');
+    actions.completeMaintenanceSlot({ slotId: id });
   };
 
   const cancel = (id: string) => {
-    setSlots(s => s.map(sl => sl.id === id ? { ...sl, status: 'Cancelled' } : sl));
     toast.info('Slot cancelled');
+    actions.cancelMaintenanceSlot(id);
   };
 
   // Simple calendar for March-October 2025
   const currentMonth = 2; // March (0-indexed)
   const [month, setMonth] = useState(currentMonth);
   const year = 2025;
+  const slots = state.maintenanceSlots;
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const firstDay = new Date(year, month, 1).getDay();
   const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
@@ -99,9 +101,9 @@ const MaintenanceSlotManager = () => {
               {selectedDay ? `Slots for ${selectedDay}` : 'All Upcoming Slots'}
             </h3>
             {(selectedDay ? daySlots : slots.filter(s => s.status !== 'Completed' && s.status !== 'Cancelled')).map(s => {
-              const trailer = soldTrailers.find(t => t.id === s.trailerId);
-              const cust = customers.find(c => c.id === s.customerId);
-              const dlr = dealers.find(d => d.id === s.dealerId);
+              const trailer = state.soldTrailers.find(t => t.id === s.trailerId);
+              const cust = state.customers.find(c => c.id === s.customerId);
+              const dlr = state.dealers.find(d => d.id === s.dealerId);
               return (
                 <div key={s.id} className="py-3 border-b border-border last:border-0">
                   <div className="flex items-center justify-between mb-1">

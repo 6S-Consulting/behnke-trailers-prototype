@@ -4,21 +4,34 @@ import { SensorGauge } from '@/components/shared/SensorGauge';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { DataTable } from '@/components/shared/DataTable';
 import { Modal } from '@/components/shared/Modal';
-import { soldTrailers } from '@/data/soldTrailers';
-import { dealers } from '@/data/dealers';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-
-const customerId = 'c1';
-const myTrailers = soldTrailers.filter(t => t.customerId === customerId);
+import { useAuth } from '@/context/AuthContext';
+import { useAppData } from '@/context/AppDataContext';
+import { MaintenanceRecord, SoldTrailer } from '@/types';
 
 const CustomerHealth = () => {
+  const { user } = useAuth();
+  const { state, actions } = useAppData();
   const [selected, setSelected] = useState(0);
   const [scheduleOpen, setScheduleOpen] = useState(false);
+  const [serviceType, setServiceType] = useState<'Scheduled' | 'Inspection' | 'Emergency'>('Scheduled');
+  const [preferredDate, setPreferredDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const [notes, setNotes] = useState('');
+
+  const myTrailers = state.soldTrailers.filter(t => t.customerId === (user?.id ?? ''));
   const trailer = myTrailers[selected];
-  const sd = trailer.sensorData;
-  const dealer = dealers.find(d => d.id === trailer.dealerId);
+  const sd = trailer?.sensorData;
+  const dealer = trailer ? state.dealers.find(d => d.id === trailer.dealerId) : undefined;
+
+  if (!user || !trailer || !sd) {
+    return (
+      <DashboardLayout>
+        <div className="text-sm text-muted-foreground">No trailers found for this account.</div>
+      </DashboardLayout>
+    );
+  }
 
   const tempHistory = Array.from({ length: 30 }, (_, i) => ({
     day: i + 1,
@@ -93,13 +106,13 @@ const CustomerHealth = () => {
         {/* Maintenance History */}
         <div className="bg-card rounded-lg shadow-industrial p-4">
           <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-3">Maintenance History</h3>
-          <DataTable
+          <DataTable<MaintenanceRecord>
             columns={[
               { key: 'date', label: 'Date', sortable: true },
-              { key: 'type', label: 'Type', render: (m: any) => <StatusBadge status={m.type} /> },
+              { key: 'type', label: 'Type', render: (m) => <StatusBadge status={m.type} /> },
               { key: 'description', label: 'Description' },
               { key: 'technicianName', label: 'Technician' },
-              { key: 'cost', label: 'Cost', render: (m: any) => <span className="font-mono">${m.cost.toLocaleString()}</span> },
+              { key: 'cost', label: 'Cost', render: (m) => <span className="font-mono text-xs">${m.cost.toLocaleString()}</span> },
             ]}
             data={trailer.maintenanceHistory}
           />
@@ -121,19 +134,51 @@ const CustomerHealth = () => {
             <div><span className="text-[10px] font-mono uppercase text-muted-foreground block">Dealer</span><p className="text-sm">{dealer?.name}</p></div>
             <div>
               <label className="text-[10px] font-mono uppercase text-muted-foreground block mb-1">Service Type</label>
-              <select className="w-full border border-border rounded-md p-2 text-sm bg-card">
-                <option>Scheduled</option><option>Inspection</option><option>Emergency</option>
+              <select
+                value={serviceType}
+                onChange={e => setServiceType(e.target.value as 'Scheduled' | 'Inspection' | 'Emergency')}
+                className="w-full border border-border rounded-md p-2 text-sm bg-card"
+              >
+                <option value="Scheduled">Scheduled</option>
+                <option value="Inspection">Inspection</option>
+                <option value="Emergency">Emergency</option>
               </select>
             </div>
             <div>
               <label className="text-[10px] font-mono uppercase text-muted-foreground block mb-1">Preferred Date</label>
-              <input type="date" className="w-full border border-border rounded-md p-2 text-sm bg-card" />
+              <input
+                type="date"
+                value={preferredDate}
+                onChange={e => setPreferredDate(e.target.value)}
+                className="w-full border border-border rounded-md p-2 text-sm bg-card"
+              />
             </div>
             <div>
               <label className="text-[10px] font-mono uppercase text-muted-foreground block mb-1">Notes</label>
-              <textarea rows={3} className="w-full border border-border rounded-md p-2 text-sm bg-card" />
+              <textarea
+                rows={3}
+                value={notes}
+                onChange={e => setNotes(e.target.value)}
+                className="w-full border border-border rounded-md p-2 text-sm bg-card"
+              />
             </div>
-            <button onClick={() => { setScheduleOpen(false); toast.success('Maintenance request submitted!'); }} className="px-4 py-2 bg-primary text-primary-foreground rounded-sm text-xs font-display uppercase tracking-wide">
+            <button
+              onClick={() => {
+                actions.requestMaintenanceSlot({
+                  customerId: user.id,
+                  dealerId: dealer?.id ?? trailer.dealerId,
+                  soldTrailerId: trailer.id,
+                  trailerId: trailer.trailerId,
+                  requestedDate: preferredDate,
+                  type: serviceType,
+                  notes,
+                });
+                setScheduleOpen(false);
+                setNotes('');
+                toast.success('Maintenance request submitted!');
+              }}
+              className="px-4 py-2 bg-primary text-primary-foreground rounded-sm text-xs font-display uppercase tracking-wide"
+            >
               Submit Request
             </button>
           </div>
