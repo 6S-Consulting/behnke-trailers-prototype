@@ -284,7 +284,7 @@ function SideReflectorStrip({
 }
 
 function Wheel({
-  tireRadius,
+  tireRadius: originalTireRadius,
   tireWidth,
   onPartHover,
   onPartLeave,
@@ -294,6 +294,7 @@ function Wheel({
   onPartHover?: PartHoverFn;
   onPartLeave?: () => void;
 }) {
+  const tireRadius = originalTireRadius - 0.7; // Reduced radius locally
   const hp = (name: string) =>
     onPartHover
       ? {
@@ -305,8 +306,11 @@ function Wheel({
         }
       : {};
 
+  const shoulderRadius = 2.0;
+
   return (
     <group>
+      {/* Tire main carcass */}
       <mesh
         rotation={[0, 0, Math.PI / 2]}
         material={rubberMaterial}
@@ -314,33 +318,112 @@ function Wheel({
         receiveShadow
         {...hp("Tire")}
       >
-        <cylinderGeometry args={[tireRadius, tireRadius, tireWidth, 38]} />
+        <cylinderGeometry
+          args={[
+            tireRadius,
+            tireRadius,
+            tireWidth - shoulderRadius * 1.5,
+            42,
+            1,
+          ]}
+        />
       </mesh>
+
+      {/* Tire shoulders (rounded edges) */}
+      {[-(tireWidth / 2 - shoulderRadius / 2), tireWidth / 2 - shoulderRadius / 2].map(
+        (offset, i) => (
+          <mesh
+            key={`shoulder-${i}`}
+            position={[offset, 0, 0]}
+            rotation={[0, Math.PI / 2, 0]}
+            material={rubberMaterial}
+            castShadow
+          >
+            <torusGeometry
+              args={[tireRadius - shoulderRadius / 2, shoulderRadius / 2, 16, 42]}
+            />
+          </mesh>
+        ),
+      )}
+
+      {/* Rim - Exterior deep dish section */}
       <mesh
         rotation={[0, 0, Math.PI / 2]}
         material={rimMaterial}
+        position={[tireWidth / 2 - 1.2, 0, 0]}
         castShadow
         {...hp("Rim")}
       >
-        <cylinderGeometry
-          args={[tireRadius * 0.56, tireRadius * 0.56, tireWidth + 0.26, 30]}
-        />
+        <cylinderGeometry args={[tireRadius * 0.58, tireRadius * 0.44, 2.4, 32, 1, true]} />
       </mesh>
+
+      {/* Rim - Inner face/hub seat */}
+      <mesh
+        rotation={[0, 0, Math.PI / 2]}
+        material={rimMaterial}
+        position={[tireWidth / 2 - 2.4, 0, 0]}
+        castShadow
+      >
+        <cylinderGeometry args={[tireRadius * 0.44, tireRadius * 0.44, 0.4, 32]} />
+      </mesh>
+
+      {/* Rim - Backing interior section */}
+      <mesh
+        rotation={[0, 0, Math.PI / 2]}
+        material={rimMaterial}
+        position={[-0.5, 0, 0]}
+        castShadow
+      >
+        <cylinderGeometry args={[tireRadius * 0.6, tireRadius * 0.6, tireWidth - 1, 30]} />
+      </mesh>
+
+      {/* Heavy-duty steel hub center */}
+      <mesh
+        rotation={[0, 0, Math.PI / 2]}
+        position={[tireWidth / 2 + 0.1, 0, 0]}
+        material={hardwareSteelMaterial}
+        castShadow
+        {...hp("Wheel Hub")}
+      >
+        <cylinderGeometry args={[2.8, 3.2, 1.4, 18]} />
+      </mesh>
+
+      {/* Hub Cover / Cap */}
+      <mesh
+        rotation={[0, 0, Math.PI / 2]}
+        position={[tireWidth / 2 + 0.8, 0, 0]}
+        material={rimMaterial}
+        castShadow
+      >
+        <cylinderGeometry args={[1.5, 1.5, 0.6, 18]} />
+      </mesh>
+
+      {/* Valve Stem (tiny detail) */}
+      <mesh
+        position={[tireWidth / 2 - 0.2, tireRadius * 0.42, 0]}
+        rotation={[0, 0, Math.PI / 2]}
+        material={hardwareSteelMaterial}
+      >
+        <cylinderGeometry args={[0.15, 0.15, 0.8, 8]} />
+      </mesh>
+
+      {/* 8 Lug Bolts circling the hub */}
       {Array.from({ length: 8 }).map((_, i) => {
         const angle = (Math.PI * 2 * i) / 8;
+        const boltRadius = 2.15;
         return (
           <mesh
             key={i}
             rotation={[0, 0, Math.PI / 2]}
             position={[
-              tireWidth / 2 + 0.15,
-              Math.cos(angle) * 2.05,
-              Math.sin(angle) * 2.05,
+              tireWidth / 2 - 0.5,
+              Math.cos(angle) * boltRadius,
+              Math.sin(angle) * boltRadius,
             ]}
-            material={rimMaterial}
+            material={hardwareSteelMaterial}
             {...hp("Lug Bolt")}
           >
-            <cylinderGeometry args={[0.16, 0.16, 0.45, 8]} />
+            <cylinderGeometry args={[0.22, 0.22, 0.6, 6]} />
           </mesh>
         );
       })}
@@ -1213,8 +1296,8 @@ function FrameAssembly({
       </group>
       {/* Axles and wheels */}
       {[
-        dims.axleCenterZ - dims.axleSpacing / 2 - 20,
-        dims.axleCenterZ + dims.axleSpacing / 2 - 20,
+        dims.axleCenterZ - (dims.axleSpacing - 4) / 2 - 20,
+        dims.axleCenterZ + (dims.axleSpacing - 4) / 2 - 20,
       ].map((z, idx) => (
         <group key={`axle-${idx}`} position={[0, axleCenterY, z]}>
           <mesh
@@ -1226,7 +1309,11 @@ function FrameAssembly({
             <cylinderGeometry args={[1.35, 1.35, 84, 20]} />
           </mesh>
           {[-dims.wheelTrackHalf, dims.wheelTrackHalf].map((x, wheelIdx) => (
-            <group key={wheelIdx} position={[x, 0, 0]}>
+            <group
+              key={wheelIdx}
+              position={[x, 0, 0]}
+              rotation={[0, x < 0 ? Math.PI : 0, 0]} // Face hubs outwards
+            >
               <Wheel
                 tireRadius={dims.tireRadius}
                 tireWidth={dims.tireWidth}
