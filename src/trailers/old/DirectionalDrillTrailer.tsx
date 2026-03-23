@@ -72,9 +72,9 @@ const rimMaterial = new THREE.MeshStandardMaterial({
 });
 
 const ledMaterial = new THREE.MeshStandardMaterial({
-  color: "#ce1f2c",
-  emissive: "#8d0f18",
-  emissiveIntensity: 0.75,
+  color: "#a00000",
+  emissive: "#ff0000",
+  emissiveIntensity: 1.2,
   roughness: 0.25,
   metalness: 0.12,
 });
@@ -124,10 +124,10 @@ const breakawayCableMaterial = new THREE.MeshStandardMaterial({
 });
 
 const tailLightMaterial = new THREE.MeshStandardMaterial({
-  color: "#8B0000",
-  emissive: "#FF0000",
-  emissiveIntensity: 3.5,
-  roughness: 0.25,
+  color: "#600000",
+  emissive: "#ff0000",
+  emissiveIntensity: 2.2,
+  roughness: 0.2,
   metalness: 0.1,
 });
 
@@ -138,13 +138,13 @@ const tailLightBaseMaterial = new THREE.MeshStandardMaterial({
 });
 
 const tailLightLensMaterial = new THREE.MeshStandardMaterial({
-  color: "#660000",
-  emissive: "#cc0000",
-  emissiveIntensity: 2.5,
-  roughness: 0.15,
-  metalness: 0.05,
+  color: "#400000",
+  emissive: "#aa0000",
+  emissiveIntensity: 1.5,
+  roughness: 0.1,
+  metalness: 0.1,
   transparent: true,
-  opacity: 0.95,
+  opacity: 0.92,
 });
 
 function deriveDimensions(
@@ -384,14 +384,14 @@ function FrameAssembly({
   const tiltAngle = (Math.PI / 180) * tiltAngleDeg * (tiltSign < 0 ? 1 : -1);
 
   const tongueBaseZ = -deckHalfLen + 15;
-  const tongueBeamLength = 59;
+  const tongueHalfAngle = (Math.PI / 180) * 34;
   const tongueBeamHeight = 5.9;
   const tongueBeamWidth = 3.15;
-  const tongueHalfAngle = (Math.PI / 180) * 26;
-  const tongueBeamSpreadX = 8.25;
-  const tongueBeamCenterZ = tongueBaseZ - tongueBeamLength * 0.5 - 8;
-  const hitchPlateZ = tongueBaseZ - tongueBeamLength - 8;
-  const hitchCenterY = frameTopY - 0.8;
+  const tongueBeamSpreadX = 14.5;
+  const tongueBeamLength = 54; // Adjusted length
+  const tongueBeamCenterZ = tongueBaseZ - tongueBeamLength * 0.5 - 6;
+  const hitchPlateZ = tongueBaseZ - tongueBeamLength - 1.5; // Apex connection point
+  const hitchCenterY = frameTopY - 4.5; // Lowered to align with tongue
 
   const jackSleeveWidth = 3.95;
   const jackSleeveHeight = 23.6;
@@ -401,7 +401,7 @@ function FrameAssembly({
   const jackCenterZ = tongueBaseZ - 33;
   const jackSleeveBottomY = frameTopY - 2.1;
   const jackSleeveCenterY = jackSleeveBottomY + jackSleeveHeight / 2;
-  const jackInnerCenterY = jackSleeveBottomY - jackInnerHeight / 2 + 2.5;
+  const jackInnerCenterY = jackSleeveBottomY - jackInnerHeight / 2 + 3.5; // Retracted
   const jackFootCenterY = jackInnerCenterY - jackInnerHeight / 2 - 0.55;
 
   const chainAnchorZ = tongueBaseZ - 20;
@@ -513,6 +513,7 @@ function FrameAssembly({
         );
       })}
 
+
       {/* Reflector stripes — left front 20% static, left rear 80% in tilt group, right full length */}
       <SideReflectorStrip
         x={leftEdge - 0.1}
@@ -534,14 +535,17 @@ function FrameAssembly({
       />
 
       {/* Stationary deck frame top surface */}
+      {/* Single, full-width front deck frame panel — no partition */}
       <mesh
-        position={[stationaryCenter, frameTopY + 2.8, 0]}
+        position={[0, frameTopY - 4.2, frontFixedCenterZ]}
         material={frameMaterial}
         castShadow
         receiveShadow
-        {...hp("Stationary Deck Frame")}
+        {...hp("Front Main Frame Plate")}
       >
-        <boxGeometry args={[dims.stationaryDeckWidth, 0.2, dims.deckLength]} />
+        <boxGeometry
+          args={[dims.betweenFenders, 6.2, frontFixedLength]}
+        />
       </mesh>
 
       {/* Stationary deck — front 60% wood planks, rear 40% metal box */}
@@ -680,16 +684,6 @@ function FrameAssembly({
         );
       })()}
 
-      {/* Front fixed section frame top surface */}
-      <mesh
-        position={[tiltCenter, frameTopY + 0.01, frontFixedCenterZ]}
-        material={frameMaterial}
-        castShadow
-        receiveShadow
-        {...hp("Front Fixed Deck Frame")}
-      >
-        <boxGeometry args={[dims.tiltDeckWidth, 0.2, frontFixedLength]} />
-      </mesh>
 
       {/* Front fixed section on the tilting side (non-tilting 20%) — wood with all-around metal border */}
       {(() => {
@@ -1152,12 +1146,12 @@ function FrameAssembly({
 
         {/* Left tail light — tilts with deck */}
         {(() => {
-          const tW = 14; // local X → world height
-          const tH = 10; // local Y → world width
+          const tW = 8; // local X → world height (Now even more reduced)
+          const tH = 14.5; // local Y → world width (Increased width)
           const tD = 4.5; // depth
           const lightY = dims.deckHeight - 8;
-          const localX = leftEdge - 11 - tiltPivotX;
-          const localY = lightY + 5 - dims.deckHeight;
+          const localX = leftEdge - 13 - tiltPivotX; // Moved 3 units further left
+          const localY = lightY + 7 - dims.deckHeight;
           const localZ = deckHalfLen - 5 - tiltPivotZ;
           return (
             <group
@@ -1174,14 +1168,14 @@ function FrameAssembly({
               >
                 <boxGeometry args={[tW, tH, tD]} />
               </mesh>
-              {/* Two wide rectangular LED bars — +3.5=top, -3.5=bottom in world Y */}
-              {[3.5, -3.5].map((lx, li) => (
+              {/* Two wide rectangular LED bars — much tighter spacing for low-profile look */}
+              {[1.8, -1.8].map((lx, li) => (
                 <group key={li} position={[lx, 0, tD]}>
-                  {/* Black border: wide pill (landscape) */}
+                  {/* Black border: very wide pill */}
                   <mesh material={tailLightBaseMaterial} castShadow>
-                    <boxGeometry args={[2.6, 5.5, 0.38]} />
+                    <boxGeometry args={[1.6, 11.0, 0.38]} />
                   </mesh>
-                  {[-2.75, 2.75].map((cy, ci2) => (
+                  {[-5.5, 5.5].map((cy, ci2) => (
                     <mesh
                       key={ci2}
                       position={[0, cy, 0]}
@@ -1189,7 +1183,7 @@ function FrameAssembly({
                       material={tailLightBaseMaterial}
                       castShadow
                     >
-                      <cylinderGeometry args={[1.3, 1.3, 0.38, 18]} />
+                      <cylinderGeometry args={[0.8, 0.8, 0.38, 18]} />
                     </mesh>
                   ))}
                   {/* Red emissive LED fill */}
@@ -1198,9 +1192,9 @@ function FrameAssembly({
                     material={tailLightMaterial}
                     castShadow
                   >
-                    <boxGeometry args={[1.6, 4.0, 0.22]} />
+                    <boxGeometry args={[0.95, 9.5, 0.22]} />
                   </mesh>
-                  {[-2.0, 2.0].map((cy, ci2) => (
+                  {[-4.75, 4.75].map((cy, ci2) => (
                     <mesh
                       key={ci2}
                       position={[0, cy, 0.22]}
@@ -1208,7 +1202,7 @@ function FrameAssembly({
                       material={tailLightMaterial}
                       castShadow
                     >
-                      <cylinderGeometry args={[0.8, 0.8, 0.22, 18]} />
+                      <cylinderGeometry args={[0.475, 0.475, 0.22, 18]} />
                     </mesh>
                   ))}
                 </group>
@@ -1360,8 +1354,8 @@ function FrameAssembly({
       {/* Rear tail light assemblies — right side only; left is in tilt group */}
       {[leftEdge + 5, rightEdge - 5].map((cx, idx) => {
         if (idx === 0) return null; // left tail light tilts with deck
-        const tW = 14;
-        const tH = 10;
+        const tW = 8;
+        const tH = 14.5;
         const tD = 4.5;
         const lightY = dims.deckHeight - 8;
 
@@ -1369,8 +1363,8 @@ function FrameAssembly({
           <group
             key={`tail-asm-${idx}`}
             position={[
-              cx + (idx === 0 ? -16 : 16),
-              lightY + 5,
+              cx + (idx === 0 ? -16 : 12), // Moved right side (idx=1) 6 units right from the rail
+              lightY + 4, // Lowered the right light position
               deckHalfLen - 5,
             ]}
             rotation={[0, 0, idx === 0 ? Math.PI / 2 : -Math.PI / 2]}
@@ -1385,14 +1379,14 @@ function FrameAssembly({
             >
               <boxGeometry args={[tW, tH, tD]} />
             </mesh>
-            {/* Two wide rectangular LED bars — [-3.5]=top, [+3.5]=bottom world Y under -π/2 */}
-            {[-3.5, 3.5].map((lx, li) => (
+            {/* Two wide rectangular LED bars — tighter spacing */}
+            {[-2.6, 2.6].map((lx, li) => (
               <group key={li} position={[lx, 0, tD]}>
-                {/* Black border: wide pill (landscape) */}
+                {/* Black border: very wide pill */}
                 <mesh material={tailLightBaseMaterial} castShadow>
-                  <boxGeometry args={[2.6, 5.5, 0.38]} />
+                  <boxGeometry args={[1.6, 11.0, 0.38]} />
                 </mesh>
-                {[-2.75, 2.75].map((cy, ci2) => (
+                {[-5.5, 5.5].map((cy, ci2) => (
                   <mesh
                     key={ci2}
                     position={[0, cy, 0]}
@@ -1400,7 +1394,7 @@ function FrameAssembly({
                     material={tailLightBaseMaterial}
                     castShadow
                   >
-                    <cylinderGeometry args={[1.3, 1.3, 0.38, 18]} />
+                    <cylinderGeometry args={[0.8, 0.8, 0.38, 18]} />
                   </mesh>
                 ))}
                 {/* Red emissive LED fill */}
@@ -1409,9 +1403,9 @@ function FrameAssembly({
                   material={tailLightMaterial}
                   castShadow
                 >
-                  <boxGeometry args={[1.6, 4.0, 0.22]} />
+                  <boxGeometry args={[0.95, 9.5, 0.22]} />
                 </mesh>
-                {[-2.0, 2.0].map((cy, ci2) => (
+                {[-4.75, 4.75].map((cy, ci2) => (
                   <mesh
                     key={ci2}
                     position={[0, cy, 0.22]}
@@ -1419,7 +1413,7 @@ function FrameAssembly({
                     material={tailLightMaterial}
                     castShadow
                   >
-                    <cylinderGeometry args={[0.8, 0.8, 0.22, 18]} />
+                    <cylinderGeometry args={[0.475, 0.475, 0.22, 18]} />
                   </mesh>
                 ))}
               </group>
@@ -1434,7 +1428,7 @@ function FrameAssembly({
           key={`tongue-beam-${side}`}
           position={[
             side * tongueBeamSpreadX,
-            frameTopY - 2.1,
+            frameTopY - 4.5,
             tongueBeamCenterZ,
           ]}
           rotation={[0, side * tongueHalfAngle, 0]}
@@ -1449,14 +1443,24 @@ function FrameAssembly({
         </mesh>
       ))}
 
-      {/* Front gusset plate */}
+      {/* Gusset Plate with light gap from A-frame */}
       <mesh
-        position={[0, frameTopY - 2.0, hitchPlateZ + 7.6]}
+        position={[0, hitchCenterY - 0.5, hitchPlateZ + 5.5]}
         material={hardwareSteelMaterial}
         castShadow
         {...hp("Gusset Plate")}
       >
-        <boxGeometry args={[6.8, 4.8, 0.7]} />
+        <boxGeometry args={[11.8, 4.8, 0.7]} />
+      </mesh>
+
+      {/* Hitch Box at A-frame apex */}
+      <mesh
+        position={[0, hitchCenterY, hitchPlateZ + 1.2]}
+        material={hardwareSteelMaterial}
+        castShadow
+        {...hp("Hitch Box")}
+      >
+        <boxGeometry args={[8.8, 6.4, 6.2]} />
       </mesh>
 
       {/* Vertical drop-leg jack with crank handle */}
