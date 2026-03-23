@@ -407,23 +407,6 @@ function FrameAssembly({
   const chainAnchorZ = tongueBaseZ - 20;
   const chainEndZ = hitchPlateZ + 1.4;
 
-  const breakawayCableCurve = useMemo(() => {
-    const startZ = chainAnchorZ - 4;
-    const endZ = hitchPlateZ + 2;
-    const points = Array.from({ length: 24 }).map((_, i) => {
-      const t = i / 23;
-      const angle = t * Math.PI * 10;
-
-      return new THREE.Vector3(
-        3.1 + Math.cos(angle) * 0.55,
-        frameTopY - 2.6 - 0.35 * t + Math.sin(angle) * 0.4,
-        startZ + t * (endZ - startZ),
-      );
-    });
-
-    return new THREE.CatmullRomCurve3(points);
-  }, [chainAnchorZ, frameTopY, hitchPlateZ]);
-
   const crossCount = Math.floor(dims.deckLength / 12);
 
   const woodPlanks = useWoodPlankMaterials(deckWood);
@@ -461,7 +444,7 @@ function FrameAssembly({
         position={[
           leftEdge,
           lowerRailCenterY,
-          -deckHalfLen + (dims.deckLength * 0.8) / 2,
+          -deckHalfLen + (dims.deckLength * 0.75) / 2,
         ]}
         material={frameMaterial}
         castShadow
@@ -472,7 +455,7 @@ function FrameAssembly({
           args={[
             dims.lowerRailWidth,
             dims.lowerRailHeight,
-            dims.deckLength * 0.8,
+            dims.deckLength * 0.75,
           ]}
         />
       </mesh>
@@ -563,8 +546,8 @@ function FrameAssembly({
 
       {/* Stationary deck — front 60% wood planks, rear 40% metal box */}
       {(() => {
-        const woodLength = dims.deckLength * 0.6;
-        const metalLength = dims.deckLength * 0.4;
+        const woodLength = dims.deckLength * 0.5;
+        const metalLength = dims.deckLength * 0.5;
         const woodCenterZ = -deckHalfLen + woodLength / 2;
         const metalCenterZ = -deckHalfLen + woodLength + metalLength / 2;
         const plankY = dims.deckHeight - dims.plankThickness / 2 + 0.015;
@@ -932,7 +915,6 @@ function FrameAssembly({
           ]}
         >
           <mesh
-            material={frameMaterial}
             castShadow
             receiveShadow
             {...hp("Beavertail")}
@@ -977,7 +959,14 @@ function FrameAssembly({
               geo.computeVertexNormals();
               return geo;
             })()}
-          />
+          >
+            <meshStandardMaterial
+              color="#1a1f25"
+              roughness={0.4}
+              metalness={0.82}
+              side={THREE.DoubleSide}
+            />
+          </mesh>
           {[-8, 0, 8].map((x, i) => (
             <mesh
               key={i}
@@ -1015,7 +1004,7 @@ function FrameAssembly({
           onPartLeave={onPartLeave}
         />
 
-        {/* Left fender — tilts with deck. All coords are pivot-relative (local to tilt group) */}
+        {/* Left fender — tilts with deck. Same geometry as right fender, mirrored X */}
         {(() => {
           const fW = dims.tireWidth + 7;
           const fThick = 1.4;
@@ -1025,25 +1014,25 @@ function FrameAssembly({
           const dropH = topYWorld - rubRailTopYWorld;
           const horizLen = 10;
           const hyp = Math.sqrt(dropH * dropH + horizLen * horizLen);
-          const ang = Math.atan2(dropH, horizLen);
+          const ang = Math.atan2(dropH, horizLen) + 3.6;
           const skirtCenterYLocal = topYLocal - dropH / 2;
           const fzFrontLocal =
             dims.axleCenterZ -
             dims.axleSpacing / 2 -
             dims.tireRadius +
             10 -
-            20 -
+            23 -
             tiltPivotZ;
           const fzRearLocal =
             dims.axleCenterZ +
             dims.axleSpacing / 2 +
             dims.tireRadius -
             10 -
-            20 -
+            17 -
             tiltPivotZ;
           const fTopLen = fzRearLocal - fzFrontLocal;
           const fCenterZLocal = (fzFrontLocal + fzRearLocal) / 2;
-          // Shift inward so outer fender edge ≈ outer tire edge, inner side covers frame
+          // Mirror of right: outer edge ≈ outer tire edge, inner side toward frame
           const xLocal =
             -dims.wheelTrackHalf + fW / 2 - dims.tireWidth / 2 - 2 - tiltPivotX;
           return (
@@ -1056,13 +1045,13 @@ function FrameAssembly({
                 receiveShadow
                 {...hp("Fender")}
               >
-                <boxGeometry args={[fW, fThick, fTopLen]} />
+                <boxGeometry args={[fW, fThick + 1, fTopLen + 1]} />
               </mesh>
               {/* Front lip */}
               <mesh
                 position={[
                   xLocal,
-                  skirtCenterYLocal,
+                  skirtCenterYLocal - 7,
                   fzFrontLocal - horizLen / 2,
                 ]}
                 rotation={[-ang, 0, 0]}
@@ -1071,13 +1060,82 @@ function FrameAssembly({
                 receiveShadow
                 {...hp("Fender")}
               >
-                <boxGeometry args={[fW, fThick, hyp]} />
+                <boxGeometry args={[fW, fThick, hyp + 13]} />
               </mesh>
+              {/* Inner side trapezium cover — right edge of left fender, between wheel and wooden deck */}
+              {(() => {
+                // Right (inner/inboard) edge of fender, facing toward the wooden board
+                const panelX = xLocal + fW / 2; // inner face of cover
+                const panelX2 = panelX + 1.4; // 1.4 unit thick toward deck
+                // Y extents in local tilt coords
+                const yTop = topYLocal;
+                const yBot = -dims.plankThickness + dims.upperRailSize - 1;
+                // Z extents: top span = fender plate, bottom span extends with lips
+                const zTopFront = fzFrontLocal;
+                const zTopRear = fzRearLocal;
+                const zBotFront = fzFrontLocal - horizLen * 0.5;
+                const zBotRear = fzRearLocal + horizLen * 0.5;
+
+                const v = new Float32Array([
+                  // inner face (x = panelX)
+                  panelX,
+                  yTop,
+                  zTopFront, // 0
+                  panelX,
+                  yTop,
+                  zTopRear, // 1
+                  panelX,
+                  yBot,
+                  zBotRear, // 2
+                  panelX,
+                  yBot,
+                  zBotFront, // 3
+                  // outer face (x = panelX2)
+                  panelX2,
+                  yTop,
+                  zTopFront, // 4
+                  panelX2,
+                  yTop,
+                  zTopRear, // 5
+                  panelX2,
+                  yBot,
+                  zBotRear, // 6
+                  panelX2,
+                  yBot,
+                  zBotFront, // 7
+                ]);
+                const idx = [
+                  // inner face (winding flipped for inward normal)
+                  0, 2, 1, 0, 3, 2,
+                  // outer face
+                  4, 5, 6, 4, 6, 7,
+                  // top face
+                  0, 1, 5, 0, 5, 4,
+                  // bottom face
+                  3, 7, 6, 3, 6, 2,
+                  // front face
+                  0, 4, 7, 0, 7, 3,
+                  // rear face
+                  1, 2, 6, 1, 6, 5,
+                ];
+                const geo = new THREE.BufferGeometry();
+                geo.setAttribute("position", new THREE.BufferAttribute(v, 3));
+                geo.setIndex(idx);
+                geo.computeVertexNormals();
+                return (
+                  <mesh
+                    geometry={geo}
+                    material={hardwareSteelMaterial}
+                    castShadow
+                    receiveShadow
+                  />
+                );
+              })()}
               {/* Rear lip */}
               <mesh
                 position={[
                   xLocal,
-                  skirtCenterYLocal,
+                  skirtCenterYLocal - 7,
                   fzRearLocal + horizLen / 2,
                 ]}
                 rotation={[ang, 0, 0]}
@@ -1086,7 +1144,7 @@ function FrameAssembly({
                 receiveShadow
                 {...hp("Fender")}
               >
-                <boxGeometry args={[fW, fThick, hyp]} />
+                <boxGeometry args={[fW, fThick, hyp + 13]} />
               </mesh>
             </>
           );
@@ -1094,159 +1152,71 @@ function FrameAssembly({
 
         {/* Left tail light — tilts with deck */}
         {(() => {
-          const boxW = 10;
-          const boxH = 14;
-          const boxDepth = 6;
-          const wall = 0.65;
+          const tW = 14; // local X → world height
+          const tH = 10; // local Y → world width
+          const tD = 4.5; // depth
           const lightY = dims.deckHeight - 8;
           const localX = leftEdge - 11 - tiltPivotX;
           const localY = lightY + 5 - dims.deckHeight;
           const localZ = deckHalfLen - 5 - tiltPivotZ;
           return (
             <group
-              position={[localX, localY, localZ]}
+              position={[localX + 6, localY, localZ]}
               rotation={[0, 0, Math.PI / 2]}
             >
+              {/* Vertical housing body */}
               <mesh
-                position={[0, 0, boxDepth / 2]}
+                position={[0, 0, tD / 2]}
                 material={tailLightBaseMaterial}
                 castShadow
                 receiveShadow
                 {...hp("Tail Light Housing")}
               >
-                <boxGeometry args={[boxW, boxH, boxDepth]} />
+                <boxGeometry args={[tW, tH, tD]} />
               </mesh>
-              <mesh
-                position={[0, 0, boxDepth + wall / 2]}
-                material={hardwareSteelMaterial}
-                castShadow
-                {...hp("Tail Light Bracket")}
-              >
-                <boxGeometry args={[boxW + 1.6, boxH + 1.6, wall]} />
-              </mesh>
-              <mesh
-                position={[0, boxH / 2 + 1.4, boxDepth * 0.35]}
-                material={hardwareSteelMaterial}
-                castShadow
-                {...hp("Tail Light Bracket")}
-              >
-                <boxGeometry args={[boxW - 0.5, 2.2, boxDepth * 0.65]} />
-              </mesh>
-              <mesh
-                position={[0, -(boxH / 2 + 1.4), boxDepth * 0.35]}
-                material={hardwareSteelMaterial}
-                castShadow
-                {...hp("Tail Light Bracket")}
-              >
-                <boxGeometry args={[boxW - 0.5, 2.2, boxDepth * 0.65]} />
-              </mesh>
-              {[-3.2, 3.2].map((bx, bi) =>
-                [boxH / 2 + 1.0, -(boxH / 2 + 1.0)].map((by, bj) => (
-                  <mesh
-                    key={`ltbolt-${bi}-${bj}`}
-                    position={[bx, by, 0]}
-                    material={chainMaterial}
-                    castShadow
-                    {...hp("Mounting Bolt")}
-                  >
-                    <cylinderGeometry args={[0.36, 0.36, 0.55, 10]} />
+              {/* Two wide rectangular LED bars — +3.5=top, -3.5=bottom in world Y */}
+              {[3.5, -3.5].map((lx, li) => (
+                <group key={li} position={[lx, 0, tD]}>
+                  {/* Black border: wide pill (landscape) */}
+                  <mesh material={tailLightBaseMaterial} castShadow>
+                    <boxGeometry args={[2.6, 5.5, 0.38]} />
                   </mesh>
-                )),
-              )}
-              <group position={[0, 3.6, boxDepth + 0.15]}>
-                <mesh
-                  scale={[3.8, 5.0, 0.6]}
-                  material={tailLightBaseMaterial}
-                  {...hp("Tail Light Housing")}
-                >
-                  <sphereGeometry args={[1, 28, 18]} />
-                </mesh>
-                <mesh
-                  scale={[3.2, 4.3, 0.55]}
-                  position={[0, 0, 0.28]}
-                  material={tailLightLensMaterial}
-                  {...hp("Tail Light Lens")}
-                >
-                  <sphereGeometry args={[1, 28, 18]} />
-                </mesh>
-                <mesh
-                  scale={[2.0, 2.9, 0.38]}
-                  position={[0, 0, 0.52]}
-                  material={tailLightMaterial}
-                  {...hp("Tail Light LED")}
-                >
-                  <sphereGeometry args={[1, 20, 14]} />
-                </mesh>
-              </group>
-              <group position={[0, -3.6, boxDepth + 0.15]}>
-                <mesh
-                  scale={[3.8, 5.0, 0.6]}
-                  material={tailLightBaseMaterial}
-                  {...hp("Tail Light Housing")}
-                >
-                  <sphereGeometry args={[1, 28, 18]} />
-                </mesh>
-                <mesh
-                  scale={[3.2, 4.3, 0.55]}
-                  position={[0, 0, 0.28]}
-                  material={tailLightLensMaterial}
-                  {...hp("Tail Light Lens")}
-                >
-                  <sphereGeometry args={[1, 28, 18]} />
-                </mesh>
-                <mesh
-                  scale={[2.0, 2.9, 0.38]}
-                  position={[0, 0, 0.52]}
-                  material={tailLightMaterial}
-                  {...hp("Tail Light LED")}
-                >
-                  <sphereGeometry args={[1, 20, 14]} />
-                </mesh>
-              </group>
-              <mesh
-                position={[1.5, -(boxH / 2 + 3.5), boxDepth * 0.42]}
-                material={reflectorRedMaterial}
-                {...hp("Rear Reflector Strip")}
-              >
-                <boxGeometry args={[boxW + 3.0, 2.2, boxDepth * 0.75]} />
-              </mesh>
-              <mesh
-                position={[1.5, -(boxH / 2 + 3.5), boxDepth * 0.42 + 0.14]}
-                material={reflectorWhiteMaterial}
-                {...hp("Rear Reflector Strip")}
-              >
-                <boxGeometry args={[boxW + 3.0, 0.9, boxDepth * 0.75 - 0.28]} />
-              </mesh>
+                  {[-2.75, 2.75].map((cy, ci2) => (
+                    <mesh
+                      key={ci2}
+                      position={[0, cy, 0]}
+                      rotation={[Math.PI / 2, 0, 0]}
+                      material={tailLightBaseMaterial}
+                      castShadow
+                    >
+                      <cylinderGeometry args={[1.3, 1.3, 0.38, 18]} />
+                    </mesh>
+                  ))}
+                  {/* Red emissive LED fill */}
+                  <mesh
+                    position={[0, 0, 0.22]}
+                    material={tailLightMaterial}
+                    castShadow
+                  >
+                    <boxGeometry args={[1.6, 4.0, 0.22]} />
+                  </mesh>
+                  {[-2.0, 2.0].map((cy, ci2) => (
+                    <mesh
+                      key={ci2}
+                      position={[0, cy, 0.22]}
+                      rotation={[Math.PI / 2, 0, 0]}
+                      material={tailLightMaterial}
+                      castShadow
+                    >
+                      <cylinderGeometry args={[0.8, 0.8, 0.22, 18]} />
+                    </mesh>
+                  ))}
+                </group>
+              ))}
             </group>
           );
         })()}
       </group>
-      {Array.from({ length: Math.floor((dims.deckLength - 24) / 24) }).map(
-        (_, i) => {
-          const z = -deckHalfLen + 20 + i * 24;
-          return (
-            <group key={`stake-${i}`}>
-              <mesh
-                position={[leftEdge + 1.4, frameTopY - 0.25, z]}
-                material={frameMaterial}
-                castShadow
-                {...hp("Stake Pocket")}
-              >
-                <boxGeometry args={[1.1, 3, 2.4]} />
-              </mesh>
-              <mesh
-                position={[rightEdge - 1.4, frameTopY - 0.25, z]}
-                material={frameMaterial}
-                castShadow
-                {...hp("Stake Pocket")}
-              >
-                <boxGeometry args={[1.1, 3, 2.4]} />
-              </mesh>
-            </group>
-          );
-        },
-      )}
-
       {/* Axles and wheels */}
       {[
         dims.axleCenterZ - dims.axleSpacing / 2 - 20,
@@ -1280,16 +1250,16 @@ function FrameAssembly({
         const fThick = 1.4;
         const topY = axleCenterY + dims.tireRadius + 5;
         const fzFront =
-          dims.axleCenterZ - dims.axleSpacing / 2 - dims.tireRadius + 10 - 20;
+          dims.axleCenterZ - dims.axleSpacing / 2 - dims.tireRadius + 10 - 23;
         const fzRear =
-          dims.axleCenterZ + dims.axleSpacing / 2 + dims.tireRadius - 10 - 20;
+          dims.axleCenterZ + dims.axleSpacing / 2 + dims.tireRadius - 10 - 17;
         const fTopLen = fzRear - fzFront;
         const fCenterZ = (fzFront + fzRear) / 2;
         const rubRailTopY = upperRailCenterY + dims.upperRailSize / 2;
         const dropH = topY - rubRailTopY;
         const horizLen = 10;
         const hyp = Math.sqrt(dropH * dropH + horizLen * horizLen);
-        const ang = Math.atan2(dropH, horizLen);
+        const ang = Math.atan2(dropH, horizLen) + 3.6;
         const skirtCenterY = topY - dropH / 2;
         // Shift inward so outer fender edge ≈ outer tire edge, inner side covers frame
         const x = dims.wheelTrackHalf - fW / 2 + dims.tireWidth / 2 + 2;
@@ -1303,30 +1273,86 @@ function FrameAssembly({
               receiveShadow
               {...hp("Fender")}
             >
-              <boxGeometry args={[fW, fThick, fTopLen]} />
+              <boxGeometry args={[fW, fThick + 1, fTopLen + 1]} />
             </mesh>
             {/* Front lip — angles down and forward to rub rail */}
             <mesh
-              position={[x, skirtCenterY, fzFront - horizLen / 2]}
+              position={[x, skirtCenterY - 7, fzFront - horizLen / 2]}
               rotation={[-ang, 0, 0]}
               material={frameMaterial}
               castShadow
               receiveShadow
               {...hp("Fender")}
             >
-              <boxGeometry args={[fW, fThick, hyp]} />
+              <boxGeometry args={[fW, fThick, hyp + 13]} />
             </mesh>
             {/* Rear lip — angles down and rearward to rub rail */}
             <mesh
-              position={[x, skirtCenterY, fzRear + horizLen / 2]}
+              position={[x, skirtCenterY - 7, fzRear + horizLen / 2]}
               rotation={[ang, 0, 0]}
               material={frameMaterial}
               castShadow
               receiveShadow
               {...hp("Fender")}
             >
-              <boxGeometry args={[fW, fThick, hyp]} />
+              <boxGeometry args={[fW, fThick, hyp + 13]} />
             </mesh>
+            {/* Inner side trapezium cover — left edge of right fender, between wheel and wooden deck */}
+            {(() => {
+              const panelX = x - fW / 2; // inner/left face of fender
+              const panelX2 = panelX - 1.4; // 1.4 unit thick toward deck
+              const yTop = topY;
+              const yBot = rubRailTopY;
+              const zTopFront = fzFront;
+              const zTopRear = fzRear;
+              const zBotFront = fzFront - horizLen * 0.5;
+              const zBotRear = fzRear + horizLen * 0.5;
+              const v = new Float32Array([
+                panelX,
+                yTop,
+                zTopFront, // 0
+                panelX,
+                yTop,
+                zTopRear, // 1
+                panelX,
+                yBot,
+                zBotRear, // 2
+                panelX,
+                yBot,
+                zBotFront, // 3
+                panelX2,
+                yTop,
+                zTopFront, // 4
+                panelX2,
+                yTop,
+                zTopRear, // 5
+                panelX2,
+                yBot,
+                zBotRear, // 6
+                panelX2,
+                yBot,
+                zBotFront, // 7
+              ]);
+              const idx = [
+                0, 1, 2, 0, 2, 3, 4, 6, 5, 4, 7, 6, 0, 5, 1, 0, 4, 5, 3, 6, 7,
+                3, 2, 6, 0, 3, 7, 0, 7, 4, 1, 5, 6, 1, 6, 2,
+              ];
+              const geo = new THREE.BufferGeometry();
+              geo.setAttribute(
+                "position",
+                new THREE.BufferAttribute(new Float32Array(v), 3),
+              );
+              geo.setIndex(idx);
+              geo.computeVertexNormals();
+              return (
+                <mesh
+                  geometry={geo}
+                  material={hardwareSteelMaterial}
+                  castShadow
+                  receiveShadow
+                />
+              );
+            })()}
           </>
         );
       })()}
@@ -1334,10 +1360,9 @@ function FrameAssembly({
       {/* Rear tail light assemblies — right side only; left is in tilt group */}
       {[leftEdge + 5, rightEdge - 5].map((cx, idx) => {
         if (idx === 0) return null; // left tail light tilts with deck
-        const boxW = 10;
-        const boxH = 14;
-        const boxDepth = 6;
-        const wall = 0.65;
+        const tW = 14;
+        const tH = 10;
+        const tD = 4.5;
         const lightY = dims.deckHeight - 8;
 
         return (
@@ -1350,137 +1375,55 @@ function FrameAssembly({
             ]}
             rotation={[0, 0, idx === 0 ? Math.PI / 2 : -Math.PI / 2]}
           >
-            {/* Main steel housing box — matte black, protrudes rearward */}
+            {/* Vertical housing body */}
             <mesh
-              position={[0, 0, boxDepth / 2]}
+              position={[0, 0, tD / 2]}
               material={tailLightBaseMaterial}
               castShadow
               receiveShadow
               {...hp("Tail Light Housing")}
             >
-              <boxGeometry args={[boxW, boxH, boxDepth]} />
+              <boxGeometry args={[tW, tH, tD]} />
             </mesh>
-
-            {/* Front bezel / rim plate — slightly proud of housing face */}
-            <mesh
-              position={[0, 0, boxDepth + wall / 2]}
-              material={hardwareSteelMaterial}
-              castShadow
-              {...hp("Tail Light Bracket")}
-            >
-              <boxGeometry args={[boxW + 1.6, boxH + 1.6, wall]} />
-            </mesh>
-
-            {/* Mounting bracket — top */}
-            <mesh
-              position={[0, boxH / 2 + 1.4, boxDepth * 0.35]}
-              material={hardwareSteelMaterial}
-              castShadow
-              {...hp("Tail Light Bracket")}
-            >
-              <boxGeometry args={[boxW - 0.5, 2.2, boxDepth * 0.65]} />
-            </mesh>
-
-            {/* Mounting bracket — bottom */}
-            <mesh
-              position={[0, -(boxH / 2 + 1.4), boxDepth * 0.35]}
-              material={hardwareSteelMaterial}
-              castShadow
-              {...hp("Tail Light Bracket")}
-            >
-              <boxGeometry args={[boxW - 0.5, 2.2, boxDepth * 0.65]} />
-            </mesh>
-
-            {/* Corner mounting bolts */}
-            {[-3.2, 3.2].map((bx, bi) =>
-              [boxH / 2 + 1.0, -(boxH / 2 + 1.0)].map((by, bj) => (
-                <mesh
-                  key={`bolt-${bi}-${bj}`}
-                  position={[bx, by, 0]}
-                  material={chainMaterial}
-                  castShadow
-                  {...hp("Mounting Bolt")}
-                >
-                  <cylinderGeometry args={[0.36, 0.36, 0.55, 10]} />
+            {/* Two wide rectangular LED bars — [-3.5]=top, [+3.5]=bottom world Y under -π/2 */}
+            {[-3.5, 3.5].map((lx, li) => (
+              <group key={li} position={[lx, 0, tD]}>
+                {/* Black border: wide pill (landscape) */}
+                <mesh material={tailLightBaseMaterial} castShadow>
+                  <boxGeometry args={[2.6, 5.5, 0.38]} />
                 </mesh>
-              )),
-            )}
-
-            {/* Top oval LED tail light */}
-            <group position={[0, 3.6, boxDepth + 0.15]}>
-              {/* Outer housing rim */}
-              <mesh
-                scale={[3.8, 5.0, 0.6]}
-                material={tailLightBaseMaterial}
-                {...hp("Tail Light Housing")}
-              >
-                <sphereGeometry args={[1, 28, 18]} />
-              </mesh>
-              {/* Red lens */}
-              <mesh
-                scale={[3.2, 4.3, 0.55]}
-                position={[0, 0, 0.28]}
-                material={tailLightLensMaterial}
-                {...hp("Tail Light Lens")}
-              >
-                <sphereGeometry args={[1, 28, 18]} />
-              </mesh>
-              {/* LED emitter core */}
-              <mesh
-                scale={[2.0, 2.9, 0.38]}
-                position={[0, 0, 0.52]}
-                material={tailLightMaterial}
-                {...hp("Tail Light LED")}
-              >
-                <sphereGeometry args={[1, 20, 14]} />
-              </mesh>
-            </group>
-
-            {/* Bottom oval LED tail light */}
-            <group position={[0, -3.6, boxDepth + 0.15]}>
-              {/* Outer housing rim */}
-              <mesh
-                scale={[3.8, 5.0, 0.6]}
-                material={tailLightBaseMaterial}
-                {...hp("Tail Light Housing")}
-              >
-                <sphereGeometry args={[1, 28, 18]} />
-              </mesh>
-              {/* Red lens */}
-              <mesh
-                scale={[3.2, 4.3, 0.55]}
-                position={[0, 0, 0.28]}
-                material={tailLightLensMaterial}
-                {...hp("Tail Light Lens")}
-              >
-                <sphereGeometry args={[1, 28, 18]} />
-              </mesh>
-              {/* LED emitter core */}
-              <mesh
-                scale={[2.0, 2.9, 0.38]}
-                position={[0, 0, 0.52]}
-                material={tailLightMaterial}
-                {...hp("Tail Light LED")}
-              >
-                <sphereGeometry args={[1, 20, 14]} />
-              </mesh>
-            </group>
-
-            {/* Horizontal reflective strip below housing */}
-            <mesh
-              position={[1.5, -(boxH / 2 + 3.5), boxDepth * 0.42]}
-              material={reflectorRedMaterial}
-              {...hp("Rear Reflector Strip")}
-            >
-              <boxGeometry args={[boxW + 3.0, 2.2, boxDepth * 0.75]} />
-            </mesh>
-            <mesh
-              position={[1.5, -(boxH / 2 + 3.5), boxDepth * 0.42 + 0.14]}
-              material={reflectorWhiteMaterial}
-              {...hp("Rear Reflector Strip")}
-            >
-              <boxGeometry args={[boxW + 3.0, 0.9, boxDepth * 0.75 - 0.28]} />
-            </mesh>
+                {[-2.75, 2.75].map((cy, ci2) => (
+                  <mesh
+                    key={ci2}
+                    position={[0, cy, 0]}
+                    rotation={[Math.PI / 2, 0, 0]}
+                    material={tailLightBaseMaterial}
+                    castShadow
+                  >
+                    <cylinderGeometry args={[1.3, 1.3, 0.38, 18]} />
+                  </mesh>
+                ))}
+                {/* Red emissive LED fill */}
+                <mesh
+                  position={[0, 0, 0.22]}
+                  material={tailLightMaterial}
+                  castShadow
+                >
+                  <boxGeometry args={[1.6, 4.0, 0.22]} />
+                </mesh>
+                {[-2.0, 2.0].map((cy, ci2) => (
+                  <mesh
+                    key={ci2}
+                    position={[0, cy, 0.22]}
+                    rotation={[Math.PI / 2, 0, 0]}
+                    material={tailLightMaterial}
+                    castShadow
+                  >
+                    <cylinderGeometry args={[0.8, 0.8, 0.22, 18]} />
+                  </mesh>
+                ))}
+              </group>
+            ))}
           </group>
         );
       })}
@@ -1514,15 +1457,6 @@ function FrameAssembly({
         {...hp("Gusset Plate")}
       >
         <boxGeometry args={[6.8, 4.8, 0.7]} />
-      </mesh>
-
-      {/* Breakaway cable as a coiled blue tube */}
-      <mesh
-        material={breakawayCableMaterial}
-        castShadow
-        {...hp("Breakaway Cable")}
-      >
-        <tubeGeometry args={[breakawayCableCurve, 120, 0.13, 10, false]} />
       </mesh>
 
       {/* Vertical drop-leg jack with crank handle */}
