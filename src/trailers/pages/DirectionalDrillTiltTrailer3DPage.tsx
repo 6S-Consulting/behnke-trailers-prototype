@@ -13,8 +13,9 @@ export function DirectionalDrillTiltTrailer3DPage() {
   const [activeModel, setActiveModel] = useState<ActiveModel>("original");
   const [tiltAngleDeg, setTiltAngleDeg] = useState(13);
   const [cameraView, setCameraView] = useState<CameraView>("perspective");
-  const [autoRotate, setAutoRotate] = useState(true);
+  const [autoRotate, setAutoRotate] = useState(false);
   const [showOptionalEquipment, setShowOptionalEquipment] = useState(false);
+  const [showHoverLabels, setShowHoverLabels] = useState(true);
 
   return (
     <div className="bg-background min-h-screen">
@@ -57,6 +58,7 @@ export function DirectionalDrillTiltTrailer3DPage() {
                 cameraView={cameraView}
                 showOptionalEquipment={showOptionalEquipment}
                 autoRotate={autoRotate}
+                showHoverLabels={showHoverLabels}
               />
 
               <aside className="absolute top-3 right-3 w-64 bg-background/70 backdrop-blur-md border border-border rounded-lg p-4 space-y-4">
@@ -111,6 +113,14 @@ export function DirectionalDrillTiltTrailer3DPage() {
                     />
                     Show optional mounts
                   </label>
+                  <label className="inline-flex items-center gap-2 font-display text-xs text-muted-foreground font-semibold">
+                    <input
+                      type="checkbox"
+                      checked={showHoverLabels}
+                      onChange={(e) => setShowHoverLabels(e.target.checked)}
+                    />
+                    Show part labels on hover
+                  </label>
                 </div>
               </aside>
             </div>
@@ -118,7 +128,6 @@ export function DirectionalDrillTiltTrailer3DPage() {
 
           {activeModel === "enhanced" && (
             <div>
-            
               <div className="h-[700px] rounded-lg overflow-hidden border border-border">
                 <TrailerScene />
               </div>

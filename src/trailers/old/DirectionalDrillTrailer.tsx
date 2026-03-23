@@ -11,6 +11,8 @@ export type HitchType = "coupler" | "pintle";
 export type TiltSide = "driver" | "passenger";
 export type CameraView = "perspective" | "side" | "top";
 
+type PartHoverFn = (name: string) => void;
+
 export type TrailerViewerProps = {
   frontDeckLengthFt?: LengthOption;
   axleRating?: AxleRating;
@@ -21,6 +23,7 @@ export type TrailerViewerProps = {
   cameraView?: CameraView;
   showOptionalEquipment?: boolean;
   autoRotate?: boolean;
+  showHoverLabels?: boolean;
 };
 
 type TrailerDimensions = {
@@ -230,11 +233,15 @@ function SideReflectorStrip({
   y,
   zStart,
   zEnd,
+  onPartHover,
+  onPartLeave,
 }: {
   x: number;
   y: number;
   zStart: number;
   zEnd: number;
+  onPartHover?: PartHoverFn;
+  onPartLeave?: () => void;
 }) {
   const segLength = 8;
   const gap = 0.55;
@@ -248,7 +255,20 @@ function SideReflectorStrip({
         const material =
           i % 2 === 0 ? reflectorWhiteMaterial : reflectorRedMaterial;
         return (
-          <mesh key={i} position={[x, y, z]} material={material}>
+          <mesh
+            key={i}
+            position={[x, y, z]}
+            material={material}
+            onPointerOver={
+              onPartHover
+                ? (e) => {
+                    e.stopPropagation();
+                    onPartHover("Side Reflector Strip");
+                  }
+                : undefined
+            }
+            onPointerOut={onPartLeave}
+          >
             <boxGeometry args={[0.22, 0.95, segLength]} />
           </mesh>
         );
@@ -260,10 +280,25 @@ function SideReflectorStrip({
 function Wheel({
   tireRadius,
   tireWidth,
+  onPartHover,
+  onPartLeave,
 }: {
   tireRadius: number;
   tireWidth: number;
+  onPartHover?: PartHoverFn;
+  onPartLeave?: () => void;
 }) {
+  const hp = (name: string) =>
+    onPartHover
+      ? {
+          onPointerOver: (e: { stopPropagation: () => void }) => {
+            e.stopPropagation();
+            onPartHover(name);
+          },
+          onPointerOut: onPartLeave,
+        }
+      : {};
+
   return (
     <group>
       <mesh
@@ -271,10 +306,16 @@ function Wheel({
         material={rubberMaterial}
         castShadow
         receiveShadow
+        {...hp("Tire")}
       >
         <cylinderGeometry args={[tireRadius, tireRadius, tireWidth, 38]} />
       </mesh>
-      <mesh rotation={[0, 0, Math.PI / 2]} material={rimMaterial} castShadow>
+      <mesh
+        rotation={[0, 0, Math.PI / 2]}
+        material={rimMaterial}
+        castShadow
+        {...hp("Rim")}
+      >
         <cylinderGeometry
           args={[tireRadius * 0.56, tireRadius * 0.56, tireWidth + 0.26, 30]}
         />
@@ -291,6 +332,7 @@ function Wheel({
               Math.sin(angle) * 2.05,
             ]}
             material={rimMaterial}
+            {...hp("Lug Bolt")}
           >
             <cylinderGeometry args={[0.16, 0.16, 0.45, 8]} />
           </mesh>
@@ -307,6 +349,8 @@ function FrameAssembly({
   deckWood,
   showOptionalEquipment,
   hitchType,
+  onPartHover,
+  onPartLeave,
 }: {
   dims: TrailerDimensions;
   tiltSide: TiltSide;
@@ -314,6 +358,8 @@ function FrameAssembly({
   deckWood: DeckWood;
   showOptionalEquipment: boolean;
   hitchType: HitchType;
+  onPartHover: PartHoverFn;
+  onPartLeave: () => void;
 }) {
   const deckHalfLen = dims.deckLength / 2;
   const leftEdge = -dims.betweenFenders / 2;
@@ -331,7 +377,7 @@ function FrameAssembly({
   const tiltPivotZ = dims.axleCenterZ - 8;
   const tiltAngle = (Math.PI / 180) * tiltAngleDeg * (tiltSign < 0 ? 1 : -1);
 
-  const tongueBaseZ = -deckHalfLen;
+  const tongueBaseZ = -deckHalfLen + 15;
   const tongueBeamLength = 59;
   const tongueBeamHeight = 5.9;
   const tongueBeamWidth = 3.15;
@@ -345,7 +391,7 @@ function FrameAssembly({
   const jackSleeveHeight = 23.6;
   const jackInnerWidth = 3.55;
   const jackInnerHeight = 16;
-  const jackFootSize = 7.9;
+  const jackFootSize = 9.9;
   const jackCenterZ = tongueBaseZ - 33;
   const jackSleeveBottomY = frameTopY - 2.1;
   const jackSleeveCenterY = jackSleeveBottomY + jackSleeveHeight / 2;
@@ -393,6 +439,14 @@ function FrameAssembly({
   const rearTiltEdgeZ = tiltDeckCenterZ + tiltDeckLength / 2;
   const beavertailLength = 27;
 
+  const hp = (name: string) => ({
+    onPointerOver: (e: { stopPropagation: () => void }) => {
+      e.stopPropagation();
+      onPartHover(name);
+    },
+    onPointerOut: onPartLeave,
+  });
+
   return (
     <group>
       {/* Main lower rails */}
@@ -401,6 +455,7 @@ function FrameAssembly({
         material={frameMaterial}
         castShadow
         receiveShadow
+        {...hp("Left Main Rail")}
       >
         <boxGeometry
           args={[dims.lowerRailWidth, dims.lowerRailHeight, dims.deckLength]}
@@ -411,6 +466,7 @@ function FrameAssembly({
         material={frameMaterial}
         castShadow
         receiveShadow
+        {...hp("Right Main Rail")}
       >
         <boxGeometry
           args={[dims.lowerRailWidth, dims.lowerRailHeight, dims.deckLength]}
@@ -422,6 +478,7 @@ function FrameAssembly({
         position={[leftEdge + 1.5, upperRailCenterY, 0]}
         material={frameWearMaterial}
         castShadow
+        {...hp("Left Rub Rail")}
       >
         <boxGeometry args={[3, dims.upperRailSize, dims.deckLength]} />
       </mesh>
@@ -429,6 +486,7 @@ function FrameAssembly({
         position={[rightEdge - 1.5, upperRailCenterY, 0]}
         material={frameWearMaterial}
         castShadow
+        {...hp("Right Rub Rail")}
       >
         <boxGeometry args={[3, dims.upperRailSize, dims.deckLength]} />
       </mesh>
@@ -442,6 +500,7 @@ function FrameAssembly({
             position={[0, frameTopY - dims.crossmemberDepth / 2, z]}
             material={frameMaterial}
             castShadow
+            {...hp("Crossmember")}
           >
             <boxGeometry
               args={[dims.betweenFenders, dims.crossmemberDepth, 1.85]}
@@ -452,16 +511,20 @@ function FrameAssembly({
 
       {/* Reflector stripes inspired by reference */}
       <SideReflectorStrip
-        x={leftEdge + 0.45}
-        y={dims.deckHeight - 15.7}
+        x={leftEdge - 1}
+        y={dims.deckHeight - 7}
         zStart={-deckHalfLen + 18}
         zEnd={deckHalfLen - 10}
+        onPartHover={onPartHover}
+        onPartLeave={onPartLeave}
       />
       <SideReflectorStrip
-        x={rightEdge - 0.45}
-        y={dims.deckHeight - 15.7}
+        x={rightEdge + 1}
+        y={dims.deckHeight - 7}
         zStart={-deckHalfLen + 18}
         zEnd={deckHalfLen - 10}
+        onPartHover={onPartHover}
+        onPartLeave={onPartLeave}
       />
 
       {/* Stationary deck frame top surface */}
@@ -470,6 +533,7 @@ function FrameAssembly({
         material={frameMaterial}
         castShadow
         receiveShadow
+        {...hp("Stationary Deck Frame")}
       >
         <boxGeometry args={[dims.stationaryDeckWidth, 0.2, dims.deckLength]} />
       </mesh>
@@ -489,6 +553,7 @@ function FrameAssembly({
             material={woodPlanks[i % woodPlanks.length]}
             castShadow
             receiveShadow
+            {...hp("Deck Plank (Stationary)")}
           >
             <boxGeometry
               args={[
@@ -507,6 +572,7 @@ function FrameAssembly({
         material={frameMaterial}
         castShadow
         receiveShadow
+        {...hp("Front Fixed Deck Frame")}
       >
         <boxGeometry args={[dims.tiltDeckWidth, 0.2, frontFixedLength]} />
       </mesh>
@@ -531,6 +597,7 @@ function FrameAssembly({
             material={woodPlanks[(i + 2) % woodPlanks.length]}
             castShadow
             receiveShadow
+            {...hp("Deck Plank (Front Fixed)")}
           >
             <boxGeometry
               args={[tiltPlankWidth, dims.plankThickness, frontFixedLength]}
@@ -544,6 +611,7 @@ function FrameAssembly({
         position={[0, dims.deckHeight + 0.35, -22]}
         material={deckStripeMaterial}
         castShadow
+        {...hp("Center Deck Stripe")}
       >
         <boxGeometry args={[2.2, 0.55, dims.deckLength - 24]} />
       </mesh>
@@ -554,7 +622,12 @@ function FrameAssembly({
         rotation={[tiltAngle, 0, 0]}
       >
         {/* Metal frame support structure for tilt deck */}
-        <mesh position={[0, -2.3, -8]} material={frameMaterial} castShadow>
+        <mesh
+          position={[0, -2.3, -8]}
+          material={frameMaterial}
+          castShadow
+          {...hp("Tilt Deck Support Structure")}
+        >
           <boxGeometry args={[dims.tiltDeckWidth * 0.45, 2.1, 2.2]} />
         </mesh>
 
@@ -568,6 +641,7 @@ function FrameAssembly({
           material={frameMaterial}
           castShadow
           receiveShadow
+          {...hp("Tilt Deck Frame")}
         >
           <boxGeometry args={[dims.tiltDeckWidth, 0.2, tiltDeckLength]} />
         </mesh>
@@ -590,6 +664,7 @@ function FrameAssembly({
               material={woodPlanks[(i + 2) % woodPlanks.length]}
               castShadow
               receiveShadow
+              {...hp("Tilt Deck Plank")}
             >
               <boxGeometry
                 args={[tiltPlankWidth, dims.plankThickness, tiltDeckLength]}
@@ -605,6 +680,7 @@ function FrameAssembly({
             position={[tiltSign * 21.6, 0.6, z]}
             material={frameMaterial}
             castShadow
+            {...hp("Tie-Down Ring")}
           >
             <torusGeometry args={[1.95, 0.45, 10, 18]} />
           </mesh>
@@ -618,11 +694,21 @@ function FrameAssembly({
             rearTiltEdgeZ - tiltPivotZ + beavertailLength / 2,
           ]}
         >
-          <mesh material={frameMaterial} castShadow receiveShadow>
+          <mesh
+            material={frameMaterial}
+            castShadow
+            receiveShadow
+            {...hp("Beavertail")}
+          >
             <boxGeometry args={[dims.tiltDeckWidth, 0.7, beavertailLength]} />
           </mesh>
           {[-8, 0, 8].map((x, i) => (
-            <mesh key={i} position={[x, 0.4, 6]} material={frameWearMaterial}>
+            <mesh
+              key={i}
+              position={[x, 0.4, 6]}
+              material={frameWearMaterial}
+              {...hp("Roller Support")}
+            >
               <cylinderGeometry args={[1.25, 1.25, 0.72, 18]} />
             </mesh>
           ))}
@@ -639,6 +725,7 @@ function FrameAssembly({
                 position={[leftEdge + 1.4, frameTopY - 0.25, z]}
                 material={frameMaterial}
                 castShadow
+                {...hp("Stake Pocket")}
               >
                 <boxGeometry args={[1.1, 3, 2.4]} />
               </mesh>
@@ -646,6 +733,7 @@ function FrameAssembly({
                 position={[rightEdge - 1.4, frameTopY - 0.25, z]}
                 material={frameMaterial}
                 castShadow
+                {...hp("Stake Pocket")}
               >
                 <boxGeometry args={[1.1, 3, 2.4]} />
               </mesh>
@@ -664,12 +752,18 @@ function FrameAssembly({
             rotation={[0, 0, Math.PI / 2]}
             material={frameMaterial}
             castShadow
+            {...hp("Axle Shaft")}
           >
             <cylinderGeometry args={[1.35, 1.35, 84, 20]} />
           </mesh>
           {[-dims.wheelTrackHalf, dims.wheelTrackHalf].map((x, wheelIdx) => (
             <group key={wheelIdx} position={[x, 0, 0]}>
-              <Wheel tireRadius={dims.tireRadius} tireWidth={dims.tireWidth} />
+              <Wheel
+                tireRadius={dims.tireRadius}
+                tireWidth={dims.tireWidth}
+                onPartHover={onPartHover}
+                onPartLeave={onPartLeave}
+              />
             </group>
           ))}
         </group>
@@ -685,12 +779,18 @@ function FrameAssembly({
             rotation={[-Math.PI / 2, -Math.PI / 2, 0]}
             material={frameMaterial}
             castShadow
+            {...hp("Fender")}
           >
             <cylinderGeometry
               args={[6.7, 6.7, dims.axleSpacing + 36, 20, 1, true, 0, Math.PI]}
             />
           </mesh>
-          <mesh position={[0, -6.5, 0]} material={frameMaterial} castShadow>
+          <mesh
+            position={[0, -6.5, 0]}
+            material={frameMaterial}
+            castShadow
+            {...hp("Fender Bracket")}
+          >
             <boxGeometry args={[13.6, 0.9, dims.axleSpacing + 36]} />
           </mesh>
         </group>
@@ -702,10 +802,18 @@ function FrameAssembly({
           key={`light-${idx}`}
           position={[x, dims.deckHeight - 14, deckHalfLen + 0.95]}
         >
-          <mesh position={[0, 2.2, 0]} material={ledMaterial}>
+          <mesh
+            position={[-5,12, 0]}
+            material={ledMaterial}
+            {...hp("Rear LED Module")}
+          >
             <boxGeometry args={[4.8, 1.75, 0.85]} />
           </mesh>
-          <mesh position={[0, -0.2, 0]} material={ledMaterial}>
+          <mesh
+            position={[-5, 9-0.2, 0]}
+            material={ledMaterial}
+            {...hp("Rear LED Module")}
+          >
             <boxGeometry args={[4.8, 1.75, 0.85]} />
           </mesh>
         </group>
@@ -723,9 +831,10 @@ function FrameAssembly({
         >
           {/* Mounting bracket */}
           <mesh
-            position={[0, 0, -0.4]}
+            position={[0, 9, -0.4]}
             material={tailLightBaseMaterial}
             castShadow
+            {...hp("Tail Light Bracket")}
           >
             <boxGeometry args={[2.8, 6.5, 0.3]} />
           </mesh>
@@ -734,14 +843,19 @@ function FrameAssembly({
           <group position={[0, 1.8, 0]}>
             {/* Housing base */}
             <mesh
-              position={[0, 0, 0]}
+              position={[0, 9, 0]}
               material={tailLightBaseMaterial}
               castShadow
+              {...hp("Tail Light Housing")}
             >
               <boxGeometry args={[2.4, 2.2, 0.8]} />
             </mesh>
             {/* Light lens - rounded rectangle effect */}
-            <mesh position={[0, 0, 0.45]} material={tailLightLensMaterial}>
+            <mesh
+              position={[0, 9, 0.45]}
+              material={tailLightLensMaterial}
+              {...hp("Tail Light Lens")}
+            >
               <boxGeometry args={[2.0, 1.8, 0.3]} />
             </mesh>
             {/* Corner rounds */}
@@ -755,28 +869,38 @@ function FrameAssembly({
                 key={i}
                 position={[cx, cy, 0.45]}
                 material={tailLightLensMaterial}
+                {...hp("Tail Light Lens")}
               >
                 <sphereGeometry args={[0.25, 12, 12]} />
               </mesh>
             ))}
             {/* Inner bright LED element */}
-            <mesh position={[0, 0, 0.55]} material={tailLightMaterial}>
+            <mesh
+              position={[0, 9, 0.55]}
+              material={tailLightMaterial}
+              {...hp("Tail Light LED")}
+            >
               <boxGeometry args={[1.4, 1.2, 0.15]} />
             </mesh>
           </group>
 
           {/* Bottom light housing */}
-          <group position={[0, -1.8, 0]}>
+          <group position={[0, 9-1.8, 0]}>
             {/* Housing base */}
             <mesh
-              position={[0, 0, 0]}
+              position={[0, 9, 0]}
               material={tailLightBaseMaterial}
               castShadow
+              {...hp("Tail Light Housing")}
             >
               <boxGeometry args={[2.4, 2.2, 0.8]} />
             </mesh>
             {/* Light lens - rounded rectangle effect */}
-            <mesh position={[0, 0, 0.45]} material={tailLightLensMaterial}>
+            <mesh
+              position={[0, 9, 0.45]}
+              material={tailLightLensMaterial}
+              {...hp("Tail Light Lens")}
+            >
               <boxGeometry args={[2.0, 1.8, 0.3]} />
             </mesh>
             {/* Corner rounds */}
@@ -790,12 +914,17 @@ function FrameAssembly({
                 key={i}
                 position={[cx, cy, 0.45]}
                 material={tailLightLensMaterial}
+                {...hp("Tail Light Lens")}
               >
                 <sphereGeometry args={[0.25, 12, 12]} />
               </mesh>
             ))}
             {/* Inner bright LED element */}
-            <mesh position={[0, 0, 0.55]} material={tailLightMaterial}>
+            <mesh
+              position={[0, 9, 0.55]}
+              material={tailLightMaterial}
+              {...hp("Tail Light LED")}
+            >
               <boxGeometry args={[1.4, 1.2, 0.15]} />
             </mesh>
           </group>
@@ -815,6 +944,7 @@ function FrameAssembly({
           material={hardwareSteelMaterial}
           castShadow
           receiveShadow
+          {...hp("A-Frame Tongue Beam")}
         >
           <boxGeometry
             args={[tongueBeamWidth, tongueBeamHeight, tongueBeamLength]}
@@ -827,6 +957,7 @@ function FrameAssembly({
         position={[0, frameTopY + 0.6, tongueBaseZ - 14]}
         material={frameWearMaterial}
         castShadow
+        {...hp("Tongue Tie Plate")}
       >
         <boxGeometry args={[14.5, 2.8, 9.5]} />
       </mesh>
@@ -834,6 +965,7 @@ function FrameAssembly({
         position={[0, frameTopY - 2.0, hitchPlateZ + 7.6]}
         material={hardwareSteelMaterial}
         castShadow
+        {...hp("Gusset Plate")}
       >
         <boxGeometry args={[6.8, 4.8, 0.7]} />
       </mesh>
@@ -858,6 +990,7 @@ function FrameAssembly({
                 ]}
                 material={chainMaterial}
                 castShadow
+                {...hp("Safety Chain")}
               >
                 <torusGeometry args={[0.78, 0.14, 10, 16]} />
               </mesh>
@@ -867,16 +1000,21 @@ function FrameAssembly({
       ))}
 
       {/* Breakaway cable as a coiled blue tube */}
-      <mesh material={breakawayCableMaterial} castShadow>
+      <mesh
+        material={breakawayCableMaterial}
+        castShadow
+        {...hp("Breakaway Cable")}
+      >
         <tubeGeometry args={[breakawayCableCurve, 120, 0.13, 10, false]} />
       </mesh>
 
       {/* Vertical drop-leg jack with crank handle */}
-      <group position={[0, 0, jackCenterZ]}>
+      <group position={[-7, -7, jackCenterZ - 10]} rotation={[0, Math.PI, 0]}>
         <mesh
           position={[0, jackSleeveCenterY, 0]}
           material={hardwareSteelMaterial}
           castShadow
+          {...hp("Jack Sleeve")}
         >
           <boxGeometry
             args={[jackSleeveWidth, jackSleeveHeight, jackSleeveWidth]}
@@ -886,6 +1024,7 @@ function FrameAssembly({
           position={[0, jackInnerCenterY, 0]}
           material={frameWearMaterial}
           castShadow
+          {...hp("Jack Inner Leg")}
         >
           <boxGeometry
             args={[jackInnerWidth, jackInnerHeight, jackInnerWidth]}
@@ -895,6 +1034,7 @@ function FrameAssembly({
           position={[0, jackFootCenterY, 0]}
           material={hardwareSteelMaterial}
           castShadow
+          {...hp("Jack Foot Plate")}
         >
           <boxGeometry args={[jackFootSize, 0.4, jackFootSize]} />
         </mesh>
@@ -905,6 +1045,7 @@ function FrameAssembly({
           rotation={[0, 0, Math.PI / 2]}
           material={frameMaterial}
           castShadow
+          {...hp("Jack Crank Shaft")}
         >
           <cylinderGeometry args={[0.21, 0.21, 4.8, 12]} />
         </mesh>
@@ -915,6 +1056,7 @@ function FrameAssembly({
           rotation={[Math.PI / 2, 0, Math.PI / 2]}
           material={frameWearMaterial}
           castShadow
+          {...hp("Jack Crank Handle")}
         >
           <capsuleGeometry args={[0.42, 1.8, 8, 14]} />
         </mesh>
@@ -923,7 +1065,11 @@ function FrameAssembly({
       {/* Hitch */}
       {hitchType === "coupler" ? (
         <group position={[0, hitchCenterY, hitchPlateZ]}>
-          <mesh material={hardwareSteelMaterial} castShadow>
+          <mesh
+            material={hardwareSteelMaterial}
+            castShadow
+            {...hp("Coupler Mounting Plate")}
+          >
             <boxGeometry args={[7.8, 8.8, 0.7]} />
           </mesh>
           <mesh
@@ -931,6 +1077,7 @@ function FrameAssembly({
             rotation={[Math.PI / 2, 0, 0]}
             material={frameMaterial}
             castShadow
+            {...hp("Ball Coupler")}
           >
             <coneGeometry args={[3.2, 8, 20]} />
           </mesh>
@@ -938,7 +1085,11 @@ function FrameAssembly({
       ) : (
         <group position={[0, hitchCenterY, hitchPlateZ]}>
           {/* Adjustable front channel */}
-          <mesh material={hardwareSteelMaterial} castShadow>
+          <mesh
+            material={hardwareSteelMaterial}
+            castShadow
+            {...hp("Pintle Channel")}
+          >
             <boxGeometry args={[8.4, 12, 1.1]} />
           </mesh>
           {Array.from({ length: 5 }).map((_, i) => (
@@ -946,13 +1097,19 @@ function FrameAssembly({
               key={`channel-hole-${i}`}
               position={[0, -4 + i * 2, 0.58]}
               material={frameWearMaterial}
+              {...hp("Pin Hole")}
             >
               <cylinderGeometry args={[0.42, 0.42, 0.22, 16]} />
             </mesh>
           ))}
 
           {/* Pintle mounting plate and bolt pattern */}
-          <mesh position={[0, 0, 0.98]} material={frameMaterial} castShadow>
+          <mesh
+            position={[0, 0, 0.98]}
+            material={frameMaterial}
+            castShadow
+            {...hp("Pintle Mounting Plate")}
+          >
             <boxGeometry args={[7.9, 9.8, 0.65]} />
           </mesh>
           {[-2.2, 2.2].map((bx) =>
@@ -962,6 +1119,7 @@ function FrameAssembly({
                 position={[bx, by, 1.28]}
                 material={chainMaterial}
                 castShadow
+                {...hp("Mounting Bolt")}
               >
                 <cylinderGeometry args={[0.28, 0.28, 0.85, 14]} />
               </mesh>
@@ -974,6 +1132,7 @@ function FrameAssembly({
             rotation={[Math.PI / 2, 0, 0]}
             material={hardwareSteelMaterial}
             castShadow
+            {...hp("Pintle Eye Ring")}
           >
             <torusGeometry args={[2.75, 1.28, 16, 34]} />
           </mesh>
@@ -992,6 +1151,7 @@ function FrameAssembly({
             ]}
             material={frameWearMaterial}
             castShadow
+            {...hp("Toolbox")}
           >
             <boxGeometry args={[26, 12, 18]} />
           </mesh>
@@ -1003,6 +1163,7 @@ function FrameAssembly({
             ]}
             material={frameMaterial}
             castShadow
+            {...hp("Toolbox Lid")}
           >
             <boxGeometry args={[27, 1.3, 19]} />
           </mesh>
@@ -1019,6 +1180,7 @@ function FrameAssembly({
               rotation={[Math.PI / 2, 0, 0]}
               material={blueReelMaterial}
               castShadow
+              {...hp("Hose Reel")}
             >
               <cylinderGeometry args={[4.8, 4.8, 7.4, 24]} />
             </mesh>
@@ -1027,6 +1189,7 @@ function FrameAssembly({
               position={[0, 0, -3.9]}
               material={blueReelMaterial}
               castShadow
+              {...hp("Hose Reel Flange")}
             >
               <cylinderGeometry args={[7.5, 7.5, 0.7, 22]} />
             </mesh>
@@ -1035,6 +1198,7 @@ function FrameAssembly({
               position={[0, 0, 3.9]}
               material={blueReelMaterial}
               castShadow
+              {...hp("Hose Reel Flange")}
             >
               <cylinderGeometry args={[7.5, 7.5, 0.7, 22]} />
             </mesh>
@@ -1051,6 +1215,7 @@ function FrameAssembly({
               ]}
               material={frameMaterial}
               castShadow
+              {...hp("Boring Bar Holder")}
             >
               <boxGeometry args={[2.2, 6.5, 2.2]} />
             </mesh>
@@ -1070,6 +1235,8 @@ function TrailerModel({
   tiltAngleDeg,
   showOptionalEquipment,
   autoRotate,
+  onPartHover,
+  onPartLeave,
 }: Required<
   Pick<
     TrailerViewerProps,
@@ -1082,7 +1249,10 @@ function TrailerModel({
     | "showOptionalEquipment"
     | "autoRotate"
   >
->) {
+> & {
+  onPartHover: PartHoverFn;
+  onPartLeave: () => void;
+}) {
   const groupRef = useRef<THREE.Group>(null);
 
   const dims = useMemo(
@@ -1105,6 +1275,8 @@ function TrailerModel({
         deckWood={deckWood}
         showOptionalEquipment={showOptionalEquipment}
         hitchType={hitchType}
+        onPartHover={onPartHover}
+        onPartLeave={onPartLeave}
       />
     </group>
   );
@@ -1120,6 +1292,7 @@ export default function TrailerViewer({
   cameraView = "perspective",
   showOptionalEquipment = true,
   autoRotate = false,
+  showHoverLabels = true,
 }: TrailerViewerProps) {
   const dims = useMemo(
     () => deriveDimensions(frontDeckLengthFt, axleRating, deckWood),
@@ -1127,10 +1300,38 @@ export default function TrailerViewer({
   );
 
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [hoveredPart, setHoveredPart] = useState<string | null>(null);
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const isDragging = useRef(false);
+
+  const handlePartHover = (name: string) => {
+    if (showHoverLabels && !isDragging.current) setHoveredPart(name);
+  };
+  const handlePartLeave = () => {
+    if (!isDragging.current) setHoveredPart(null);
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    setMousePos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+  };
+
+  const handlePointerDown = () => {
+    isDragging.current = true;
+    setHoveredPart(null);
+  };
+  const handlePointerUp = () => {
+    isDragging.current = false;
+  };
+  // Called by OrbitControls onStart/onEnd directly
 
   return (
     <>
-      <div className="relative w-full h-[700px] bg-gray-200 rounded-lg overflow-hidden border border-slate-300">
+      <div
+        className="relative w-full h-[700px] bg-gray-200 rounded-lg overflow-hidden border border-slate-300"
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handlePartLeave}
+      >
         <Canvas
           camera={{ position: [360, 180, 520], fov: 40, near: 1, far: 3200 }}
           shadows
@@ -1163,6 +1364,8 @@ export default function TrailerViewer({
               tiltAngleDeg={tiltAngleDeg}
               showOptionalEquipment={showOptionalEquipment}
               autoRotate={autoRotate}
+              onPartHover={handlePartHover}
+              onPartLeave={handlePartLeave}
             />
           </group>
 
@@ -1193,8 +1396,19 @@ export default function TrailerViewer({
             enableRotate={cameraView === "perspective"}
             minPolarAngle={0.01}
             maxPolarAngle={Math.PI / 2 - 0.02}
+            onStart={handlePointerDown}
+            onEnd={handlePointerUp}
           />
         </Canvas>
+
+        {hoveredPart && (
+          <div
+            className="absolute pointer-events-none z-20 bg-black/80 text-white text-xs font-semibold px-2.5 py-1 rounded-md shadow-lg border border-white/20 whitespace-nowrap"
+            style={{ left: mousePos.x + 14, top: mousePos.y - 32 }}
+          >
+            {hoveredPart}
+          </div>
+        )}
 
         <button
           onClick={() => setIsFullscreen(true)}
@@ -1206,7 +1420,11 @@ export default function TrailerViewer({
       </div>
 
       {isFullscreen && (
-        <div className="fixed inset-0 z-50 bg-gray-300">
+        <div
+          className="fixed inset-0 z-50 bg-gray-300"
+          onMouseMove={handleMouseMove}
+          onMouseLeave={handlePartLeave}
+        >
           <Canvas
             camera={{ position: [360, 180, 520], fov: 40, near: 1, far: 3200 }}
             shadows
@@ -1239,6 +1457,8 @@ export default function TrailerViewer({
                 tiltAngleDeg={tiltAngleDeg}
                 showOptionalEquipment={showOptionalEquipment}
                 autoRotate={true}
+                onPartHover={handlePartHover}
+                onPartLeave={handlePartLeave}
               />
             </group>
 
@@ -1269,8 +1489,19 @@ export default function TrailerViewer({
               enableRotate={true}
               minPolarAngle={0}
               maxPolarAngle={Math.PI}
+              onStart={handlePointerDown}
+              onEnd={handlePointerUp}
             />
           </Canvas>
+
+          {hoveredPart && (
+            <div
+              className="absolute pointer-events-none z-20 bg-black/80 text-white text-xs font-semibold px-2.5 py-1 rounded-md shadow-lg border border-white/20 whitespace-nowrap"
+              style={{ left: mousePos.x + 14, top: mousePos.y - 32 }}
+            >
+              {hoveredPart}
+            </div>
+          )}
 
           <button
             onClick={() => setIsFullscreen(false)}
