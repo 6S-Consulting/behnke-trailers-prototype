@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
 import {
   ArrowLeft, Tractor, HardHat, Truck, Weight, Ruler,
@@ -48,20 +48,78 @@ const DiscoverySection = () => {
   const [step, setStep]                         = useState(0);
   const [selectedIndustry, setSelectedIndustry] = useState<Industry | null>(null);
   const [selectedUseCase, setSelectedUseCase]   = useState<UseCase | null>(null);
+  const [selectedTrailerType, setSelectedTrailerType] = useState<TrailerType | null>(null);
   const [selectedProducts, setSelectedProducts] = useState<Product[]>([]);
+  
+  // Using useState for the ref guarantees our effect runs when the element ACTUALLY mounts 
+  // after the AnimatePresence wait transition completes.
+  const [scrollEl, setScrollEl] = useState<HTMLDivElement | null>(null);
+  const wheelLock = useRef({ atEdge: false, timestamp: 0 });
+
+  useEffect(() => {
+    if (!scrollEl) return;
+
+    const onWheel = (e: WheelEvent) => {
+      // Don't intercept purely horizontal trackpad swipes
+      if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+      if (e.deltaY === 0) return;
+      
+      const isAtStart = scrollEl.scrollLeft <= 2;
+      const isAtEnd = scrollEl.scrollLeft + scrollEl.clientWidth >= scrollEl.scrollWidth - 2;
+
+      const goingUp = e.deltaY < 0;
+      const goingDown = e.deltaY > 0;
+      
+      const now = Date.now();
+      const timeSinceLast = now - wheelLock.current.timestamp;
+      wheelLock.current.timestamp = now;
+
+      // Reset the boundary lock if this is a fresh scroll gesture (gap > 100ms)
+      if (timeSinceLast > 40){
+        wheelLock.current.atEdge = false;
+      }
+
+      // If we are at the edge and trying to scroll past it
+      if ((isAtStart && goingUp) || (isAtEnd && goingDown)) {
+        if (!wheelLock.current.atEdge) {
+          // Unlocked: allow page to scroll normally
+          return;
+        } else {
+          // Locked: we hit the edge during the current swipe. Swallow momentum.
+          e.preventDefault();
+          return;
+        }
+      }
+
+      // Otherwise, intercept and scroll horizontally
+      e.preventDefault();
+      scrollEl.scrollLeft += e.deltaY;
+
+      // Check if this movement JUST caused us to hit an edge
+      const hitStart = scrollEl.scrollLeft <= 2;
+      const hitEnd = scrollEl.scrollLeft + scrollEl.clientWidth >= scrollEl.scrollWidth - 2;
+      
+      if ((hitStart && goingUp) || (hitEnd && goingDown)) {
+        wheelLock.current.atEdge = true; // Lock remainder of this gesture
+      }
+    };
+
+    scrollEl.addEventListener("wheel", onWheel, { passive: false });
+    return () => scrollEl.removeEventListener("wheel", onWheel);
+  }, [scrollEl]);
 
   useEffect(() => {
     fetch("/data/trailers.json").then(r => r.json()).then(d => setData(d.industries));
   }, []);
 
   const goBack = () => {
-    if (step === 3)      { setSelectedProducts([]); setStep(2); }
+    if (step === 3)      { setSelectedProducts([]); setSelectedTrailerType(null); setStep(2); }
     else if (step === 2) { setSelectedUseCase(null); setStep(1); }
     else if (step === 1) { setSelectedIndustry(null); setStep(0); }
   };
 
   return (
-    <section id="discovery" className="relative py-28 px-4 min-h-screen overflow-hidden bg-[#181818]">
+    <section id="discovery" className="relative py-28 px-4 min-h-screen overflow-hidden bg-[#222]">
 
       {/* ── Ambient glow blobs ── */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -138,27 +196,47 @@ const DiscoverySection = () => {
 
           {/* Breadcrumb dots */}
           <div className="flex items-center gap-2 ml-auto">
-            {STEP_LABELS.map((label, i) => (
+            {STEP_LABELS.map((label, i) => {
+              const isActive = i === step;
+              const isPast = i < step;
+              let displayText = label;
+              let layoutIdKey: string | undefined = undefined;
+
+              if (i === 0 && selectedIndustry) {
+                displayText = selectedIndustry.name;
+                layoutIdKey = `title-ind-${selectedIndustry.id}`;
+              } else if (i === 1 && selectedUseCase) {
+                displayText = selectedUseCase.name;
+                layoutIdKey = `title-uc-${selectedUseCase.id}`;
+              } else if (i === 2 && selectedTrailerType) {
+                displayText = selectedTrailerType.name;
+                layoutIdKey = `title-tt-${selectedTrailerType.id}`;
+              }
+
+              return (
               <div key={label} className="flex items-center gap-2">
-                <div className={`flex items-center gap-1.5 transition-all duration-500 ${i <= step ? "opacity-100" : "opacity-25"}`}>
+                <div className={`flex items-center gap-1.5 transition-all duration-500 ${isPast || isActive ? "opacity-100" : "opacity-25"}`}>
                   <div className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold transition-all duration-500 ${
-                    i === step
+                    isActive
                       ? "bg-primary text-white"
-                      : i < step
+                      : isPast
                       ? "bg-primary/20 text-primary"
                       : "bg-white/5 text-gray-500"
                   }`}>
                     {i + 1}
                   </div>
-                  <span className={`text-[11px] font-medium tracking-wide hidden sm:block ${i === step ? "text-white" : "text-gray-600"}`}>
-                    {label}
-                  </span>
+                  <motion.span 
+                    layoutId={layoutIdKey}
+                    className={`text-[11px] font-medium tracking-wide hidden sm:block ${isActive ? "text-white" : "text-gray-600"} whitespace-nowrap`}
+                  >
+                    {displayText}
+                  </motion.span>
                 </div>
                 {i < 3 && (
-                  <div className={`w-6 h-px transition-all duration-500 ${i < step ? "bg-primary/40" : "bg-white/10"}`} />
+                  <div className={`w-6 h-px transition-all duration-500 ${isPast ? "bg-primary/40" : "bg-white/10"}`} />
                 )}
               </div>
-            ))}
+            )})}
           </div>
         </div>
 
@@ -168,12 +246,13 @@ const DiscoverySection = () => {
           {/* ── Step 0: Industries ── */}
           {step === 0 && (
             <motion.div
+              ref={setScrollEl as any}
               key="industries"
               variants={container}
               initial="hidden"
               animate="visible"
               exit={{ opacity: 0, x: -30, transition: { duration: 0.3 } }}
-              className="flex overflow-x-auto overflow-y-hidden gap-5 pb-4 scrollbar-hide snap-x snap-mandatory"
+              className="flex overflow-x-auto overflow-y-hidden gap-5 pb-4 scrollbar-hide"
             >
               {data.map((ind) => {
                 const meta = industryMeta[ind.id] || { icon: <Truck size={28} />, accent: "from-white/5 to-transparent", number: "00" };
@@ -183,7 +262,7 @@ const DiscoverySection = () => {
                     variants={cardAnim}
                     whileTap={{ scale: 0.97 }}
                     onClick={() => { setSelectedIndustry(ind); setStep(1); }}
-                    className="group relative flex-shrink-0 w-[260px] md:w-[300px] snap-start text-left overflow-hidden rounded-2xl border border-white/8 bg-white/4 backdrop-blur-sm flex flex-col min-h-[230px] p-6 cursor-pointer transition-all duration-500 hover:border-primary/40 hover:bg-white/6"
+                    className="group relative flex-shrink-0 w-[260px] md:w-[300px] text-left overflow-hidden rounded-2xl border border-white/8 bg-white/4 backdrop-blur-sm flex flex-col min-h-[230px] p-6 cursor-pointer transition-all duration-500 hover:border-primary/40 hover:bg-white/6"
                     style={{ boxShadow: "0 4px 24px rgba(0,0,0,0.4)" }}
                   >
                     {/* gradient bleed */}
@@ -200,7 +279,7 @@ const DiscoverySection = () => {
                         {meta.icon}
                       </div>
                       <div className="mt-6">
-                        <h3 className="font-display text-xl font-bold text-white mb-1.5">{ind.name}</h3>
+                        <motion.h3 layoutId={`title-ind-${ind.id}`} className="font-display text-xl font-bold text-white mb-1.5">{ind.name}</motion.h3>
                         {ind.description && (
                           <p className="text-xs text-gray-500 leading-relaxed line-clamp-2 group-hover:text-gray-400 transition-colors">
                             {ind.description}
@@ -221,12 +300,13 @@ const DiscoverySection = () => {
           {/* ── Step 1: Categories ── */}
           {step === 1 && selectedIndustry && (
             <motion.div
+              ref={setScrollEl as any}
               key="usecases"
               variants={container}
               initial="hidden"
               animate="visible"
               exit={{ opacity: 0, x: -30, transition: { duration: 0.3 } }}
-              className="flex overflow-x-auto overflow-y-hidden gap-5 pb-4 scrollbar-hide snap-x snap-mandatory"
+              className="flex overflow-x-auto overflow-y-hidden gap-5 pb-4 scrollbar-hide"
             >
               {selectedIndustry.useCases.map((uc) => (
                 <motion.button
@@ -234,7 +314,7 @@ const DiscoverySection = () => {
                   variants={cardAnim}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => { setSelectedUseCase(uc); setStep(2); }}
-                  className="group relative flex-shrink-0 w-[260px] md:w-[300px] snap-start text-left overflow-hidden rounded-2xl border border-white/8 bg-white/4 backdrop-blur-sm flex flex-col min-h-[230px] p-6 cursor-pointer transition-all duration-500 hover:border-primary/40 hover:bg-white/6"
+                  className="group relative flex-shrink-0 w-[260px] md:w-[300px] text-left overflow-hidden rounded-2xl border border-white/8 bg-white/4 backdrop-blur-sm flex flex-col min-h-[230px] p-6 cursor-pointer transition-all duration-500 hover:border-primary/40 hover:bg-white/6"
                   style={{ boxShadow: "0 4px 24px rgba(0,0,0,0.4)" }}
                 >
                   <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -244,7 +324,7 @@ const DiscoverySection = () => {
                       <div className="w-2.5 h-2.5 rounded-full bg-primary" />
                     </div>
                     <div className="mt-6">
-                      <h3 className="font-display text-lg font-bold text-white mb-2 leading-snug">{uc.name}</h3>
+                      <motion.h3 layoutId={`title-uc-${uc.id}`} className="font-display text-lg font-bold text-white mb-2 leading-snug">{uc.name}</motion.h3>
                       {uc.description && (
                         <p className="text-xs text-gray-500 leading-relaxed line-clamp-3 group-hover:text-gray-400 transition-colors">
                           {uc.description}
@@ -266,20 +346,21 @@ const DiscoverySection = () => {
           {/* ── Step 2: Trailer Types ── */}
           {step === 2 && selectedUseCase && (
             <motion.div
+              ref={setScrollEl as any}
               key="trailertypes"
               variants={container}
               initial="hidden"
               animate="visible"
               exit={{ opacity: 0, x: -30, transition: { duration: 0.3 } }}
-              className="flex overflow-x-auto overflow-y-hidden gap-5 pb-4 scrollbar-hide snap-x snap-mandatory"
+              className="flex overflow-x-auto overflow-y-hidden gap-5 pb-4 scrollbar-hide"
             >
               {selectedUseCase.trailerTypes.map((tt) => (
                 <motion.button
                   key={tt.id}
                   variants={cardAnim}
                   whileTap={{ scale: 0.97 }}
-                  onClick={() => { setSelectedProducts(tt.products); setStep(3); }}
-                  className="group relative flex-shrink-0 w-[260px] md:w-[300px] snap-start text-left overflow-hidden rounded-2xl border border-white/8 bg-white/4 backdrop-blur-sm flex flex-col min-h-[230px] p-6 cursor-pointer transition-all duration-500 hover:border-primary/40 hover:bg-white/6"
+                  onClick={() => { setSelectedProducts(tt.products); setSelectedTrailerType(tt); setStep(3); }}
+                  className="group relative flex-shrink-0 w-[260px] md:w-[300px] text-left overflow-hidden rounded-2xl border border-white/8 bg-white/4 backdrop-blur-sm flex flex-col min-h-[230px] p-6 cursor-pointer transition-all duration-500 hover:border-primary/40 hover:bg-white/6"
                   style={{ boxShadow: "0 4px 24px rgba(0,0,0,0.4)" }}
                 >
                   <div className="absolute bottom-0 right-0 w-24 h-24 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none overflow-hidden rounded-2xl">
@@ -292,7 +373,7 @@ const DiscoverySection = () => {
                       {tt.products.length} MODEL{tt.products.length !== 1 ? "S" : ""}
                     </div>
                     <div className="mt-6">
-                      <h3 className="font-display text-lg font-bold text-white mb-2 leading-snug">{tt.name}</h3>
+                      <motion.h3 layoutId={`title-tt-${tt.id}`} className="font-display text-lg font-bold text-white mb-2 leading-snug">{tt.name}</motion.h3>
                       {tt.description && (
                         <p className="text-xs text-gray-500 leading-relaxed line-clamp-3 group-hover:text-gray-400 transition-colors">
                           {tt.description}
@@ -313,18 +394,19 @@ const DiscoverySection = () => {
           {/* ── Step 3: Products ── */}
           {step === 3 && selectedProducts.length > 0 && (
             <motion.div
+              ref={setScrollEl as any}
               key="results"
               variants={container}
               initial="hidden"
               animate="visible"
               exit={{ opacity: 0, transition: { duration: 0.25 } }}
-              className="flex overflow-x-auto overflow-y-hidden gap-5 pb-4 scrollbar-hide snap-x snap-mandatory"
+              className="flex overflow-x-auto overflow-y-hidden gap-5 pb-4 scrollbar-hide"
             >
               {selectedProducts.map((product) => (
                 <motion.div
                   key={product.model}
                   variants={cardAnim}
-                  className="group relative flex-shrink-0 w-[280px] md:w-[310px] snap-start overflow-hidden rounded-2xl border border-white/8 bg-white/4 backdrop-blur-sm flex flex-col min-h-[260px] p-5 transition-all duration-500 hover:border-primary/35 hover:bg-white/6"
+                  className="group relative flex-shrink-0 w-[280px] md:w-[310px] overflow-hidden rounded-2xl border border-white/8 bg-white/4 backdrop-blur-sm flex flex-col min-h-[260px] p-5 transition-all duration-500 hover:border-primary/35 hover:bg-white/6"
                   style={{ boxShadow: "0 4px 24px rgba(0,0,0,0.4)" }}
                 >
                   <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-primary/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
