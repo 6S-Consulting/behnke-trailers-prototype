@@ -112,7 +112,7 @@ const DealerDashboard = () => {
                 <Pie data={orderStatusData} cx="50%" cy="50%" innerRadius={45} outerRadius={75} paddingAngle={2} dataKey="value">
                   {orderStatusData.map((_, i) => <Cell key={i} fill={PIE_COLORS[i]} />)}
                 </Pie>
-                <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', fontSize: 11 }} />
+                <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', fontSize: 11, color: 'hsl(var(--foreground))' }} />
               </PieChart>
             </ResponsiveContainer>
           </div>

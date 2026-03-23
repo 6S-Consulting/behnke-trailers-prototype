@@ -15,14 +15,15 @@ import { DirectionalDrillTiltTrailerDetails } from "./trailers/pages/Directional
 import { DirectionalDrillTiltTrailer3DPage } from "./trailers/pages/DirectionalDrillTiltTrailer3DPage.tsx";
 import { UserRole } from "./types";
 
-// Admin Pages
 import AdminDashboard from "./admin/AdminDashboard";
 import InventoryManagement from "./admin/InventoryManagement";
 import DealerManagement from "./admin/DealerManagement";
+import DealerDetail from "./admin/DealerDetail";
 import TrailerHealthOverview from "./admin/TrailerHealthOverview";
 import SensorDataDetail from "./admin/SensorDataDetail";
 import MaintenanceSlotManager from "./admin/MaintenanceSlotManager";
 import AdminOrders from "./admin/AdminOrders";
+import AdminCustomers from "./admin/AdminCustomers";
 
 // Dealer Pages
 import DealerDashboard from "./dealer/DealerDashboard";
@@ -76,6 +77,8 @@ const AppRoutes = () => {
       <Route path="/admin" element={<ProtectedRoleRoute requiredRole="admin"><AdminDashboard /></ProtectedRoleRoute>} />
       <Route path="/admin/inventory" element={<ProtectedRoleRoute requiredRole="admin"><InventoryManagement /></ProtectedRoleRoute>} />
       <Route path="/admin/dealers" element={<ProtectedRoleRoute requiredRole="admin"><DealerManagement /></ProtectedRoleRoute>} />
+      <Route path="/admin/dealers/:id" element={<ProtectedRoleRoute requiredRole="admin"><DealerDetail /></ProtectedRoleRoute>} />
+      <Route path="/admin/customers" element={<ProtectedRoleRoute requiredRole="admin"><AdminCustomers /></ProtectedRoleRoute>} />
       <Route path="/admin/health" element={<ProtectedRoleRoute requiredRole="admin"><TrailerHealthOverview /></ProtectedRoleRoute>} />
       <Route path="/admin/health/:vin" element={<ProtectedRoleRoute requiredRole="admin"><SensorDataDetail /></ProtectedRoleRoute>} />
       <Route path="/admin/maintenance" element={<ProtectedRoleRoute requiredRole="admin"><MaintenanceSlotManager /></ProtectedRoleRoute>} />

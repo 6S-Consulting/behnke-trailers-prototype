@@ -5,7 +5,7 @@ import { UserRole } from '@/types';
 import { useAppData } from '@/context/AppDataContext';
 import {
   BarChart3, Package, Store, Heart, Wrench, ClipboardList, Bell, Settings2,
-  ShoppingCart, MessageSquare, Boxes, Home, Phone, LogOut, ChevronDown, Menu, X, Truck
+  ShoppingCart, MessageSquare, Boxes, Home, Phone, LogOut, ChevronDown, Menu, X, Truck, Users
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -19,6 +19,7 @@ const adminNav: NavItem[] = [
   { label: 'Overview', path: '/admin', icon: BarChart3 },
   { label: 'Trailer Inventory', path: '/admin/inventory', icon: Package },
   { label: 'Dealer Management', path: '/admin/dealers', icon: Store },
+  { label: 'Customer Management', path: '/admin/customers', icon: Users },
   { label: 'Trailer Health', path: '/admin/health', icon: Heart },
   { label: 'Maintenance Slots', path: '/admin/maintenance', icon: Wrench },
   { label: 'Orders (All)', path: '/admin/orders', icon: ClipboardList },
@@ -146,8 +147,8 @@ export const DashboardLayout = ({ children }: { children: ReactNode }) => {
                 admin: 'Admin', dealer: 'Dealer', customer: 'Customer',
                 inventory: 'Inventory', dealers: 'Dealers', health: 'Health',
                 maintenance: 'Maintenance', orders: 'Orders', quotes: 'Quotes',
-                stock: 'Stock', contact: 'Contact', notifications: 'Notifications',
-                settings: 'Settings',
+                customers: 'Customers', stock: 'Stock', contact: 'Contact',
+                notifications: 'Notifications', settings: 'Settings',
               };
               return labels[seg] ?? seg;
             }).join(' / ')}

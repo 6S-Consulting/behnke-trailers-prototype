@@ -105,7 +105,7 @@ const AdminDashboard = () => {
                   {categoryData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                 </Pie>
                 <Legend iconSize={8} wrapperStyle={{ fontSize: 11, fontFamily: 'Inter' }} />
-                <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', fontSize: 12 }} />
+                <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', fontSize: 12, color: 'hsl(var(--foreground))' }} />
               </PieChart>
             </ResponsiveContainer>
           </div>

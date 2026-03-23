@@ -68,6 +68,9 @@ type PushHealthWarningInput = {
   message: string;
 };
 
+type AddTrailerInput = Omit<Trailer, 'id'>;
+type UpdateTrailerInput = Partial<Omit<Trailer, 'id'>> & { id: string };
+
 type AppDataContextType = {
   state: AppDataState;
   actions: {
@@ -83,6 +86,8 @@ type AppDataContextType = {
     completeMaintenanceSlot: (input: CompleteMaintenanceSlotInput) => MaintenanceSlot | null;
     cancelMaintenanceSlot: (slotId: string) => void;
     pushHealthWarning: (input: PushHealthWarningInput) => Notification | null;
+    addTrailer: (input: AddTrailerInput) => Trailer;
+    updateTrailer: (input: UpdateTrailerInput) => Trailer | null;
   };
 };
 
@@ -116,6 +121,8 @@ const AppDataContext = createContext<AppDataContextType>({
     completeMaintenanceSlot: () => null,
     cancelMaintenanceSlot: () => { },
     pushHealthWarning: () => null,
+    addTrailer: () => { throw new Error('AppDataContext not initialized'); },
+    updateTrailer: () => null,
   },
 });
 
@@ -598,7 +605,7 @@ const AppDataProviderImpl = ({ children }: { children: React.ReactNode }) => {
           : null;
 
         setState(s => {
-          const nextSlots = s.maintenanceSlots.map(ms => (ms.id === slotId ? { ...ms, status: 'Completed' } : ms));
+          const nextSlots = s.maintenanceSlots.map(ms => (ms.id === slotId ? { ...ms, status: 'Completed' as const } : ms));
           if (!updatedSold) return { ...s, maintenanceSlots: nextSlots };
           const nextSold = s.soldTrailers.map(st => (st.id === slot.trailerId ? updatedSold : st));
           return { ...s, maintenanceSlots: nextSlots, soldTrailers: nextSold };
@@ -619,7 +626,7 @@ const AppDataProviderImpl = ({ children }: { children: React.ReactNode }) => {
       cancelMaintenanceSlot: (slotId: string) => {
         setState(s => ({
           ...s,
-          maintenanceSlots: s.maintenanceSlots.map(ms => (ms.id === slotId ? { ...ms, status: 'Cancelled' } : ms)),
+          maintenanceSlots: s.maintenanceSlots.map(ms => (ms.id === slotId ? { ...ms, status: 'Cancelled' as const } : ms)),
         }));
       },
 
@@ -635,6 +642,20 @@ const AppDataProviderImpl = ({ children }: { children: React.ReactNode }) => {
           actionUrl: '/customer/health',
         };
         return pushNotification(notification);
+      },
+
+      addTrailer: (input: AddTrailerInput) => {
+        const trailer: Trailer = { ...input, id: uid('t') };
+        setState(s => ({ ...s, trailers: [...s.trailers, trailer] }));
+        return trailer;
+      },
+
+      updateTrailer: (input: UpdateTrailerInput) => {
+        const existing = state.trailers.find(t => t.id === input.id);
+        if (!existing) return null;
+        const updated: Trailer = { ...existing, ...input };
+        setState(s => ({ ...s, trailers: s.trailers.map(t => (t.id === input.id ? updated : t)) }));
+        return updated;
       },
     };
   }, [state]);

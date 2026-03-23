@@ -36,6 +36,8 @@ const statusStyles: Record<string, string> = {
   Draft: 'bg-muted text-muted-foreground',
   'Custom Order': 'bg-secondary text-secondary-foreground',
   Inspection: 'bg-secondary text-secondary-foreground',
+  Standard: 'bg-muted text-muted-foreground',
+  Custom: 'bg-secondary text-secondary-foreground',
 };
 
 export const StatusBadge = ({ status, breathing = false, className }: { status: StatusType; breathing?: boolean; className?: string }) => {
