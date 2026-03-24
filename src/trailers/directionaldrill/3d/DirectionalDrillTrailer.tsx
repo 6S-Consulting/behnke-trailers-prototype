@@ -810,6 +810,7 @@ function FrameAssembly({
               material={frameMaterial}
               castShadow
               receiveShadow
+              {...hp("Front Deck Front Rail")}
             >
               <boxGeometry
                 args={[dims.tiltDeckWidth, dims.plankThickness, 3]}
@@ -825,6 +826,7 @@ function FrameAssembly({
               material={frameMaterial}
               castShadow
               receiveShadow
+              {...hp("Front Deck Internal Rail")}
             >
               <boxGeometry
                 args={[dims.tiltDeckWidth, dims.plankThickness, 3]}
@@ -909,6 +911,7 @@ function FrameAssembly({
           material={frameMaterial}
           castShadow
           receiveShadow
+          {...hp("Tilt Deck Side Border")}
         >
           <boxGeometry
             args={[tiltGap * 2, dims.plankThickness, tiltDeckLength]}
@@ -924,6 +927,7 @@ function FrameAssembly({
           material={frameMaterial}
           castShadow
           receiveShadow
+          {...hp("Tilt Deck Side Border")}
         >
           <boxGeometry
             args={[tiltGap * 2, dims.plankThickness, tiltDeckLength]}
@@ -939,6 +943,7 @@ function FrameAssembly({
           material={frameMaterial}
           castShadow
           receiveShadow
+          {...hp("Tilt Deck Front Rail")}
         >
           <boxGeometry args={[dims.tiltDeckWidth, dims.plankThickness, 3]} />
         </mesh>
@@ -952,6 +957,7 @@ function FrameAssembly({
           material={frameMaterial}
           castShadow
           receiveShadow
+          {...hp("Tilt Deck Rear Rail")}
         >
           <boxGeometry args={[dims.tiltDeckWidth, dims.plankThickness, 3]} />
         </mesh>
@@ -1205,6 +1211,7 @@ function FrameAssembly({
                     material={hardwareSteelMaterial}
                     castShadow
                     receiveShadow
+                    {...hp("Fender Inner Cover")}
                   />
                 );
               })()}
@@ -1431,6 +1438,7 @@ function FrameAssembly({
                   material={hardwareSteelMaterial}
                   castShadow
                   receiveShadow
+                  {...hp("Fender Inner Cover")}
                 />
               );
             })()}
@@ -1470,7 +1478,7 @@ function FrameAssembly({
             {[-2.6, 2.6].map((lx, li) => (
               <group key={li} position={[lx, 0, tD]}>
                 {/* Black border: very wide pill */}
-                <mesh material={tailLightBaseMaterial} castShadow>
+                <mesh material={tailLightBaseMaterial} castShadow {...hp("Tail Light Border")}>
                   <boxGeometry args={[1.6, 11.0, 0.38]} />
                 </mesh>
                 {[-5.5, 5.5].map((cy, ci2) => (
@@ -1480,6 +1488,7 @@ function FrameAssembly({
                     rotation={[Math.PI / 2, 0, 0]}
                     material={tailLightBaseMaterial}
                     castShadow
+                    {...hp("Tail Light Border End Cap")}
                   >
                     <cylinderGeometry args={[0.8, 0.8, 0.38, 18]} />
                   </mesh>
@@ -1489,6 +1498,7 @@ function FrameAssembly({
                   position={[0, 0, 0.22]}
                   material={tailLightMaterial}
                   castShadow
+                  {...hp("Tail Light LED Fill")}
                 >
                   <boxGeometry args={[0.95, 9.5, 0.22]} />
                 </mesh>
@@ -1499,6 +1509,7 @@ function FrameAssembly({
                     rotation={[Math.PI / 2, 0, 0]}
                     material={tailLightMaterial}
                     castShadow
+                    {...hp("Tail Light LED End Cap")}
                   >
                     <cylinderGeometry args={[0.475, 0.475, 0.22, 18]} />
                   </mesh>

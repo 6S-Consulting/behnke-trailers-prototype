@@ -606,6 +606,7 @@ function FrameAssembly({
                   onPartHover={onPartHover}
                   onPartLeave={onPartLeave}
                 />
+                
              </group>
           </group>
         );
@@ -643,27 +644,44 @@ function FrameAssembly({
               <boxGeometry args={[dims.tiltDeckWidth, 0.2, deckLengthMinusBeavertail]} />
             </mesh>
 
-            {/* Left border */}
+            {/* Frame borders and dividers */}
+            {/* Left outer border */}
             <mesh
-              position={[-dims.tiltDeckWidth / 2 + tiltGap / 2, -(dims.plankThickness / 2) + 0.015, 0]}
+              position={[-dims.tiltDeckWidth / 2 + 1.5, -(dims.plankThickness / 2) + 0.015, 0]}
               material={frameMaterial}
               castShadow receiveShadow
+              {...hp("Main Deck Outer Border")}
             >
-              <boxGeometry args={[tiltGap * 2, dims.plankThickness, deckLengthMinusBeavertail]} />
+              <boxGeometry args={[3, dims.plankThickness, deckLengthMinusBeavertail]} />
             </mesh>
-            {/* Right border */}
+            {/* Right outer border */}
             <mesh
-              position={[dims.tiltDeckWidth / 2 - tiltGap / 2, -(dims.plankThickness / 2) + 0.015, 0]}
+              position={[dims.tiltDeckWidth / 2 - 1.5, -(dims.plankThickness / 2) + 0.015, 0]}
               material={frameMaterial}
               castShadow receiveShadow
+              {...hp("Main Deck Outer Border")}
             >
-              <boxGeometry args={[tiltGap * 2, dims.plankThickness, deckLengthMinusBeavertail]} />
+              <boxGeometry args={[3, dims.plankThickness, deckLengthMinusBeavertail]} />
             </mesh>
+            {/* Internal Dividers */}
+            {[-1, 1].map((side) => (
+              <mesh
+                key={`divider-${side}`}
+                position={[side * (48/2 + 4/2), -(dims.plankThickness / 2) + 0.015, 0]}
+                material={frameMaterial}
+                castShadow receiveShadow
+                {...hp("Deck Internal Divider")}
+              >
+                <boxGeometry args={[4, dims.plankThickness, deckLengthMinusBeavertail]} />
+              </mesh>
+            ))}
+
             {/* Front border */}
             <mesh
               position={[0, -(dims.plankThickness / 2) + 0.015, -deckLengthMinusBeavertail / 2 + 1.5]}
               material={frameMaterial}
               castShadow receiveShadow
+              {...hp("Deck Front Rail")}
             >
               <boxGeometry args={[dims.tiltDeckWidth, dims.plankThickness, 3]} />
             </mesh>
@@ -672,29 +690,38 @@ function FrameAssembly({
               position={[0, -(dims.plankThickness / 2) + 0.015, deckLengthMinusBeavertail / 2 - 1.5]}
               material={frameMaterial}
               castShadow receiveShadow
+              {...hp("Deck Rear Internal Rail")}
             >
               <boxGeometry args={[dims.tiltDeckWidth, dims.plankThickness, 3]} />
             </mesh>
 
-            {/* Wood Planks */}
-            {Array.from({ length: 14 }).map((_, i) => {
-              const plankWidth = (dims.tiltDeckWidth - (13 * tiltGap)) / 14;
-              const x = -dims.tiltDeckWidth / 2 + plankWidth / 2 + i * (plankWidth + tiltGap);
-              const innerLength = deckLengthMinusBeavertail - 6;
+            {/* Wood Planks - 3 partitioned sections */}
+            {[
+              { xStart: -dims.tiltDeckWidth / 2 + 3, width: 20, count: 3, sectionIdx: 0 },
+              { xStart: -48/2, width: 48, count: 7, sectionIdx: 1 },
+              { xStart: 48/2 + 4, width: 20, count: 3, sectionIdx: 2 }
+            ].map((section) => (
+              <group key={`section-${section.sectionIdx}`}>
+                {Array.from({ length: section.count }).map((_, i) => {
+                  const pW = (section.width - (section.count - 1) * tiltGap) / section.count;
+                  const x = section.xStart + pW / 2 + i * (pW + tiltGap);
+                  const innerLength = deckLengthMinusBeavertail - 6;
 
-              return (
-                <mesh
-                  key={`plank-${i}`}
-                  position={[x, -(dims.plankThickness / 2) + 0.015, 0]}
-                  material={woodPlanks[(i + 2) % woodPlanks.length]}
-                  castShadow
-                  receiveShadow
-                  {...hp("Deck Plank")}
-                >
-                  <boxGeometry args={[plankWidth, dims.plankThickness, innerLength]} />
-                </mesh>
-              );
-            })}
+                  return (
+                    <mesh
+                      key={`plank-${section.sectionIdx}-${i}`}
+                      position={[x, -(dims.plankThickness / 2) + 0.015, 0]}
+                      material={woodPlanks[(i + section.sectionIdx * 5) % woodPlanks.length]}
+                      castShadow
+                      receiveShadow
+                      {...hp("Deck Plank")}
+                    >
+                      <boxGeometry args={[pW, dims.plankThickness, innerLength]} />
+                    </mesh>
+                  );
+                })}
+              </group>
+            ))}
           </group>
         );
       })()}
@@ -747,49 +774,75 @@ function FrameAssembly({
               />
             </mesh>
             
-            {/* Left border */}
+            {/* Frame borders and dividers */}
+            {/* Left outer border */}
             <mesh
-              position={[-dims.tiltDeckWidth / 2 + tiltGap / 2, -(dims.plankThickness / 2) + 0.015, 0]}
+              position={[-dims.tiltDeckWidth / 2 + 1.5, -(dims.plankThickness / 2) + 0.015, 0]}
               material={frameMaterial}
               castShadow receiveShadow
+              {...hp("Beavertail Side Border")}
             >
-              <boxGeometry args={[tiltGap * 2, dims.plankThickness, beavertailLength]} />
+              <boxGeometry args={[3, dims.plankThickness, beavertailLength]} />
             </mesh>
-            {/* Right border */}
+            {/* Right outer border */}
             <mesh
-              position={[dims.tiltDeckWidth / 2 - tiltGap / 2, -(dims.plankThickness / 2) + 0.015, 0]}
+              position={[dims.tiltDeckWidth / 2 - 1.5, -(dims.plankThickness / 2) + 0.015, 0]}
               material={frameMaterial}
               castShadow receiveShadow
+              {...hp("Beavertail Side Border")}
             >
-              <boxGeometry args={[tiltGap * 2, dims.plankThickness, beavertailLength]} />
+              <boxGeometry args={[3, dims.plankThickness, beavertailLength]} />
             </mesh>
+            {/* Internal Dividers */}
+            {[-1, 1].map((side) => (
+              <mesh
+                key={`divider-${side}`}
+                position={[side * (48/2 + 4/2), -(dims.plankThickness / 2) + 0.015, 0]}
+                material={frameMaterial}
+                castShadow receiveShadow
+                {...hp("Beavertail Divider")}
+              >
+                <boxGeometry args={[4, dims.plankThickness, beavertailLength]} />
+              </mesh>
+            ))}
             {/* Rear border */}
+            {/* Rear border - Expanded to 10" for ramp connection */}
             <mesh
-              position={[0, -(dims.plankThickness / 2) + 0.015, beavertailLength / 2 - 1.5]}
+              position={[0, -(dims.plankThickness / 2) + 0.015, beavertailLength / 2 - 5]}
               material={frameMaterial}
               castShadow receiveShadow
+              {...hp("Beavertail Tail End Rail")}
             >
-              <boxGeometry args={[dims.tiltDeckWidth, dims.plankThickness, 3]} />
+              <boxGeometry args={[dims.tiltDeckWidth, dims.plankThickness, 10]} />
             </mesh>
 
-            {/* Wood Planks for Beavertail */}
-            {Array.from({ length: 14 }).map((_, i) => {
-              const plankWidth = (dims.tiltDeckWidth - (13 * tiltGap)) / 14;
-              const x = -dims.tiltDeckWidth / 2 + plankWidth / 2 + i * (plankWidth + tiltGap);
-              const innerLength = beavertailLength - 3; // Accounts for rear border
+            {/* Wood Planks for Beavertail - 3 partitioned sections */}
+            {[
+              { xStart: -dims.tiltDeckWidth / 2 + 3, width: 20, count: 3, sectionIdx: 0 },
+              { xStart: -48/2, width: 48, count: 7, sectionIdx: 1 },
+              { xStart: 48/2 + 4, width: 20, count: 3, sectionIdx: 2 }
+            ].map((section) => (
+              <group key={`bt-section-${section.sectionIdx}`}>
+                {Array.from({ length: section.count }).map((_, i) => {
+                  const pW = (section.width - (section.count - 1) * tiltGap) / section.count;
+                  const x = section.xStart + pW / 2 + i * (pW + tiltGap);
+                  const innerLength = beavertailLength - 10; // Accounts for 10" rear border
 
-              return (
-                <mesh
-                  key={`bt-plank-${i}`}
-                  position={[x, -(dims.plankThickness / 2) + 0.015, -1.5]}
-                  material={woodPlanks[(i + 2) % woodPlanks.length]}
-                  castShadow
-                  receiveShadow
-                >
-                  <boxGeometry args={[plankWidth, dims.plankThickness, innerLength]} />
-                </mesh>
-              );
-            })}
+                  return (
+                    <mesh
+                      key={`bt-plank-${section.sectionIdx}-${i}`}
+                      position={[x, -(dims.plankThickness / 2) + 0.015, -5]}
+                      material={woodPlanks[(i + section.sectionIdx * 5) % woodPlanks.length]}
+                      castShadow
+                      receiveShadow
+                      {...hp("Beavertail Wood Plank")}
+                    >
+                      <boxGeometry args={[pW, dims.plankThickness, innerLength]} />
+                    </mesh>
+                  );
+                })}
+              </group>
+            ))}
           </group>
           {[-8, 0, 8].map((x, i) => (
             <mesh
@@ -821,42 +874,41 @@ function FrameAssembly({
                 return (
                   <group key={side} position={[xPos, 0, 0]}>
                     <group position={[0, -rThick / 2, -rLen1 / 2]}>
-                      
-                      {/* Section 1: Main Ramp Segment */}
+                                  {/* Section 1: Main Ramp Segment */}
                       <group>
-                        <mesh position={[-rWidth / 2 + 1.5, 0, 0]} material={frameMaterial} castShadow receiveShadow>
+                        <mesh position={[-rWidth / 2 + 1.5, 0, 0]} material={frameMaterial} castShadow receiveShadow {...hp("Ramp Main Rail")}>
                           <boxGeometry args={[3, rThick, rLen1]} />
                         </mesh>
-                        <mesh position={[rWidth / 2 - 1.5, 0, 0]} material={frameMaterial} castShadow receiveShadow>
+                        <mesh position={[rWidth / 2 - 1.5, 0, 0]} material={frameMaterial} castShadow receiveShadow {...hp("Ramp Main Rail")}>
                           <boxGeometry args={[3, rThick, rLen1]} />
                         </mesh>
-                        <mesh position={[0, 0, -rLen1 / 2 + 1.5]} material={frameMaterial} castShadow receiveShadow>
+                        <mesh position={[0, 0, -rLen1 / 2 + 1.5]} material={frameMaterial} castShadow receiveShadow {...hp("Ramp Connection Rail")}>
                           <boxGeometry args={[rWidth - 6, rThick, 3]} />
                         </mesh>
-                        <mesh position={[0, 0, rLen1 / 2 - 1.5]} material={frameMaterial} castShadow receiveShadow>
-                          <boxGeometry args={[rWidth - 6, rThick, 3]} />
+                        <mesh position={[0, 0, rLen1 / 2 - 5]} material={frameMaterial} castShadow receiveShadow {...hp("Ramp Hinge Rail")}>
+                          <boxGeometry args={[rWidth - 6, rThick, 10]} />
                         </mesh>
                         
                         {/* 4 Support Stands (Stabilizer Legs) — 2 per ramp at the corners */}
                         {[-1, 1].map((xSide) => (
                            <group key={`stand-${xSide}`} position={[xSide * (rWidth / 2 - 4.5), rThick / 2 + 6.5, rLen1 / 2 - 6]}>
-                              <mesh material={hardwareSteelMaterial} castShadow>
+                              <mesh material={hardwareSteelMaterial} castShadow {...hp("Support Stand")}>
                                  <boxGeometry args={[3.2, 14.0, 3.2]} />
                               </mesh>
-                              <mesh position={[0, 7.0, 0]} material={hardwareSteelMaterial} castShadow>
+                              <mesh position={[0, 7.0, 0]} material={hardwareSteelMaterial} castShadow {...hp("Support Foot")}>
                                  <boxGeometry args={[5.2, 1.2, 5.2]} />
                               </mesh>
                            </group>
                         ))}
                         
                         {Array.from({ length: 4 }).map((_, cIdx) => (
-                           <mesh key={`cross-${cIdx}`} position={[0, rThick / 2 - 0.2, -rLen1 / 2 + 10 + cIdx * 12]} material={hardwareSteelMaterial} castShadow>
+                           <mesh key={`cross-${cIdx}`} position={[0, rThick / 2 - 0.2, -rLen1 / 2 + 10 + cIdx * 12]} material={hardwareSteelMaterial} castShadow {...hp("Ramp Crossmember")}>
                               <boxGeometry args={[rWidth - 6, 0.4, 2]} />
                            </mesh>
                         ))}
                         
                         {[-rWidth / 2 + 2.5, rWidth / 2 - 2.5].map((hx, hi) => (
-                           <mesh key={`hinge-${hi}`} position={[hx, 0, rLen1 / 2]} rotation={[0, Math.PI / 2, 0]} material={hardwareSteelMaterial} castShadow>
+                           <mesh key={`hinge-${hi}`} position={[hx, 0, rLen1 / 2]} rotation={[0, Math.PI / 2, 0]} material={hardwareSteelMaterial} castShadow {...hp("Main Ramp Hinge")}>
                               <cylinderGeometry args={[2.5, 2.5, 4, 16]} />
                            </mesh>
                         ))}
@@ -866,35 +918,34 @@ function FrameAssembly({
                           const wWidth = (rWidth - 6 - (0.24 * (wCount - 1))) / wCount;
                           const wx = -rWidth / 2 + 3 + wWidth / 2 + wIdx * (wWidth + 0.24);
                           return (
-                            <mesh key={`wood-${wIdx}`} position={[wx, (woodThick - rThick) / 2 + 0.5, 0]} material={woodPlanks[(wIdx + side + 3) % woodPlanks.length]} castShadow receiveShadow>
-                                <boxGeometry args={[wWidth, woodThick, rLen1 - 6]} />
+                            <mesh key={`wood-${wIdx}`} position={[wx, (woodThick - rThick) / 2 + 0.5, -3.5]} material={woodPlanks[(wIdx + side + 3) % woodPlanks.length]} castShadow receiveShadow {...hp("Ramp Wood Plank")}>
+                                <boxGeometry args={[wWidth, woodThick, rLen1 - 13]} />
                             </mesh>
                           );
                         })}
-
-                        {/* Section 2: Bi-fold Segment (Reduced Size) */}
+                          {/* Section 2: Bi-fold Segment (Reduced Size) */}
                         <group position={[0, rThick / 2, -rLen1 / 2]} rotation={[r2Angle, 0, 0]}>
                           <group position={[0, -rThick / 2, -rLen2 / 2]}>
                              {[-rWidth / 2 + 2.5, rWidth / 2 - 2.5].map((hx, hi) => (
-                               <mesh key={`hinge-mid-${hi}`} position={[hx, 0, rLen2 / 2]} rotation={[0, Math.PI / 2, 0]} material={hardwareSteelMaterial} castShadow>
+                               <mesh key={`hinge-mid-${hi}`} position={[hx, 0, rLen2 / 2]} rotation={[0, Math.PI / 2, 0]} material={hardwareSteelMaterial} castShadow {...hp("Bi-fold Hinge")}>
                                   <cylinderGeometry args={[2.5, 2.5, 4, 16]} />
                                </mesh>
                              ))}
                              
-                             <mesh position={[0, rThick / 2 + 1.5, rLen2 / 2 - 3]} material={frameMaterial} castShadow>
+                             <mesh position={[0, rThick / 2 + 1.5, rLen2 / 2 - 3]} material={frameMaterial} castShadow {...hp("Ramp Handle")}>
                                 <boxGeometry args={[8, 4, 3]} />
                              </mesh>
 
-                             <mesh position={[-rWidth / 2 + 1.5, 0, 0]} material={frameMaterial} castShadow receiveShadow>
+                             <mesh position={[-rWidth / 2 + 1.5, 0, 0]} material={frameMaterial} castShadow receiveShadow {...hp("Ramp Bi-fold Rail")}>
                                <boxGeometry args={[3, rThick, rLen2]} />
                              </mesh>
-                             <mesh position={[rWidth / 2 - 1.5, 0, 0]} material={frameMaterial} castShadow receiveShadow>
+                             <mesh position={[rWidth / 2 - 1.5, 0, 0]} material={frameMaterial} castShadow receiveShadow {...hp("Ramp Bi-fold Rail")}>
                                <boxGeometry args={[3, rThick, rLen2]} />
                              </mesh>
-                             <mesh position={[0, 0, -rLen2 / 2 + 1.5]} material={frameMaterial} castShadow receiveShadow>
+                             <mesh position={[0, 0, -rLen2 / 2 + 1.5]} material={frameMaterial} castShadow receiveShadow {...hp("Ramp End Rail")}>
                                <boxGeometry args={[rWidth - 6, rThick, 3]} />
                              </mesh>
-                             <mesh position={[0, 0, rLen2 / 2 - 1.5]} material={frameMaterial} castShadow receiveShadow>
+                             <mesh position={[0, 0, rLen2 / 2 - 1.5]} material={frameMaterial} castShadow receiveShadow {...hp("Ramp End Rail")}>
                                <boxGeometry args={[rWidth - 6, rThick, 3]} />
                              </mesh>
 
@@ -903,7 +954,7 @@ function FrameAssembly({
                                 const wWidth = (rWidth - 6 - (0.24 * (wCount - 1))) / wCount;
                                 const wx = -rWidth / 2 + 3 + wWidth / 2 + wIdx * (wWidth + 0.24);
                                 return (
-                                  <mesh key={`wood-2-${wIdx}`} position={[wx, (woodThick - rThick) / 2 + 0.5, 0]} material={woodPlanks[(wIdx + side + 1) % woodPlanks.length]} castShadow receiveShadow>
+                                  <mesh key={`wood-2-${wIdx}`} position={[wx, (woodThick - rThick) / 2 + 0.5, 0]} material={woodPlanks[(wIdx + side + 1) % woodPlanks.length]} castShadow receiveShadow {...hp("Bi-fold Wood Plank")}>
                                       <boxGeometry args={[wWidth, woodThick, rLen2 - 6]} />
                                   </mesh>
                                 );
@@ -911,7 +962,7 @@ function FrameAssembly({
 
                              {/* Section 3: Sharp end beaver tail like thing */}
                              <group position={[0, 0, -rLen2 / 2]}>
-                                <mesh castShadow receiveShadow>
+                                <mesh castShadow receiveShadow {...hp("Ramp Wedge End")}>
                                   <meshStandardMaterial color="#1a1f25" roughness={0.4} metalness={0.82} side={THREE.DoubleSide} />
                                   <bufferGeometry onUpdate={(self) => {
                                     const w = rWidth / 2;
@@ -953,6 +1004,65 @@ function FrameAssembly({
             </group>
           );
         })()}
+
+        {/* Safety Transport Belt - Connecting wood beavertail border to folded ramp bifold rail */}
+        {!isUnfolded && (
+          <group>
+            {[-1, 1].map((side) => {
+              const ax = side * 52.8;
+              const ay = -4.5;
+              const az = 21.6; // 80% mark: (72 * 0.8) - 36 = 21.6
+              
+              // Coordinates for the folded ramp bifold center (Ramp 2 center when folded over Ramp 1)
+              const bx = side * 48.5;
+              const by = 47.0; 
+              const bz = 25.0;
+              
+              const midX = (ax + bx) / 2;
+              const midY = (ay + by) / 2;
+              const midZ = (az + bz) / 2;
+              
+              const dx = bx - ax;
+              const dy = by - ay;
+              const dz = bz - az;
+              const dist = Math.sqrt(dx*dx + dy*dy + dz*dz) + 0.5;
+              
+              return (
+                <group key={`belt-side-${side}`}>
+                   {/* The main belt strap connecting the two points */}
+                   <mesh 
+                    position={[midX, midY, midZ]}
+                    rotation={[
+                      -Math.atan2(dy, dz),
+                      Math.atan2(dx, Math.sqrt(dy*dy + dz*dz)),
+                      0
+                    ]}
+                    castShadow
+                    {...hp("Safety Transport Belt")}
+                   >
+                     <boxGeometry args={[1.6, 0.3, dist]} />
+                     <meshStandardMaterial color="#b8860b" roughness={0.9} />
+                   </mesh>
+                   
+                   {/* Anchor point on the beavertail side border */}
+                   <mesh position={[ax, ay, az]} material={hardwareSteelMaterial} {...hp("Belt Frame Anchor")}>
+                      <boxGeometry args={[2.0, 2.0, 2.2]} />
+                   </mesh>
+                   
+                   {/* Bracket/attachment point on the ramp bifold rail center */}
+                   <mesh 
+                    position={[bx, by-1, bz]} 
+                    rotation={[-0.2, 0, 0]}
+                    material={hardwareSteelMaterial} 
+                    {...hp("Ramp Belt Bracket")}
+                   >
+                      <boxGeometry args={[2.5, 0.8, 3.5]} />
+                   </mesh>
+                </group>
+              );
+            })}
+          </group>
+        )}
 
         </group>
         );
