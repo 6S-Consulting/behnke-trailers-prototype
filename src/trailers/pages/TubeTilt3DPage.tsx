@@ -9,7 +9,7 @@ import Footer from "@/components/Footer";
 export function TubeTilt3DPage() {
   const [tiltAngleDeg, setTiltAngleDeg] = useState(13);
   const [cameraView, setCameraView] = useState<CameraView>("perspective");
-  const [autoRotate, setAutoRotate] = useState(false);
+  const [autoRotate, setAutoRotate] = useState(true);
   const [showHoverLabels, setShowHoverLabels] = useState(true);
 
   return (

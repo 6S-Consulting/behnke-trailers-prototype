@@ -28,6 +28,11 @@ import trailer03 from "@/trailers/directionaldrill/images/trailer-03.png";
 import trailer04 from "@/trailers/directionaldrill/images/trailer-04.png";
 import trailer05 from "@/trailers/directionaldrill/images/trailer-05.png";
 import trailer06 from "@/trailers/directionaldrill/images/trailer-06.png";
+import paverTag1 from "@/trailers/pavertag/images/1.png";
+import paverTag2 from "@/trailers/pavertag/images/2.png";
+import paverTag3 from "@/trailers/pavertag/images/3.png";
+import paverTag4 from "@/trailers/pavertag/images/4.png";
+import paverTag5 from "@/trailers/pavertag/images/5.png";
 
 export const directionalDrillTiltTrailer: TrailerProduct = {
   slug: "directional-drill-tilt-trailer",
@@ -90,9 +95,11 @@ export const directionalDrillTiltTrailer: TrailerProduct = {
     "Optional machine stops, boring bar holders, reel mounts, and tank mounts.",
   ],
   keyAdvantages: [
+    "Patented split tilt design for maximum safety",
     "No ramps required for loading workflow",
     "Dual-deck organization for drill plus support equipment",
-    "Heavy-duty structure for high payload capacity",
+    "Heavy-duty 2 x 8 in tube lower frame construction",
+    "Low 25 in unloaded deck height",
     "Configurable for field-specific mounting layouts",
   ],
   optionalFeatures: [
@@ -164,7 +171,68 @@ export const tubeTilt20K: TrailerProduct = {
   resources: ["Find a Dealer", "Download Brochure", "Explore Product Options"],
 };
 
+export const paverTagTrailer: TrailerProduct = {
+  slug: "paver-tag-trailer",
+  title: "Paver Tag Trailer",
+  shortDescription:
+    "Ultra-low profile paver trailer with hydraulic bi-folding ramps and 50,000 lb GVWR.",
+  description:
+    "Our paver tag line utilizes a 6' wood beavertail with hydraulic bi-folding ramps to achieve an 8 degree load angle. The trailer typically is set up with (3) 22,500 lb. air brake axles and dual 235/75R 17.5 tires, which provide an ultra-low 34\" unloaded deck height. These trailers feature the same one piece fabricated I-beam construction (80 ksi), 4\" jr. I-beam x-members (80 ksi) and oak decking, as our other tag trailers.",
+  overview:
+    "Heavy-duty 50,000 lb GVWR paver trailer featuring a 6' wood beavertail and hydraulic bi-folding ramps for an ultra-low loading angle.",
+  heroImage: paverTag1,
+  gallery: [paverTag1, paverTag2, paverTag3, paverTag4, paverTag5],
+  brochureFileName: "paver-tag-trailer-brochure.pdf",
+  specs: [
+    { label: "GVWR", value: "50,000 lbs" },
+    { label: "Weight", value: "Varies by length" },
+    { label: "Length", value: "25' bed + 6' wood tail w/ hydraulic bi-folding ramps" },
+    { label: "Width", value: "102\"" },
+    { label: "Frame", value: "1-Piece Fabricated (80 ksi)" },
+    { label: "Unloaded Deck Height", value: "34\"" },
+    { label: "Side Rails", value: "8\" channel" },
+    { label: "Crossmembers", value: "4\" Jr. I-beams (80 KSI)" },
+    { label: "Fenders", value: "1/4\" sheet" },
+    { label: "Jack", value: "Dual Speed, Semi Style" },
+    { label: "Hitch", value: "3\" Pintle Eye (90,000 lbs.)" },
+    { label: "Safety Chains", value: "(2) 1/2\" Gr. 70" },
+    { label: "Tie-Downs", value: "1\" Bent D-rings (every 4')" },
+    { label: "Storage", value: "Lockable toolbox in tongue" },
+    { label: "Axles", value: "(3) Dexter 22,500 lb. air brake axles" },
+    { label: "Suspension", value: "Hutch H9700" },
+    { label: "Tire and Wheel", value: "235/75R 17.5H dual" },
+    { label: "Decking", value: "1 1/2\" Rough Oak" },
+    { label: "Lights", value: "LED flush mount" },
+    { label: "Elect. Plug", value: "Semi Plug" },
+    {
+      label: "Finish and Paint",
+      value: "Bead blasted, acid washed, zinc rich primed, powder coated",
+    },
+  ],
+  details: [
+    "20-32' bed length available",
+    "Hydraulic bi-folding ramps achieve 7.5° load angle",
+    "Air ride or lift axles available",
+    "One piece fabricated I-beam construction (80 ksi)",
+    "6' wood beavertail for improved traction during loading",
+  ],
+  keyAdvantages: [
+    "Ultra-low 8 degree load angle",
+    "50,000 lb high-capacity GVWR",
+    "Extreme durability with 80 ksi steel",
+    "Low 34\" unloaded deck height",
+  ],
+  optionalFeatures: [
+    "Bed lengths from 20' to 32'",
+    "Air ride suspension",
+    "Lift axles",
+    "Custom tie-down configurations",
+  ],
+  resources: ["Find a Dealer", "Download Brochure", "Product Options"],
+};
+
 export const trailers: TrailerProduct[] = [
   directionalDrillTiltTrailer,
   tubeTilt20K,
+  paverTagTrailer,
 ];

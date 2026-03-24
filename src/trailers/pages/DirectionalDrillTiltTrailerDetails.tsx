@@ -254,6 +254,35 @@ export function DirectionalDrillTiltTrailerDetails() {
             </ul>
           </motion.section>
 
+          <motion.section
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+            className="mb-12"
+          >
+            <h3 className="font-display text-4xl font-black text-foreground mb-6">
+              Key Advantages
+            </h3>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              {directionalDrillTiltTrailer.keyAdvantages.map((adv, idx) => (
+                <motion.div
+                  key={adv}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.1 }}
+                  className="bg-card border border-border p-6 rounded-sm text-center flex flex-col items-center gap-3"
+                >
+                  <Shield size={24} className="text-[#bf1e2e]" />
+                  <span className="font-display font-bold text-sm uppercase tracking-wide">
+                    {adv}
+                  </span>
+                </motion.div>
+              ))}
+            </div>
+          </motion.section>
+
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}

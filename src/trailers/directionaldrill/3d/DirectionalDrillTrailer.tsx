@@ -1083,7 +1083,7 @@ function FrameAssembly({
 
         {/* Left fender — tilts with deck. Same geometry as right fender, mirrored X */}
         {(() => {
-          const fW = dims.tireWidth + 7;
+          const fW = (dims.tireWidth + 7) * 0.8; // Reduced width by 20%
           const fThick = 1.4;
           const topYWorld = axleCenterY + dims.tireRadius + 5;
           const topYLocal = topYWorld - dims.deckHeight;
@@ -1142,16 +1142,16 @@ function FrameAssembly({
               {/* Inner side trapezium cover — right edge of left fender, between wheel and wooden deck */}
               {(() => {
                 // Right (inner/inboard) edge of fender, facing toward the wooden board
-                const panelX = xLocal + fW / 2; // inner face of cover
+                const panelX = xLocal + fW / 2 - 1.0; // inner face of cover, moved towards wheel
                 const panelX2 = panelX + 1.4; // 1.4 unit thick toward deck
                 // Y extents in local tilt coords
-                const yTop = topYLocal;
-                const yBot = -dims.plankThickness + dims.upperRailSize - 1;
+                const yTop = topYLocal - 0.5;
+                const yBot = -dims.plankThickness + dims.upperRailSize - 7;
                 // Z extents: top span = fender plate, bottom span extends with lips
                 const zTopFront = fzFrontLocal;
                 const zTopRear = fzRearLocal;
-                const zBotFront = fzFrontLocal - horizLen * 0.5;
-                const zBotRear = fzRearLocal + horizLen * 0.5;
+                const zBotFront = fzFrontLocal - horizLen * 0.7;
+                const zBotRear = fzRearLocal + horizLen * 0.7;
 
                 const v = new Float32Array([
                   // inner face (x = panelX)
@@ -1327,7 +1327,7 @@ function FrameAssembly({
 
       {/* Straight fender — right side (static), flat top + angled front/rear lips to rub rail */}
       {(() => {
-        const fW = dims.tireWidth + 7;
+        const fW = (dims.tireWidth + 7) * 0.8; // Reduced width by 20%
         const fThick = 1.4;
         const topY = axleCenterY + dims.tireRadius + 5;
         const fzFront =
@@ -1380,14 +1380,14 @@ function FrameAssembly({
             </mesh>
             {/* Inner side trapezium cover — left edge of right fender, between wheel and wooden deck */}
             {(() => {
-              const panelX = x - fW / 2; // inner/left face of fender
-              const panelX2 = panelX - 1.4; // 1.4 unit thick toward deck
-              const yTop = topY;
-              const yBot = rubRailTopY;
+              const panelX = x - fW / 2 + 1.0; // inner face, moved towards wheel
+              const panelX2 = panelX - 1.4; // toward deck
+              const yTop = topY - 0.5;
+              const yBot = rubRailTopY - 7;
               const zTopFront = fzFront;
               const zTopRear = fzRear;
-              const zBotFront = fzFront - horizLen * 0.5;
-              const zBotRear = fzRear + horizLen * 0.5;
+              const zBotFront = fzFront - horizLen * 0.7;
+              const zBotRear = fzRear + horizLen * 0.7;
               const v = new Float32Array([
                 panelX,
                 yTop,

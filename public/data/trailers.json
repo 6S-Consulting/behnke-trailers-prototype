@@ -786,12 +786,29 @@
             {
               "id": "paver_tag",
               "name": "Paver",
-              "description": "Paver tag trailer specifically designed for transporting pavers and road machinery. Tag axle configuration with low deck height.",
+              "description": "Our paver tag line utilizes a 6' wood beavertail with hydraulic bi-folding ramps to achieve an 8 degree load angle.",
               "products": [
                 {
                   "model": "Paver Tag Trailer",
-                  "url": "https://behnkeenterprises.com/trailers/paver-tag-trailer/",
-                  "features": ["Paver-specific design", "Tag axle configuration", "Low deck height", "Air brakes"]
+                  "url": "/trailers/paver-tag-trailer",
+                  "gvwr": "50,000 lbs",
+                  "weight": "Varies",
+                  "length": "25' bed + 6' wood tail w/hydraulic bi-folding ramps",
+                  "width": "102\"",
+                  "frame": "1-Piece Fabricated (80 ksi)",
+                  "deckHeight": "34\"",
+                  "axles": "(3) Dexter 22,500 lb. air brake axles",
+                  "suspension": "Hutch H9700",
+                  "tireWheel": "235/75R 17.5H dual",
+                  "decking": "1 1/2\" Rough Oak",
+                  "lights": "LED flush mount",
+                  "finish": "Bead blasted, acid washed, zinc rich primed, powder coated",
+                  "features": [
+                    "6' wood beavertail with hydraulic bi-folding ramps",
+                    "8 degree load angle",
+                    "20-32' bed length available",
+                    "Air ride or lift axles available"
+                  ]
                 }
               ]
             }

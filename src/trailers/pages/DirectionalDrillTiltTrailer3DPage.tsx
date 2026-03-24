@@ -9,9 +9,9 @@ import Footer from "@/components/Footer";
 export function DirectionalDrillTiltTrailer3DPage() {
   const [tiltAngleDeg, setTiltAngleDeg] = useState(13);
   const [cameraView, setCameraView] = useState<CameraView>("perspective");
-  const [autoRotate, setAutoRotate] = useState(false);
+  const [autoRotate, setAutoRotate] = useState(true);
   const [showOptionalEquipment, setShowOptionalEquipment] = useState(false);
-  const [showHoverLabels, setShowHoverLabels] = useState(false);
+  const [showHoverLabels, setShowHoverLabels] = useState(true);
 
   return (
     <div className="bg-background min-h-screen">
