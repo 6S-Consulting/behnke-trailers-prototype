@@ -11,8 +11,8 @@ import NotFound from "./pages/NotFound.tsx";
 import SettingsPage from "./pages/Settings.tsx";
 import NotificationsPage from "./pages/Notifications.tsx";
 import { TrailersPage } from "./trailers/pages/TrailersPage.tsx";
-import { DirectionalDrillTiltTrailerDetails } from "./trailers/pages/DirectionalDrillTiltTrailerDetails.tsx";
-import { DirectionalDrillTiltTrailer3DPage } from "./trailers/pages/DirectionalDrillTiltTrailer3DPage.tsx";
+import { TrailerDetailLoader } from "./trailers/pages/TrailerDetailLoader.tsx";
+import { Trailer3DLoader } from "./trailers/pages/Trailer3DLoader.tsx";
 import { UserRole } from "./types";
 
 import AdminDashboard from "./admin/AdminDashboard";
@@ -67,8 +67,8 @@ const AppRoutes = () => {
       {/* Public Site */}
       <Route path="/" element={<Index />} />
       <Route path="/trailers" element={<TrailersPage />} />
-      <Route path="/trailers/:slug" element={<DirectionalDrillTiltTrailerDetails />} />
-      <Route path="/trailers/:slug/3d" element={<DirectionalDrillTiltTrailer3DPage />} />
+      <Route path="/trailers/:slug" element={<TrailerDetailLoader />} />
+      <Route path="/trailers/:slug/3d" element={<Trailer3DLoader />} />
 
       {/* Auth */}
       <Route path="/login" element={user ? <Navigate to={`/${user.role}`} replace /> : <Login />} />

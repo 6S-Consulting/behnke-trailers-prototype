@@ -1,21 +1,17 @@
 import { useState } from "react";
 import TrailerViewer, {
   CameraView,
-} from "@/trailers/old/DirectionalDrillTrailer";
-import TrailerScene from "@/trailers/new/TrailerScene";
+} from "@/trailers/directionaldrill/3d/DirectionalDrillTrailer";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
-type ActiveModel = "original" | "enhanced";
-
 export function DirectionalDrillTiltTrailer3DPage() {
-  const [activeModel, setActiveModel] = useState<ActiveModel>("original");
   const [tiltAngleDeg, setTiltAngleDeg] = useState(13);
   const [cameraView, setCameraView] = useState<CameraView>("perspective");
   const [autoRotate, setAutoRotate] = useState(false);
   const [showOptionalEquipment, setShowOptionalEquipment] = useState(false);
-  const [showHoverLabels, setShowHoverLabels] = useState(true);
+  const [showHoverLabels, setShowHoverLabels] = useState(false);
 
   return (
     <div className="bg-background min-h-screen">
@@ -23,116 +19,78 @@ export function DirectionalDrillTiltTrailer3DPage() {
 
       <div className="pt-24 pb-12 px-6">
         <div className="container mx-auto max-w-7xl">
-          <h1 className="font-display text-4xl lg:text-5xl font-black text-foreground mb-6">
-            Directional Drill Tilt Trailer - 3D Model
-          </h1>
+          <div className="relative mb-6">
+            <TrailerViewer
+              tiltAngleDeg={tiltAngleDeg}
+              cameraView={cameraView}
+              showOptionalEquipment={showOptionalEquipment}
+              autoRotate={autoRotate}
+              showHoverLabels={showHoverLabels}
+            />
 
-          {/* Model switcher buttons */}
-          <div className="flex items-center gap-3 mb-8">
-            <button
-              onClick={() => setActiveModel("original")}
-              className={`px-5 py-2.5 rounded-sm font-display font-semibold text-sm transition-all ${
-                activeModel === "original"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-card border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
-              }`}
-            >
-              Original Model
-            </button>
-            <button
-              onClick={() => setActiveModel("enhanced")}
-              className={`px-5 py-2.5 rounded-sm font-display font-semibold text-sm transition-all ${
-                activeModel === "enhanced"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-card border border-border text-muted-foreground hover:text-foreground hover:border-foreground/30"
-              }`}
-            >
-              Enhanced Model
-            </button>
-          </div>
+            <aside className="absolute top-3 right-3 w-64 bg-background/70 backdrop-blur-md border border-border rounded-lg p-4 space-y-4">
+              <h2 className="font-display text-sm font-black text-foreground uppercase tracking-widest">
+                Engineering Controls
+              </h2>
 
-          {activeModel === "original" && (
-            <div className="relative mb-6">
-              <TrailerViewer
-                tiltAngleDeg={tiltAngleDeg}
-                cameraView={cameraView}
-                showOptionalEquipment={showOptionalEquipment}
-                autoRotate={autoRotate}
-                showHoverLabels={showHoverLabels}
-              />
+              <label className="font-display text-xs font-bold text-muted-foreground block">
+                Camera View
+                <select
+                  value={cameraView}
+                  onChange={(e) =>
+                    setCameraView(e.target.value as CameraView)
+                  }
+                  className="mt-1 w-full border border-border rounded px-2 py-1.5 bg-card text-foreground text-xs"
+                >
+                  <option value="perspective">3/4 Perspective</option>
+                  <option value="side">Side View</option>
+                  <option value="top">Top View</option>
+                </select>
+              </label>
 
-              <aside className="absolute top-3 right-3 w-64 bg-background/70 backdrop-blur-md border border-border rounded-lg p-4 space-y-4">
-                <h2 className="font-display text-sm font-black text-foreground uppercase tracking-widest">
-                  Engineering Controls
-                </h2>
+              <label className="font-display text-xs font-bold text-muted-foreground block">
+                Tilt Angle: {tiltAngleDeg.toFixed(1)}°
+                <input
+                  type="range"
+                  min={0}
+                  max={13}
+                  step={0.5}
+                  value={tiltAngleDeg}
+                  onChange={(e) => setTiltAngleDeg(Number(e.target.value))}
+                  className="mt-1 w-full accent-primary"
+                />
+              </label>
 
-                <label className="font-display text-xs font-bold text-muted-foreground block">
-                  Camera View
-                  <select
-                    value={cameraView}
-                    onChange={(e) =>
-                      setCameraView(e.target.value as CameraView)
-                    }
-                    className="mt-1 w-full border border-border rounded px-2 py-1.5 bg-card text-foreground text-xs"
-                  >
-                    <option value="perspective">3/4 Perspective</option>
-                    <option value="side">Side View</option>
-                    <option value="top">Top View</option>
-                  </select>
-                </label>
-
-                <label className="font-display text-xs font-bold text-muted-foreground block">
-                  Tilt Angle: {tiltAngleDeg.toFixed(1)}°
+              <div className="flex flex-col gap-2 pt-1">
+                <label className="inline-flex items-center gap-2 font-display text-xs text-muted-foreground font-semibold">
                   <input
-                    type="range"
-                    min={0}
-                    max={13}
-                    step={0.5}
-                    value={tiltAngleDeg}
-                    onChange={(e) => setTiltAngleDeg(Number(e.target.value))}
-                    className="mt-1 w-full accent-primary"
+                    type="checkbox"
+                    checked={autoRotate}
+                    onChange={(e) => setAutoRotate(e.target.checked)}
                   />
+                  Auto rotate model
                 </label>
-
-                <div className="flex flex-col gap-2 pt-1">
-                  <label className="inline-flex items-center gap-2 font-display text-xs text-muted-foreground font-semibold">
-                    <input
-                      type="checkbox"
-                      checked={autoRotate}
-                      onChange={(e) => setAutoRotate(e.target.checked)}
-                    />
-                    Auto rotate model
-                  </label>
-                  <label className="inline-flex items-center gap-2 font-display text-xs text-muted-foreground font-semibold">
-                    <input
-                      type="checkbox"
-                      checked={showOptionalEquipment}
-                      onChange={(e) =>
-                        setShowOptionalEquipment(e.target.checked)
-                      }
-                    />
-                    Show optional mounts
-                  </label>
-                  <label className="inline-flex items-center gap-2 font-display text-xs text-muted-foreground font-semibold">
-                    <input
-                      type="checkbox"
-                      checked={showHoverLabels}
-                      onChange={(e) => setShowHoverLabels(e.target.checked)}
-                    />
-                    Show part labels on hover
-                  </label>
-                </div>
-              </aside>
-            </div>
-          )}
-
-          {activeModel === "enhanced" && (
-            <div>
-              <div className="h-[700px] rounded-lg overflow-hidden border border-border">
-                <TrailerScene />
+                <label className="inline-flex items-center gap-2 font-display text-xs text-muted-foreground font-semibold">
+                  <input
+                    type="checkbox"
+                    checked={showOptionalEquipment}
+                    onChange={(e) =>
+                      setShowOptionalEquipment(e.target.checked)
+                    }
+                  />
+                  Show optional mounts
+                </label>
+                <label className="inline-flex items-center gap-2 font-display text-xs text-muted-foreground font-semibold">
+                  <input
+                    type="checkbox"
+                    checked={showHoverLabels}
+                    onChange={(e) => setShowHoverLabels(e.target.checked)}
+                  />
+                  Show part labels on hover
+                </label>
               </div>
-            </div>
-          )}
+            </aside>
+          </div>
 
           <div className="mt-8 flex gap-3">
             <Link

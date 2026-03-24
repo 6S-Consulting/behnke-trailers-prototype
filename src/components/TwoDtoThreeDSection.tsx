@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import TrailerViewer from "../trailers/old/DirectionalDrillTrailer"
+import TrailerViewer from "@/trailers/directionaldrill/3d/DirectionalDrillTrailer"
 
 export default function TwoDtoThreeDSection() {
   const [file, setFile] = useState<File | null>(null)
@@ -163,7 +163,9 @@ export default function TwoDtoThreeDSection() {
 
               <TabsContent value="3d-view" className="flex-1 p-0 m-0 relative bg-slate-900 group">
                 <div className="w-full h-full absolute inset-0">
-                  <TrailerViewer key="3d-model" className="w-full h-full border-0 rounded-none bg-slate-900" />
+                <div className="w-full h-full border-0 rounded-none bg-slate-900 overflow-hidden">
+                  <TrailerViewer key="3d-model" />
+                </div>
                 </div>
 
                 {/* Overlay Controls */}
