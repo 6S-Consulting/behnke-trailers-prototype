@@ -5,6 +5,7 @@ import TrailerViewer, {
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { paverTagTrailer } from "@/trailers/data/trailerData";
 
 export function PaverTag3DPage() {
   const [isUnfolded, setIsUnfolded] = useState(false);
@@ -18,6 +19,13 @@ export function PaverTag3DPage() {
 
       <div className="pt-24 pb-12 px-6">
         <div className="container mx-auto max-w-7xl">
+          <div className="mb-8">
+            <h1 className="text-3xl font-black font-display uppercase tracking-tight text-foreground">
+              {paverTagTrailer.title}
+            </h1>
+            <p className="text-muted-foreground mt-1">3D Interactive Engineering Model</p>
+          </div>
+
           <div className="relative mb-6">
             <TrailerViewer
               isUnfolded={isUnfolded}

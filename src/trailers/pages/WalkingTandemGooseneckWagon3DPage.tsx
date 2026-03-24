@@ -5,6 +5,7 @@ import WalkingTandemScene, {
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { walkingTandemGooseneckWagon } from "@/trailers/data/trailerData";
 
 export function WalkingTandemGooseneckWagon3DPage() {
   const [autoRotate, setAutoRotate] = useState(true);
@@ -18,9 +19,12 @@ export function WalkingTandemGooseneckWagon3DPage() {
 
       <div className="pt-24 pb-12 px-6">
         <div className="container mx-auto max-w-7xl">
-          <h1 className="font-display text-4xl lg:text-5xl font-black text-foreground mb-6">
-            Walking Tandem Gooseneck Wagon - 3D Model
-          </h1>
+          <div className="mb-8">
+            <h1 className="text-3xl font-black font-display uppercase tracking-tight text-foreground">
+              {walkingTandemGooseneckWagon.title}
+            </h1>
+            <p className="text-muted-foreground mt-1">3D Interactive Engineering Model</p>
+          </div>
 
           <div className="relative mb-6">
             <div className="h-[700px] rounded-lg overflow-hidden border border-border">

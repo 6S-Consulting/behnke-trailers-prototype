@@ -4,7 +4,7 @@ import { join, extname } from 'node:path';
 
 const TARGET_DIRS = ['src', 'public'];
 const MAX_SIZE_MB = 1.0; 
-const JPEG_QUALITY = 85;
+const JPEG_QUALITY =50;
 
 function optimizeImage(filePath) {
   const stats = statSync(filePath);
