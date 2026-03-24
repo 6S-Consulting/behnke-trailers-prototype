@@ -19,15 +19,15 @@ export type TrailerProduct = {
   resources: string[];
 };
 
-import heroImage from "@/trailers/directionaldrill/images/image.png";
-import tubeTilt1 from "@/trailers/tubetilt/images/1.png";
-import tubeTilt2 from "@/trailers/tubetilt/images/2.png";
-import tubeTilt3 from "@/trailers/tubetilt/images/3.png";
-import tubeTilt4 from "@/trailers/tubetilt/images/4.png";
-import trailer03 from "@/trailers/directionaldrill/images/trailer-03.png";
-import trailer04 from "@/trailers/directionaldrill/images/trailer-04.png";
-import trailer05 from "@/trailers/directionaldrill/images/trailer-05.png";
-import trailer06 from "@/trailers/directionaldrill/images/trailer-06.png";
+import heroImage from "@/trailers/directionaldrill/images/image.jpg";
+import tubeTilt1 from "@/trailers/tubetilt/images/1.jpg";
+import tubeTilt2 from "@/trailers/tubetilt/images/2.jpg";
+import tubeTilt3 from "@/trailers/tubetilt/images/3.jpg";
+import tubeTilt4 from "@/trailers/tubetilt/images/4.jpg";
+import trailer03 from "@/trailers/directionaldrill/images/trailer-03.jpg";
+import trailer04 from "@/trailers/directionaldrill/images/trailer-04.jpg";
+import trailer05 from "@/trailers/directionaldrill/images/trailer-05.jpg";
+import trailer06 from "@/trailers/directionaldrill/images/trailer-06.jpg";
 
 import image0 from "@/trailers/WalkingTandemGooseneckWagon/images/image 0.jpg";
 import image1 from "@/trailers/WalkingTandemGooseneckWagon/images/image1.jpg";
@@ -37,11 +37,11 @@ import image4 from "@/trailers/WalkingTandemGooseneckWagon/images/image 4.jpg";
 import image5 from "@/trailers/WalkingTandemGooseneckWagon/images/image 5.jpg";
 import image6 from "@/trailers/WalkingTandemGooseneckWagon/images/image 6.jpg";
 import image7 from "@/trailers/WalkingTandemGooseneckWagon/images/image 7.jpg";
-import paverTag1 from "@/trailers/pavertag/images/1.png";
-import paverTag2 from "@/trailers/pavertag/images/2.png";
-import paverTag3 from "@/trailers/pavertag/images/3.png";
-import paverTag4 from "@/trailers/pavertag/images/4.png";
-import paverTag5 from "@/trailers/pavertag/images/5.png";
+import paverTag1 from "@/trailers/pavertag/images/1.jpg";
+import paverTag2 from "@/trailers/pavertag/images/2.jpg";
+import paverTag3 from "@/trailers/pavertag/images/3.jpg";
+import paverTag4 from "@/trailers/pavertag/images/4.jpg";
+import paverTag5 from "@/trailers/pavertag/images/5.jpg";
 
 export const directionalDrillTiltTrailer: TrailerProduct = {
   slug: "directional-drill-tilt-trailer",
@@ -272,7 +272,7 @@ export const paverTagTrailer: TrailerProduct = {
     { label: "Safety Chains", value: '(2) 1/2" Gr. 70' },
     { label: "Tie-Downs", value: "1\" Bent D-rings (every 4')" },
     { label: "Storage", value: "Lockable toolbox in tongue" },
-    { label: "Axles", value: "(3) Dexter 22,500 lb. air brake axles" },
+    { label: "Axles", value: "(2) Dexter 22,500 lb. air brake axles" },
     { label: "Suspension", value: "Hutch H9700" },
     { label: "Tire and Wheel", value: "235/75R 17.5H dual" },
     { label: "Decking", value: '1 1/2" Rough Oak' },
