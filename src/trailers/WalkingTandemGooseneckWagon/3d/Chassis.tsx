@@ -160,10 +160,6 @@ export function GooseneckArch({ position }: { position: [number, number, number]
       <FlatLeg from={apexLeft} to={footF} />
       <FlatLeg from={apexRight} to={footR} />
       {/* ══ Reflective DOT Tape (Legs - MIRRORED) ══ */}
-      {/* ══ Reflective DOT Tape (Legs - MIRRORED STRIP) ══ */}
-      {/* ══ Reflective DOT Tape (Fixed to FlatLeg Edges) ══ */}
-      {/* ══ Reflective DOT Tape (Corrected Rotation for FlatLeg Edges) ══ */}
-      {/* ══ Reflective DOT Tape (Increased Parallel Gap) ══ */}
       {[
         { from: apexLeft, to: footF },
         { from: apexRight, to: footR }
@@ -325,23 +321,22 @@ export function Chassis({ position }: { position: [number, number, number] }) {
           rotation={[0, -Math.PI / 2, 0]}
         />
       </group>
-      {/* ══ Reflective DOT Tape ══ */}
-      {/* ══ Reflective DOT Tape (Main Outer Side - Continuous Long Strip) ══ */}
-      {/* ══ Reflective DOT Tape (Fixed Flickering/Z-Fighting) ══ */}
+      {/* ══ Reflective DOT Tape ══ */}    
       {([-railOffset, railOffset] as number[]).map((railX, railIndex) => {
         const isRightRail = railX > 0;
         const sideDirection = isRightRail ? 1 : -1;
 
         return (
           <group key={railIndex}>
-            {Array.from({ length: 21 }).map((_, i) => {
-              const stripLen = 0.25;
+            {Array.from({ length: 20 }).map((_, i) => {
+              const stripLen = 0.25; // Slightly shorter to create a gap
+              const gap = 0.02;      // Gap size
               // 1. Precise Z-Positioning to prevent overlap
-              const zPos = -frameLength / 2 + 0.4 + (i * stripLen);
+              const zPos = -frameLength / 2 + 0.4 + (i * (stripLen + gap));
 
               const tapeThickness = 0.006; // 2. Slightly thicker than the rail face
-              const tapeWidth = 0.08;
-              const gapOffset = 0.005; // 3. Increased gap to stop Z-fighting with rail
+              const tapeWidth = 0.06;
+              const gapOffset = -0.01; // 3. Increased gap to stop Z-fighting with rail
 
               return (
                 <mesh
@@ -349,7 +344,7 @@ export function Chassis({ position }: { position: [number, number, number] }) {
                   position={[
                     railX + (railW / 2 + gapOffset) * sideDirection,
                     0,
-                    zPos
+                    zPos -0.1
                   ]}
                   // 4. Simplified rotation to keep it vertical and flat
                   rotation={[0, Math.PI, Math.PI / 2]}

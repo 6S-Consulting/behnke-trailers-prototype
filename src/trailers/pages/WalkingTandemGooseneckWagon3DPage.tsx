@@ -10,7 +10,7 @@ export function WalkingTandemGooseneckWagon3DPage() {
   const [autoRotate, setAutoRotate] = useState(true);
   const [cameraView, setCameraView] = useState<CameraView>("perspective");
   const [showOptionalEquipment, setShowOptionalEquipment] = useState(false);
-  const [showHoverLabels, setShowHoverLabels] = useState(true);
+  const [showHoverLabels, setShowHoverLabels] = useState(false);
 
   return (
     <div className="bg-background min-h-screen">

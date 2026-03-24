@@ -183,7 +183,7 @@ export const walkingTandemGooseneckWagon: TrailerProduct = {
   slug: "walking-tandem-gooseneck-wagon",
   title: "Walking Tandem Gooseneck Wagon (Twin 1450 gal. Tanks)",
   shortDescription:
-    "Heavy-duty gooseneck wagon trailer with high-capacity walking tandem axles for superior stability.",
+    "The GN2900TWG will be our best running gear for navigating difficult terrain.",
   description:
     "The GN2900TWG will be our best running gear for navigating difficult terrain. With a rear walking tandem pivoting axle, this model is versatile enough to sit on uneven terrain and built heavy enough to take the stress. Pairing the rear walking tandem with a torflex front axle will make this the smoothest riding running gear in your fleet.",
   overview:

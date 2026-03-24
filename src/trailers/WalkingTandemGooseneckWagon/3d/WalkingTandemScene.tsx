@@ -1,5 +1,5 @@
-import { Suspense, useEffect, useRef, useState } from "react";
-import { Canvas, useThree } from "@react-three/fiber";
+import { Suspense, useEffect, useState } from "react";
+import { Canvas, useThree, ThreeEvent } from "@react-three/fiber";
 import {
   OrbitControls,
   Environment,
@@ -49,12 +49,12 @@ export default function WalkingTandemScene({
   const [hoveredPart, setHoveredPart] = useState<string | null>(null);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
-  const handlePointerOver = (e: any) => {
+  const handlePointerOver = (e: ThreeEvent<PointerEvent>) => {
     if (!showHoverLabels) return;
     e.stopPropagation();
     
     // Improved logic to find a meaningful name by traversing up the parent tree
-    let current = e.object;
+    let current: THREE.Object3D | null = e.object;
     let name = current.name;
     
     // Traverse up to find a named group if the leaf mesh isn't named specifically
