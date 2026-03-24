@@ -151,9 +151,8 @@ function deriveDimensions(
   deckWood: DeckWood,
 ): TrailerDimensions {
   const frontDeckLength = frontDeckLengthFt * 12;
-  // User asked for increased length. Brochures usually say 25' + 6' tail.
-  // We'll set the base deck length to 30 feet as requested.
-  const deckLength = 30 * 12 + frontDeckLength;
+  // Reduced deck length by 20% as requested
+  const deckLength = (30 * 12 * 0.8) + frontDeckLength;
 
   const tireData =
     axleRating === 8000
@@ -173,7 +172,7 @@ function deriveDimensions(
     crossmemberDepth: 3,
     plankThickness: deckWood === "white-oak" ? 3.375 : 3.0,
     axleSpacing: 34, // Tightened axle spacing
-    axleCenterZ: deckLength * 0.18, // Shift forward towards the front of the trailer
+    axleCenterZ: deckLength * 0.11, // Shift forward slightly towards the front of the trailer
     tireRadius: tireData.tireRadius,
     tireWidth: tireData.tireWidth,
     wheelTrackHalf: 48.5, // WHEEL END: pushed to the absolute widest left and right edges of 102" deck
