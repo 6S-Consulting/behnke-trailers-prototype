@@ -8,6 +8,7 @@ import { Plus, Download, LayoutGrid, List, Pencil, Save, Trash2 } from 'lucide-r
 import { cn } from '@/lib/utils';
 import { useAppData } from '@/context/AppDataContext';
 import { toast } from 'sonner';
+import { motion } from 'framer-motion';
 
 const categories: TrailerCategory[] = ['Agricultural', 'Construction', 'Heavy Haul', 'Commercial', 'Utility/Telecom', 'OEM'];
 
@@ -114,24 +115,28 @@ const InventoryManagement = () => {
           <div className="flex gap-2">
             <button
               onClick={() => { setShowAddModal(true); setForm(EMPTY_FORM); }}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground rounded-sm text-xs font-display uppercase tracking-wide hover:opacity-90 transition-opacity"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-primary text-primary-foreground rounded-sm text-xs font-display uppercase tracking-wide hover:brightness-110 transition-all active:scale-95"
             >
               <Plus size={14} /> Add Trailer
             </button>
             <button
               onClick={exportCSV}
-              className="flex items-center gap-1.5 px-3 py-1.5 border border-border rounded-sm text-xs font-display uppercase tracking-wide hover:bg-muted transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 border border-white/10 rounded-sm text-xs font-display uppercase tracking-wide hover:bg-white/5 transition-all active:scale-95"
             >
               <Download size={14} /> Export CSV
             </button>
-            <button onClick={() => setView(view === 'table' ? 'grid' : 'table')} className="p-1.5 border border-border rounded-sm hover:bg-muted">
+            <button onClick={() => setView(view === 'table' ? 'grid' : 'table')} className="p-1.5 border border-white/10 rounded-sm hover:bg-white/5 transition-all active:scale-95">
               {view === 'table' ? <LayoutGrid size={14} /> : <List size={14} />}
             </button>
           </div>
         </div>
 
         {/* Summary strip — all cards clickable */}
-        <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
+        <motion.div
+          className="grid grid-cols-3 md:grid-cols-6 gap-2"
+          initial="hidden" animate="show"
+          variants={{ hidden: {}, show: { transition: { staggerChildren: 0.04 } } }}
+        >
           {[
             { label: 'Total Models', v: trailers.length, status: 'ALL' },
             { label: 'Total Units', v: trailers.reduce((s, t) => s + t.inStock, 0), status: 'ALL' },
@@ -143,26 +148,27 @@ const InventoryManagement = () => {
             const isAll = status === 'ALL';
             const isActive = isAll ? (!filterStatus && !filterCat) : filterStatus === status;
             return (
-              <div
-                key={label}
-                onClick={() => {
-                  if (isAll) { setFilterStatus(''); setFilterCat(''); }
-                  else setFilterStatus(filterStatus === status ? '' : status);
-                }}
-                className={cn(
-                  'rounded-lg p-3 text-center transition-all cursor-pointer',
-                  isActive
-                    ? 'bg-primary/20 border border-primary/50 ring-1 ring-primary/30'
-                    : 'bg-card/60 border border-white/5 hover:border-white/20'
-                )}
-              >
-                <p className={cn('font-mono text-lg font-bold', isActive ? 'text-primary' : 'text-white')}>{v}</p>
-                <p className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground">{label}</p>
-                {isActive && <p className="text-[8px] font-mono text-primary/70 mt-0.5">▲ active filter</p>}
-              </div>
+              <motion.div key={label} variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}>
+                <div
+                  onClick={() => {
+                    if (isAll) { setFilterStatus(''); setFilterCat(''); }
+                    else setFilterStatus(filterStatus === status ? '' : status);
+                  }}
+                  className={cn(
+                    'rounded-lg p-3 text-center transition-all cursor-pointer backdrop-blur-sm',
+                    isActive
+                      ? 'bg-primary/20 border border-primary/50 ring-1 ring-primary/30'
+                      : 'bg-card/60 border border-white/[0.08] hover:border-white/[0.12]'
+                  )}
+                >
+                  <p className={cn('font-mono text-lg font-bold', isActive ? 'text-primary' : 'text-white')}>{v}</p>
+                  <p className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground">{label}</p>
+                  {isActive && <p className="text-[8px] font-mono text-primary/70 mt-0.5">▲ active filter</p>}
+                </div>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
 
         {/* Category Filters */}
         <div className="flex gap-2 flex-wrap items-center">
@@ -193,7 +199,7 @@ const InventoryManagement = () => {
               { key: 'category', label: 'Category', render: (t) => <StatusBadge status={t.category} /> },
               { key: 'subType', label: 'Sub-Type', render: (t) => <span className="text-xs">{t.subType}</span> },
               { key: 'gvw', label: 'GVW', sortable: true, render: (t) => <span className="font-mono text-xs">{t.gvw.toLocaleString()} lb</span> },
-              { key: 'price', label: 'Price', sortable: true, render: (t) => <span className="font-mono text-xs">£{t.price.toLocaleString()}</span> },
+              { key: 'price', label: 'Price', sortable: true, render: (t) => <span className="font-mono text-xs">�${t.price.toLocaleString()}</span> },
               { key: 'inStock', label: 'Stock', sortable: true, render: (t) => <span className={cn('font-mono text-xs font-bold', t.inStock === 0 ? 'text-danger' : t.inStock <= 3 ? 'text-warning' : 'text-success')}>{t.inStock}</span> },
               { key: 'status', label: 'Status', render: (t) => <StatusBadge status={t.status} /> },
               {
@@ -212,7 +218,7 @@ const InventoryManagement = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
             {filtered.map(t => (
-              <div key={t.id} onClick={() => openDetail(t)} className="bg-card rounded-lg shadow-industrial p-4 cursor-pointer hover:border-primary/30 transition-all border border-white/5 group">
+              <div key={t.id} onClick={() => openDetail(t)} className="bg-card/60 backdrop-blur-sm border border-white/[0.08] rounded-lg p-4 cursor-pointer hover:border-primary/30 transition-all group">
                 <div className="flex justify-between items-start mb-2">
                   <span className="font-mono text-xs text-muted-foreground">{t.modelNumber}</span>
                   <StatusBadge status={t.status} />
@@ -220,7 +226,7 @@ const InventoryManagement = () => {
                 <h3 className="font-display font-bold uppercase tracking-wide text-sm group-hover:text-primary transition-colors">{t.name}</h3>
                 <p className="text-xs text-muted-foreground mt-1">{t.category} — {t.subType}</p>
                 <div className="flex items-baseline justify-between mt-3">
-                  <span className="font-display text-lg font-bold">£{t.price.toLocaleString()}</span>
+                  <span className="font-display text-lg font-bold">�${t.price.toLocaleString()}</span>
                   <span className={cn('font-mono text-xs', t.inStock === 0 ? 'text-danger' : t.inStock <= 3 ? 'text-warning' : 'text-success')}>{t.inStock} in stock</span>
                 </div>
               </div>
@@ -243,7 +249,7 @@ const InventoryManagement = () => {
                       <span className="text-xs text-danger font-mono">Permanently delete?</span>
                       <button
                         onClick={handleDelete}
-                        className="flex items-center gap-1 px-3 py-1.5 bg-danger text-white rounded-sm text-xs font-display uppercase tracking-wide hover:opacity-90 transition-opacity"
+                        className="flex items-center gap-1 px-3 py-1.5 bg-danger text-white rounded-sm text-xs font-display uppercase tracking-wide hover:brightness-110 transition-all active:scale-95"
                       >
                         <Trash2 size={12} /> Confirm
                       </button>
@@ -264,7 +270,7 @@ const InventoryManagement = () => {
                       </button>
                       <button
                         onClick={() => setEditMode(!editMode)}
-                        className={cn('flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-display uppercase tracking-wide transition-all', editMode ? 'bg-muted' : 'bg-primary text-primary-foreground hover:opacity-90')}
+                        className={cn('flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-display uppercase tracking-wide transition-all active:scale-95', editMode ? 'bg-muted' : 'bg-primary text-primary-foreground hover:brightness-110')}
                       >
                         <Pencil size={12} /> {editMode ? 'Cancel Edit' : 'Edit'}
                       </button>
@@ -281,7 +287,7 @@ const InventoryManagement = () => {
                       { key: 'modelNumber', label: 'Model #', type: 'text' },
                       { key: 'subType', label: 'Sub-Type', type: 'text' },
                       { key: 'gvw', label: 'GVW (lb)', type: 'number' },
-                      { key: 'price', label: 'Price (£)', type: 'number' },
+                      { key: 'price', label: 'Price (�$)', type: 'number' },
                       { key: 'inStock', label: 'In Stock', type: 'number' },
                       { key: 'leadTimeDays', label: 'Lead Time (days)', type: 'number' },
                     ].map(({ key, label, type }) => (
@@ -291,7 +297,7 @@ const InventoryManagement = () => {
                           type={type}
                           value={(editForm as Record<string, unknown>)[key] as string ?? ''}
                           onChange={e => setEditForm(prev => ({ ...prev, [key]: type === 'number' ? Number(e.target.value) : e.target.value }))}
-                          className="w-full px-3 py-1.5 text-sm bg-background border border-border rounded-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                          className="w-full px-3 py-1.5 text-sm bg-card/60 border border-white/[0.08] rounded-sm focus:outline-none focus:ring-1 focus:ring-primary"
                         />
                       </div>
                     ))}
@@ -300,7 +306,7 @@ const InventoryManagement = () => {
                       <select
                         value={editForm.status ?? detailTrailer.status}
                         onChange={e => setEditForm(prev => ({ ...prev, status: e.target.value as Trailer['status'] }))}
-                        className="w-full px-3 py-1.5 text-sm bg-background border border-border rounded-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                        className="w-full px-3 py-1.5 text-sm bg-card/60 border border-white/[0.08] rounded-sm focus:outline-none focus:ring-1 focus:ring-primary"
                       >
                         {['Available', 'Low Stock', 'Out of Stock', 'Custom Order'].map(s => <option key={s}>{s}</option>)}
                       </select>
@@ -312,12 +318,12 @@ const InventoryManagement = () => {
                       value={editForm.description ?? detailTrailer.description}
                       onChange={e => setEditForm(prev => ({ ...prev, description: e.target.value }))}
                       rows={2}
-                      className="w-full px-3 py-1.5 text-sm bg-background border border-border rounded-sm focus:outline-none focus:ring-1 focus:ring-primary resize-none"
+                      className="w-full px-3 py-1.5 text-sm bg-card/60 border border-white/[0.08] rounded-sm focus:outline-none focus:ring-1 focus:ring-primary resize-none"
                     />
                   </div>
                   <button
                     onClick={handleUpdate}
-                    className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-sm text-xs font-display uppercase tracking-wide hover:opacity-90 transition-opacity"
+                    className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-sm text-xs font-display uppercase tracking-wide hover:brightness-110 transition-all active:scale-95"
                   >
                     <Save size={13} /> Save Changes
                   </button>
@@ -327,7 +333,7 @@ const InventoryManagement = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <Field label="Category" value={`${detailTrailer.category} — ${detailTrailer.subType}`} />
                     <Field label="GVW" value={`${detailTrailer.gvw.toLocaleString()} lb`} />
-                    <Field label="Base Price" value={<span className="font-display text-xl font-bold">£{detailTrailer.price.toLocaleString()}</span>} />
+                    <Field label="Base Price" value={<span className="font-display text-xl font-bold">�${detailTrailer.price.toLocaleString()}</span>} />
                     <Field label="Lead Time" value={`${detailTrailer.leadTimeDays} days`} />
                     <Field label="In Stock" value={<span className={cn('font-bold', detailTrailer.inStock > 5 ? 'text-success' : detailTrailer.inStock > 0 ? 'text-warning' : 'text-danger')}>{detailTrailer.inStock}</span>} />
                   </div>
@@ -335,7 +341,7 @@ const InventoryManagement = () => {
                   {detailTrailer.specs.length > 0 && (
                     <div>
                       <h4 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-2">Specifications</h4>
-                      <div className="border border-border rounded-md overflow-hidden">
+                      <div className="border border-white/[0.08] rounded-md overflow-hidden">
                         {detailTrailer.specs.map((s, i) => (
                           <div key={i} className={cn('flex justify-between px-3 py-1.5 text-sm', i % 2 === 0 ? 'bg-muted/30' : '')}>
                             <span className="text-muted-foreground">{s.label}</span>
@@ -349,12 +355,12 @@ const InventoryManagement = () => {
                     <div>
                       <h4 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-2">Available Options</h4>
                       {detailTrailer.options.map(o => (
-                        <div key={o.id} className="flex justify-between items-center py-1.5 border-b border-border last:border-0">
+                        <div key={o.id} className="flex justify-between items-center py-1.5 border-b border-white/5 last:border-0">
                           <div>
                             <span className="text-sm font-medium">{o.name}</span>
                             <span className="text-xs text-muted-foreground ml-2">{o.description}</span>
                           </div>
-                          <span className="font-mono text-sm text-primary">+£{o.priceAdd.toLocaleString()}</span>
+                          <span className="font-mono text-sm text-primary">+�${o.priceAdd.toLocaleString()}</span>
                         </div>
                       ))}
                     </div>
@@ -374,7 +380,7 @@ const InventoryManagement = () => {
                 { key: 'modelNumber', label: 'Model # *', type: 'text', placeholder: 'e.g. STX22A' },
                 { key: 'subType', label: 'Sub-Type', type: 'text', placeholder: 'e.g. Sprayer Trailers' },
                 { key: 'gvw', label: 'GVW (lb)', type: 'number', placeholder: '0' },
-                { key: 'price', label: 'Price (£)', type: 'number', placeholder: '0' },
+                { key: 'price', label: 'Price (�$)', type: 'number', placeholder: '0' },
                 { key: 'inStock', label: 'In Stock', type: 'number', placeholder: '0' },
                 { key: 'leadTimeDays', label: 'Lead Time (days)', type: 'number', placeholder: '21' },
               ].map(({ key, label, type, placeholder }) => (
@@ -385,7 +391,7 @@ const InventoryManagement = () => {
                     placeholder={placeholder}
                     value={(form as Record<string, unknown>)[key] as string ?? ''}
                     onChange={e => setForm(prev => ({ ...prev, [key]: type === 'number' ? Number(e.target.value) : e.target.value }))}
-                    className="w-full px-3 py-1.5 text-sm bg-background border border-border rounded-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                    className="w-full px-3 py-1.5 text-sm bg-card/60 border border-white/[0.08] rounded-sm focus:outline-none focus:ring-1 focus:ring-primary"
                   />
                 </div>
               ))}
@@ -394,7 +400,7 @@ const InventoryManagement = () => {
                 <select
                   value={form.category}
                   onChange={e => setForm(prev => ({ ...prev, category: e.target.value as TrailerCategory }))}
-                  className="w-full px-3 py-1.5 text-sm bg-background border border-border rounded-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                  className="w-full px-3 py-1.5 text-sm bg-card/60 border border-white/[0.08] rounded-sm focus:outline-none focus:ring-1 focus:ring-primary"
                 >
                   {categories.map(c => <option key={c}>{c}</option>)}
                 </select>
@@ -404,7 +410,7 @@ const InventoryManagement = () => {
                 <select
                   value={form.status}
                   onChange={e => setForm(prev => ({ ...prev, status: e.target.value as Trailer['status'] }))}
-                  className="w-full px-3 py-1.5 text-sm bg-background border border-border rounded-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                  className="w-full px-3 py-1.5 text-sm bg-card/60 border border-white/[0.08] rounded-sm focus:outline-none focus:ring-1 focus:ring-primary"
                 >
                   {['Available', 'Low Stock', 'Out of Stock', 'Custom Order'].map(s => <option key={s}>{s}</option>)}
                 </select>
@@ -417,14 +423,14 @@ const InventoryManagement = () => {
                 onChange={e => setForm(prev => ({ ...prev, description: e.target.value }))}
                 rows={2}
                 placeholder="Brief product description..."
-                className="w-full px-3 py-1.5 text-sm bg-background border border-border rounded-sm focus:outline-none focus:ring-1 focus:ring-primary resize-none"
+                className="w-full px-3 py-1.5 text-sm bg-card/60 border border-white/[0.08] rounded-sm focus:outline-none focus:ring-1 focus:ring-primary resize-none"
               />
             </div>
             <div className="flex gap-2 pt-1">
-              <button onClick={handleAdd} className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-sm text-xs font-display uppercase tracking-wide hover:opacity-90 transition-opacity">
+              <button onClick={handleAdd} className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-sm text-xs font-display uppercase tracking-wide hover:brightness-110 transition-all active:scale-95">
                 <Plus size={13} /> Add Trailer
               </button>
-              <button onClick={() => setShowAddModal(false)} className="px-4 py-2 border border-border rounded-sm text-xs font-display uppercase tracking-wide hover:bg-muted transition-colors">
+              <button onClick={() => setShowAddModal(false)} className="px-4 py-2 border border-white/10 rounded-sm text-xs font-display uppercase tracking-wide hover:bg-white/5 transition-all active:scale-95">
                 Cancel
               </button>
             </div>

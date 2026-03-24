@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { useAppData } from '@/context/AppDataContext';
 import { CheckCircle, XCircle, AlertTriangle, ChevronLeft, ChevronRight } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -66,29 +67,39 @@ const MaintenanceSlotManager = () => {
         <h1 className="font-display text-2xl font-bold uppercase tracking-wide">Maintenance Schedule</h1>
 
         {/* Summary Strip */}
-        <div className="grid grid-cols-3 gap-3">
-          <div className="bg-warning/10 border border-warning/20 rounded-lg p-3 flex items-center gap-3">
-            <AlertTriangle size={18} className="text-warning shrink-0" />
-            <div>
-              <p className="font-display text-xl font-bold text-white">{pending}</p>
-              <p className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground">Pending Requests</p>
+        <motion.div
+          className="grid grid-cols-3 gap-3"
+          initial="hidden" animate="show"
+          variants={{ hidden: {}, show: { transition: { staggerChildren: 0.05 } } }}
+        >
+          <motion.div variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}>
+            <div className="bg-warning/10 border border-warning/20 rounded-lg p-3 flex items-center gap-3">
+              <AlertTriangle size={18} className="text-warning shrink-0" />
+              <div>
+                <p className="font-display text-xl font-bold text-white">{pending}</p>
+                <p className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground">Pending Requests</p>
+              </div>
             </div>
-          </div>
-          <div className="bg-success/10 border border-success/20 rounded-lg p-3 flex items-center gap-3">
-            <CheckCircle size={18} className="text-success shrink-0" />
-            <div>
-              <p className="font-display text-xl font-bold text-white">{confirmed}</p>
-              <p className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground">Confirmed Slots</p>
+          </motion.div>
+          <motion.div variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}>
+            <div className="bg-success/10 border border-success/20 rounded-lg p-3 flex items-center gap-3">
+              <CheckCircle size={18} className="text-success shrink-0" />
+              <div>
+                <p className="font-display text-xl font-bold text-white">{confirmed}</p>
+                <p className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground">Confirmed Slots</p>
+              </div>
             </div>
-          </div>
-          <div className="bg-card border border-white/5 rounded-lg p-3 flex items-center gap-3">
-            <XCircle size={18} className="text-muted-foreground shrink-0" />
-            <div>
-              <p className="font-display text-xl font-bold text-white">{completed}</p>
-              <p className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground">Completed</p>
+          </motion.div>
+          <motion.div variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}>
+            <div className="bg-card/60 backdrop-blur-sm border border-white/[0.08] rounded-lg p-3 flex items-center gap-3">
+              <XCircle size={18} className="text-muted-foreground shrink-0" />
+              <div>
+                <p className="font-display text-xl font-bold text-white">{completed}</p>
+                <p className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground">Completed</p>
+              </div>
             </div>
-          </div>
-        </div>
+          </motion.div>
+        </motion.div>
 
         {/* Year + Month Navigator */}
         <div className="flex items-center gap-2 flex-wrap">
@@ -148,7 +159,7 @@ const MaintenanceSlotManager = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Calendar Grid */}
-          <div className="lg:col-span-2 bg-card rounded-lg shadow-industrial p-4">
+          <div className="lg:col-span-2 bg-card/60 backdrop-blur-sm border border-white/[0.08] rounded-lg p-4 hover:border-white/[0.12] transition-colors">
             <h3 className="font-display font-bold uppercase tracking-wide mb-3">{months[month]} {year}</h3>
             <div className="grid grid-cols-7 gap-1 mt-1">
               {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
@@ -169,8 +180,8 @@ const MaintenanceSlotManager = () => {
                 // Inline colors — guaranteed to render regardless of Tailwind purge
                 const dominantColor = hasEmergency ? '#ef4444'
                   : hasRequested ? '#f59e0b'
-                  : hasConfirmed ? '#10b981'
-                  : '#6b7280';
+                    : hasConfirmed ? '#10b981'
+                      : '#6b7280';
 
                 const cellInlineStyle: React.CSSProperties = ds.length > 0 && !isSelected
                   ? { borderLeft: `3px solid ${dominantColor}`, backgroundColor: `${dominantColor}18` }
@@ -248,7 +259,7 @@ const MaintenanceSlotManager = () => {
           </div>
 
           {/* Slot List / Day Detail */}
-          <div className="bg-card rounded-lg shadow-industrial p-4 max-h-[520px] overflow-y-auto">
+          <div className="bg-card/60 backdrop-blur-sm border border-white/[0.08] rounded-lg p-4 max-h-[520px] overflow-y-auto hover:border-white/[0.12] transition-colors">
             <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-3">
               {selectedDay ? `Slots for ${selectedDay}` : 'Upcoming Slots'}
             </h3>
@@ -296,7 +307,7 @@ const MaintenanceSlotManager = () => {
         </div>
 
         {/* All Slots Table */}
-        <div className="bg-card rounded-lg shadow-industrial p-4">
+        <div className="bg-card/60 backdrop-blur-sm border border-white/[0.08] rounded-lg p-4 hover:border-white/[0.12] transition-colors">
           <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-3">All Maintenance Slots</h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">

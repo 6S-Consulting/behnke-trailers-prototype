@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { UserRole } from '@/types';
 import { useAppData } from '@/context/AppDataContext';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   BarChart3, Package, Store, Heart, Wrench, ClipboardList, Bell, Settings2,
   ShoppingCart, MessageSquare, Boxes, Home, Phone, LogOut, ChevronDown, Menu, X, Truck, Users
@@ -85,7 +86,7 @@ export const DashboardLayout = ({ children }: { children: ReactNode }) => {
     <div className="flex h-screen bg-background font-body antialiased text-foreground">
       {/* Mobile toggle */}
       <button
-        className="fixed top-3 left-3 z-50 lg:hidden p-2 bg-card rounded-md shadow-industrial"
+        className="fixed top-3 left-3 z-50 lg:hidden p-2 bg-card rounded-lg border border-border"
         onClick={() => setSidebarOpen(!sidebarOpen)}
         aria-label="Toggle sidebar"
       >
@@ -94,19 +95,22 @@ export const DashboardLayout = ({ children }: { children: ReactNode }) => {
 
       {/* Sidebar */}
       <aside className={cn(
-        'fixed lg:static z-40 h-full flex flex-col bg-sidebar transition-all duration-200',
+        'fixed lg:static z-40 h-full flex flex-col transition-all duration-300',
         sidebarOpen ? 'w-64' : 'w-0 lg:w-16 overflow-hidden'
-      )}>
-        <div className="p-5 pt-6">
+      )} style={{ background: 'linear-gradient(180deg, hsl(220 20% 5%) 0%, hsl(220 20% 3%) 100%)' }}>
+        {/* Brand */}
+        <div className="p-5 pt-6 border-b border-white/[0.06]">
           <h1 className="font-display text-xl font-bold tracking-tight">
             <span className="text-white">B-B </span>
-            <span className="text-primary">TRAILERS</span>
+            <span className="text-gradient">TRAILERS</span>
           </h1>
-          <p className="text-[9px] text-muted-foreground font-mono uppercase tracking-[0.2em] mt-0.5 opacity-60">
+          <p className="text-[9px] text-steel font-mono uppercase tracking-[0.2em] mt-1 opacity-60">
             {getBrandTitle(role)}
           </p>
         </div>
-        <nav className="flex-1 px-3 space-y-0.5 mt-2">
+
+        {/* Nav */}
+        <nav className="flex-1 px-3 space-y-1 mt-4 overflow-y-auto scrollbar-hide">
           {nav.map(item => {
             const active = location.pathname === item.path ||
               (item.path !== '/admin' && item.path !== '/dealer' && item.path !== '/customer' && location.pathname.startsWith(item.path));
@@ -115,23 +119,36 @@ export const DashboardLayout = ({ children }: { children: ReactNode }) => {
                 key={item.path}
                 to={item.path}
                 className={cn(
-                  'flex items-center gap-3 px-3 py-2 rounded-sm transition-all duration-200 text-sm',
+                  'flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 text-sm group relative',
                   active
-                    ? 'bg-primary/10 text-primary border-l-2 border-primary'
-                    : 'text-muted-foreground hover:bg-white/5 hover:text-foreground border-l-2 border-transparent'
+                    ? 'text-white'
+                    : 'text-steel hover:text-foreground hover:bg-white/[0.04]'
                 )}
               >
-                <item.icon size={17} className={active ? 'text-primary' : ''} />
-                <span className={cn('font-display uppercase tracking-wide', sidebarOpen ? '' : 'lg:hidden')}>
+                {active && (
+                  <motion.div
+                    layoutId="nav-active"
+                    className="absolute inset-0 rounded-lg"
+                    style={{ background: 'linear-gradient(135deg, hsl(0 72% 51% / 0.15), hsl(0 72% 51% / 0.05))' }}
+                    transition={{ type: 'spring', bounce: 0.15, duration: 0.5 }}
+                  />
+                )}
+                {active && (
+                  <div className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-5 rounded-r-full bg-primary" />
+                )}
+                <item.icon size={17} className={cn('relative z-10', active ? 'text-primary' : 'group-hover:text-primary/60')} />
+                <span className={cn('font-display uppercase tracking-wide relative z-10', sidebarOpen ? '' : 'lg:hidden')}>
                   {item.label}
                 </span>
               </Link>
             );
           })}
         </nav>
-        <div className="p-3 border-t border-white/5">
-          <Link to={`/${role}/settings`} className="flex items-center gap-3 px-3 py-2 text-muted-foreground hover:text-foreground text-sm rounded-sm hover:bg-white/5 transition-colors">
-            <Settings2 size={17} />
+
+        {/* Bottom */}
+        <div className="p-3 border-t border-white/[0.06]">
+          <Link to={`/${role}/settings`} className="flex items-center gap-3 px-3 py-2.5 text-steel hover:text-foreground text-sm rounded-lg hover:bg-white/[0.04] transition-all group">
+            <Settings2 size={17} className="group-hover:text-primary/60" />
             <span className={cn('font-display uppercase tracking-wide', sidebarOpen ? '' : 'lg:hidden')}>Settings</span>
           </Link>
         </div>
@@ -140,8 +157,8 @@ export const DashboardLayout = ({ children }: { children: ReactNode }) => {
       {/* Main */}
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
         {/* Header */}
-        <header className="h-14 bg-card/50 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-4 lg:px-8 shrink-0 relative z-50">
-          <div className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.2em] pl-10 lg:pl-0">
+        <header className="h-16 border-b border-white/[0.06] flex items-center justify-between px-4 lg:px-8 shrink-0 relative z-50" style={{ background: 'linear-gradient(90deg, hsl(220 16% 8% / 0.8), hsl(220 16% 8% / 0.6))', backdropFilter: 'blur(16px)' }}>
+          <div className="text-[10px] font-mono text-steel uppercase tracking-[0.2em] pl-10 lg:pl-0">
             {location.pathname.split('/').filter(Boolean).map(seg => {
               const labels: Record<string, string> = {
                 admin: 'Admin', dealer: 'Dealer', customer: 'Customer',
@@ -153,24 +170,24 @@ export const DashboardLayout = ({ children }: { children: ReactNode }) => {
               return labels[seg] ?? seg;
             }).join(' / ')}
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             {/* Role switcher */}
             <div className="relative">
               <button
                 onClick={() => { setRoleDrop(!roleDrop); setNotifDrop(false); }}
-                className="flex items-center gap-1.5 text-xs font-display uppercase tracking-wide px-2 py-1 rounded-sm hover:bg-muted"
+                className="flex items-center gap-1.5 text-xs font-display uppercase tracking-wide px-3 py-1.5 rounded-lg border border-white/[0.06] hover:border-primary/20 hover:bg-primary/[0.03] transition-all"
               >
                 {role} <ChevronDown size={12} />
               </button>
               {roleDrop && (
-                <div className="absolute right-0 mt-1 bg-card border border-border rounded-md shadow-industrial-md py-1 z-[100] w-40">
+                <div className="absolute right-0 mt-2 bg-card border border-white/10 rounded-xl shadow-2xl py-1 z-[100] w-44 overflow-hidden">
                   {(['admin', 'dealer', 'customer'] as UserRole[]).map(r => (
                     <button
                       key={r}
                       onClick={() => handleRoleSwitch(r)}
                       className={cn(
-                        'w-full text-left px-3 py-1.5 text-xs font-display uppercase tracking-wide hover:bg-muted',
-                        r === role && 'text-primary font-bold'
+                        'w-full text-left px-4 py-2.5 text-xs font-display uppercase tracking-wide hover:bg-white/[0.04] transition-colors',
+                        r === role && 'text-primary bg-primary/[0.06]'
                       )}
                     >
                       {r}
@@ -184,20 +201,20 @@ export const DashboardLayout = ({ children }: { children: ReactNode }) => {
             <div className="relative">
               <button
                 onClick={() => { setNotifDrop(!notifDrop); setRoleDrop(false); }}
-                className="relative p-1.5 hover:bg-muted rounded-sm"
+                className="relative p-2 hover:bg-white/[0.04] rounded-lg transition-all"
                 aria-label="Notifications"
               >
-                <Bell size={17} />
+                <Bell size={17} className="text-steel" />
                 {unread > 0 && (
-                  <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-primary text-primary-foreground text-[9px] font-bold rounded-full flex items-center justify-center">
+                  <span className="absolute -top-0.5 -right-0.5 w-4.5 h-4.5 bg-primary text-primary-foreground text-[9px] font-bold rounded-full flex items-center justify-center ring-2 ring-background">
                     {unread}
                   </span>
                 )}
               </button>
               {notifDrop && (
-                <div className="absolute right-0 mt-1 bg-card border border-border rounded-md shadow-industrial-md py-1 z-[100] w-80 max-h-80 overflow-y-auto">
-                  <div className="px-3 py-2 border-b border-border">
-                    <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Notifications</span>
+                <div className="absolute right-0 mt-2 bg-card border border-white/10 rounded-xl shadow-2xl py-1 z-[100] w-80 max-h-80 overflow-y-auto">
+                  <div className="px-4 py-3 border-b border-white/[0.06]">
+                    <span className="text-[10px] font-mono uppercase tracking-widest text-steel">Notifications</span>
                   </div>
                   {userNotifs.slice(0, 8).map(n => (
                     <button
@@ -208,15 +225,15 @@ export const DashboardLayout = ({ children }: { children: ReactNode }) => {
                         setNotifDrop(false);
                       }}
                       className={cn(
-                        'w-full text-left px-3 py-2 border-b border-border last:border-0 transition-colors',
-                        !n.read ? 'bg-primary/5 hover:bg-primary/10' : 'hover:bg-white/5'
+                        'w-full text-left px-4 py-3 border-b border-white/[0.04] last:border-0 transition-colors',
+                        !n.read ? 'bg-primary/[0.04] hover:bg-primary/[0.08]' : 'hover:bg-white/[0.03]'
                       )}
                     >
                       <p className="text-xs font-medium">{n.title}</p>
-                      <p className="text-[11px] text-muted-foreground mt-0.5 line-clamp-2">{n.message}</p>
+                      <p className="text-[11px] text-steel mt-0.5 line-clamp-2">{n.message}</p>
                     </button>
                   ))}
-                  <div className="px-3 py-2 border-t border-border">
+                  <div className="px-4 py-3 border-t border-white/[0.06]">
                     <button
                       onClick={() => {
                         setNotifDrop(false);
@@ -232,21 +249,31 @@ export const DashboardLayout = ({ children }: { children: ReactNode }) => {
             </div>
 
             {/* Logout */}
-            <button onClick={() => { logout(); navigate('/'); }} className="p-1.5 hover:bg-muted rounded-sm" aria-label="Logout">
-              <LogOut size={17} />
+            <button onClick={() => { logout(); navigate('/'); }} className="p-2 hover:bg-white/[0.04] rounded-lg transition-all" aria-label="Logout">
+              <LogOut size={17} className="text-steel" />
             </button>
           </div>
         </header>
 
         {/* Content */}
         <main className="flex-1 overflow-y-auto p-4 lg:p-8">
-          {children}
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={location.pathname}
+              initial={{ opacity: 0, y: 12 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.25, ease: [0.25, 0.1, 0.25, 1] }}
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
         </main>
 
         {/* Footer */}
-        <footer className="h-8 border-t border-white/5 flex items-center justify-center shrink-0">
-          <span className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-widest">
-            © 2026 Behnke Enterprises, Inc. | Farley, IA | (563) 744-3246
+        <footer className="h-8 border-t border-white/[0.04] flex items-center justify-center shrink-0">
+          <span className="text-[9px] font-mono text-steel/40 uppercase tracking-widest">
+            © 2026 Behnke Enterprises, Inc. | Farley, IA
           </span>
         </footer>
       </div>

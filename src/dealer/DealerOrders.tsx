@@ -46,7 +46,7 @@ const DealerOrders = () => {
     { key: 'quantity', label: 'Qty', render: (o: Order) => <span className="font-mono text-xs">{o.quantity}</span> },
     {
       key: 'totalPrice', label: 'Total', sortable: true,
-      render: (o: Order) => <span className="font-mono text-xs">£{o.totalPrice.toLocaleString()}</span>,
+      render: (o: Order) => <span className="font-mono text-xs">${o.totalPrice.toLocaleString()}</span>,
     },
     { key: 'status', label: 'Status', render: (o: Order) => <StatusBadge status={o.status} /> },
     { key: 'createdDate', label: 'Date', render: (o: Order) => <span className="text-xs text-muted-foreground">{o.createdDate}</span> },
@@ -97,14 +97,6 @@ const DealerOrders = () => {
             Customer Orders to Me ({custOrders.length})
           </button>
         </div>
-
-        {/* Context banner for customer tab */}
-        {tab === 'customer' && (
-          <div className="bg-primary/5 border border-primary/20 rounded-lg px-4 py-2.5 text-xs text-primary/80 font-mono">
-            💡 Click any row or <strong>Details</strong> to open the order — you can advance its stage from <strong>Submitted → Under Review → Approved → In Production → Shipped → Delivered</strong>.
-          </div>
-        )}
-
         {/* Table view */}
         {view === 'table' ? (
           <div className="bg-card rounded-lg shadow-industrial p-4">
@@ -139,7 +131,7 @@ const DealerOrders = () => {
                     <span className="text-[9px] font-mono uppercase text-muted-foreground">Qty</span>
                   </div>
                   <div className="text-center">
-                    <span className="font-display font-bold text-sm block text-white">£{o.totalPrice.toLocaleString()}</span>
+                    <span className="font-display font-bold text-sm block text-white">${o.totalPrice.toLocaleString()}</span>
                     <span className="text-[9px] font-mono uppercase text-muted-foreground">Total</span>
                   </div>
                 </div>
@@ -222,11 +214,11 @@ const DealerOrders = () => {
                   </div>
                   <div>
                     <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Unit Price</p>
-                    <p className="font-mono text-white">£{selectedOrder.unitPrice.toLocaleString()}</p>
+                    <p className="font-mono text-white">${selectedOrder.unitPrice.toLocaleString()}</p>
                   </div>
                   <div>
                     <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Total Price</p>
-                    <p className="font-display text-xl font-bold text-primary">£{selectedOrder.totalPrice.toLocaleString()}</p>
+                    <p className="font-display text-xl font-bold text-primary">${selectedOrder.totalPrice.toLocaleString()}</p>
                   </div>
                   <div>
                     <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Date Created</p>
@@ -274,7 +266,7 @@ const DealerOrders = () => {
                     >
                       <span className="font-mono text-xs text-muted-foreground">{t.modelNumber}</span>
                       <p className="text-sm font-medium">{t.name}</p>
-                      <p className="font-mono text-xs text-primary mt-1">£{t.price.toLocaleString()}</p>
+                      <p className="font-mono text-xs text-primary mt-1">${t.price.toLocaleString()}</p>
                     </button>
                   ))}
                 </div>
@@ -327,7 +319,7 @@ const DealerOrders = () => {
                     <div className="bg-muted/30 rounded-md p-3">
                       <p className="font-mono text-xs">{t.modelNumber}</p>
                       <p className="text-sm font-medium">{t.name}</p>
-                      <p className="font-display text-lg font-bold mt-2">£{t.price.toLocaleString()}</p>
+                      <p className="font-display text-lg font-bold mt-2">${t.price.toLocaleString()}</p>
                     </div>
                   ) : null;
                 })()}

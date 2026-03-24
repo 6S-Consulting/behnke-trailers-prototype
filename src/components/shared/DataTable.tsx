@@ -29,20 +29,20 @@ export function DataTable<T extends object>({
 
   const filtered = searchable && search
     ? data.filter(item =>
-        Object.values(item).some(v => String(v).toLowerCase().includes(search.toLowerCase()))
-      )
+      Object.values(item).some(v => String(v).toLowerCase().includes(search.toLowerCase()))
+    )
     : data;
 
   const sorted = sortKey
     ? [...filtered].sort((a, b) => {
-        const av = (a as Record<string, unknown>)[sortKey];
-        const bv = (b as Record<string, unknown>)[sortKey];
-        const cmp =
-          typeof av === 'number' && typeof bv === 'number'
-            ? av - bv
-            : String(av).localeCompare(String(bv));
-        return sortDir === 'asc' ? cmp : -cmp;
-      })
+      const av = (a as Record<string, unknown>)[sortKey];
+      const bv = (b as Record<string, unknown>)[sortKey];
+      const cmp =
+        typeof av === 'number' && typeof bv === 'number'
+          ? av - bv
+          : String(av).localeCompare(String(bv));
+      return sortDir === 'asc' ? cmp : -cmp;
+    })
     : filtered;
 
   const totalPages = Math.ceil(sorted.length / pageSize);
@@ -57,41 +57,46 @@ export function DataTable<T extends object>({
     <div>
       {/* ── Search ── */}
       {searchable && (
-        <div className="relative mb-3">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+        <div className="relative mb-4">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-steel" />
           <input
             type="text"
             value={search}
             onChange={e => { setSearch(e.target.value); setPage(0); }}
             placeholder={searchPlaceholder}
-            className="w-full pl-9 pr-3 py-2 text-sm bg-muted/30 border border-white/10 rounded-md text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary/60"
+            className="w-full pl-9 pr-3 py-2.5 text-sm rounded-lg text-foreground placeholder:text-steel/60 border border-white/[0.06] focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/30 transition-all"
+            style={{ background: 'hsl(220 16% 10%)' }}
           />
         </div>
       )}
 
       {/* ── Table ── */}
-      <div className="overflow-x-auto rounded-lg border border-white/[0.08]">
+      <div className="overflow-x-auto rounded-xl border border-white/[0.06]" style={{ background: 'linear-gradient(145deg, hsl(220 16% 9%), hsl(220 16% 7%))' }}>
         <table className="w-full text-sm">
           <thead>
-            <tr className="bg-white/[0.04] border-b border-white/[0.08]">
+            <tr style={{ background: 'hsl(220 16% 6%)' }}>
               {columns.map(col => (
                 <th
                   key={col.key}
                   className={cn(
-                    'px-4 py-3 text-left text-[10px] font-mono uppercase tracking-widest text-muted-foreground/80 whitespace-nowrap',
-                    col.sortable && 'cursor-pointer select-none hover:text-foreground/90 transition-colors',
+                    'px-4 py-3.5 text-left text-[10px] font-mono uppercase tracking-[0.15em] text-steel whitespace-nowrap border-b border-white/[0.06]',
+                    col.sortable && 'cursor-pointer select-none hover:text-foreground transition-colors',
                     col.className
                   )}
                   onClick={() => col.sortable && toggleSort(col.key)}
+                  role={col.sortable ? 'button' : undefined}
+                  tabIndex={col.sortable ? 0 : undefined}
+                  aria-label={col.sortable ? `Sort by ${col.label}` : undefined}
+                  onKeyDown={col.sortable ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleSort(col.key); } } : undefined}
                 >
-                  <span className="inline-flex items-center gap-1">
+                  <span className="inline-flex items-center gap-1.5">
                     {col.label}
                     {col.sortable && sortKey === col.key ? (
                       sortDir === 'asc'
                         ? <ChevronUp size={11} className="text-primary" />
                         : <ChevronDown size={11} className="text-primary" />
                     ) : col.sortable ? (
-                      <ChevronUp size={11} className="opacity-20" />
+                      <ChevronUp size={11} className="opacity-15" />
                     ) : null}
                   </span>
                 </th>
@@ -101,8 +106,14 @@ export function DataTable<T extends object>({
           <tbody>
             {paged.length === 0 ? (
               <tr>
-                <td colSpan={columns.length} className="px-4 py-10 text-center text-muted-foreground text-xs">
-                  No data found
+                <td colSpan={columns.length} className="px-4 py-16 text-center">
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="w-10 h-10 rounded-lg flex items-center justify-center border border-white/[0.06]" style={{ background: 'hsl(220 14% 12%)' }}>
+                      <Search size={16} className="text-steel/50" />
+                    </div>
+                    <span className="text-steel text-xs font-display uppercase tracking-wide">No data found</span>
+                    {search && <span className="text-steel/50 text-[10px]">Try a different search term</span>}
+                  </div>
                 </td>
               </tr>
             ) : (
@@ -111,15 +122,14 @@ export function DataTable<T extends object>({
                   key={i}
                   onClick={() => onRowClick?.(item)}
                   className={cn(
-                    'border-t border-white/[0.04] transition-all duration-100',
-                    i % 2 === 0 ? 'bg-transparent' : 'bg-white/[0.02]',
-                    onRowClick && 'cursor-pointer hover:bg-primary/[0.06]'
+                    'border-t border-white/[0.04] transition-all duration-150',
+                    onRowClick && 'cursor-pointer hover:bg-primary/[0.04]'
                   )}
                 >
                   {columns.map(col => (
                     <td
                       key={col.key}
-                      className={cn('px-4 py-3 text-foreground/75', col.className)}
+                      className={cn('px-4 py-3.5 text-foreground/80', col.className)}
                     >
                       {col.render
                         ? col.render(item)
@@ -135,18 +145,18 @@ export function DataTable<T extends object>({
 
       {/* ── Pagination ── */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between mt-3 text-xs text-muted-foreground">
-          <span className="font-mono">{sorted.length} results</span>
+        <div className="flex items-center justify-between mt-4 text-xs">
+          <span className="font-mono text-steel">{sorted.length} results</span>
           <div className="flex gap-1">
             {Array.from({ length: totalPages }, (_, i) => (
               <button
                 key={i}
                 onClick={() => setPage(i)}
                 className={cn(
-                  'w-7 h-7 rounded-sm font-mono text-xs transition-colors',
+                  'w-8 h-8 rounded-lg font-mono text-xs transition-all duration-200',
                   page === i
-                    ? 'bg-primary text-primary-foreground'
-                    : 'hover:bg-muted text-muted-foreground'
+                    ? 'bg-primary text-white shadow-[0_0_12px_hsl(0_72%_51%/0.3)]'
+                    : 'text-steel hover:bg-white/[0.06] hover:text-foreground'
                 )}
               >
                 {i + 1}

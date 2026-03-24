@@ -7,51 +7,60 @@ type StatusType = 'Active' | 'Pending' | 'Inactive' | 'Critical' | 'Warning' | '
   'Scheduled' | 'Emergency' | 'Inspection' | string;
 
 const statusStyles: Record<string, string> = {
-  Active: 'bg-success/15 text-success',
-  Good: 'bg-success/15 text-success',
-  Approved: 'bg-success/15 text-success',
-  Delivered: 'bg-success/15 text-success',
-  Accepted: 'bg-success/15 text-success',
-  Confirmed: 'bg-success/15 text-success',
-  Completed: 'bg-success/15 text-success',
-  Available: 'bg-success/15 text-success',
-  Pending: 'bg-warning/15 text-warning',
-  Warning: 'bg-warning/15 text-warning',
-  'Under Review': 'bg-warning/15 text-warning',
-  Requested: 'bg-warning/15 text-warning',
-  'Low Stock': 'bg-warning/15 text-warning',
-  Submitted: 'bg-primary/15 text-primary',
-  'In Production': 'bg-primary/15 text-primary',
-  Sent: 'bg-primary/15 text-primary',
-  Viewed: 'bg-primary/15 text-primary',
-  Shipped: 'bg-primary/15 text-primary',
-  Scheduled: 'bg-primary/15 text-primary',
-  Critical: 'bg-danger/15 text-danger',
-  Rejected: 'bg-danger/15 text-danger',
-  'Out of Stock': 'bg-danger/15 text-danger',
-  Emergency: 'bg-danger/15 text-danger',
-  Cancelled: 'bg-muted text-muted-foreground',
-  Inactive: 'bg-muted text-muted-foreground',
-  Expired: 'bg-muted text-muted-foreground',
-  Draft: 'bg-muted text-muted-foreground',
-  'Custom Order': 'bg-secondary text-secondary-foreground',
-  Inspection: 'bg-secondary text-secondary-foreground',
-  Standard: 'bg-muted text-muted-foreground',
-  Custom: 'bg-secondary text-secondary-foreground',
+  Active: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+  Good: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+  Approved: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+  Delivered: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+  Accepted: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+  Confirmed: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+  Completed: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+  Available: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
+  Pending: 'text-amber-400 bg-amber-500/10 border-amber-500/20',
+  Warning: 'text-amber-400 bg-amber-500/10 border-amber-500/20',
+  'Under Review': 'text-amber-400 bg-amber-500/10 border-amber-500/20',
+  Requested: 'text-amber-400 bg-amber-500/10 border-amber-500/20',
+  'Low Stock': 'text-amber-400 bg-amber-500/10 border-amber-500/20',
+  Submitted: 'text-sky-400 bg-sky-500/10 border-sky-500/20',
+  'In Production': 'text-sky-400 bg-sky-500/10 border-sky-500/20',
+  Sent: 'text-sky-400 bg-sky-500/10 border-sky-500/20',
+  Viewed: 'text-sky-400 bg-sky-500/10 border-sky-500/20',
+  Shipped: 'text-sky-400 bg-sky-500/10 border-sky-500/20',
+  Scheduled: 'text-sky-400 bg-sky-500/10 border-sky-500/20',
+  Critical: 'text-red-400 bg-red-500/10 border-red-500/20',
+  Rejected: 'text-red-400 bg-red-500/10 border-red-500/20',
+  'Out of Stock': 'text-red-400 bg-red-500/10 border-red-500/20',
+  Emergency: 'text-red-400 bg-red-500/10 border-red-500/20',
+  Cancelled: 'text-steel bg-white/[0.04] border-white/[0.08]',
+  Inactive: 'text-steel bg-white/[0.04] border-white/[0.08]',
+  Expired: 'text-steel bg-white/[0.04] border-white/[0.08]',
+  Draft: 'text-steel bg-white/[0.04] border-white/[0.08]',
+  'Custom Order': 'text-violet-400 bg-violet-500/10 border-violet-500/20',
+  Inspection: 'text-violet-400 bg-violet-500/10 border-violet-500/20',
+  Standard: 'text-steel bg-white/[0.04] border-white/[0.08]',
+  Custom: 'text-violet-400 bg-violet-500/10 border-violet-500/20',
 };
 
 export const StatusBadge = ({ status, breathing = false, className }: { status: StatusType; breathing?: boolean; className?: string }) => {
-  const style = statusStyles[status] || 'bg-muted text-muted-foreground';
+  const style = statusStyles[status] || 'text-steel bg-white/[0.04] border-white/[0.08]';
   return (
     <span
       role="status"
       className={cn(
-        'inline-flex items-center px-2 py-0.5 rounded-sm text-[10px] font-bold font-display uppercase tracking-[0.1em]',
+        'inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-bold font-mono uppercase tracking-[0.1em] border transition-colors',
         style,
         breathing && (status === 'Critical' || status === 'Emergency') && 'animate-breathing',
         className
       )}
     >
+      <span className={cn(
+        'w-1.5 h-1.5 rounded-full',
+        status === 'Critical' || status === 'Rejected' || status === 'Out of Stock' || status === 'Emergency' ? 'bg-red-400' :
+          status === 'Pending' || status === 'Warning' || status === 'Under Review' || status === 'Requested' || status === 'Low Stock' ? 'bg-amber-400' :
+            status === 'Active' || status === 'Good' || status === 'Approved' || status === 'Delivered' || status === 'Accepted' || status === 'Confirmed' || status === 'Completed' || status === 'Available' ? 'bg-emerald-400' :
+              status === 'Submitted' || status === 'In Production' || status === 'Sent' || status === 'Viewed' || status === 'Shipped' || status === 'Scheduled' ? 'bg-sky-400' :
+                status === 'Custom Order' || status === 'Inspection' || status === 'Custom' ? 'bg-violet-400' :
+                  'bg-steel'
+      )} />
       {status}
     </span>
   );

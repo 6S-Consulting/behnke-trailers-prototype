@@ -8,6 +8,7 @@ import { useAppData } from '@/context/AppDataContext';
 import { Dealer } from '@/types';
 import { Store, DollarSign, Clock, ArrowRight, LayoutGrid, List } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { motion } from 'framer-motion';
 
 const DealerManagement = () => {
   const navigate = useNavigate();
@@ -30,29 +31,39 @@ const DealerManagement = () => {
       <div className="space-y-5">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <h1 className="font-display text-2xl font-bold uppercase tracking-wide">Dealer Network</h1>
-          <button onClick={() => setView(view === 'table' ? 'grid' : 'table')} className="p-1.5 border border-border rounded-sm hover:bg-muted">
+          <button onClick={() => setView(view === 'table' ? 'grid' : 'table')} className="p-1.5 border border-white/10 rounded-sm hover:bg-white/5 transition-all active:scale-95">
             {view === 'table' ? <LayoutGrid size={14} /> : <List size={14} />}
           </button>
         </div>
 
         {/* KPIs */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <MetricCard title="Active Dealers" value={active} icon={Store} />
-          <MetricCard title="Total Dealers" value={dealers.length} icon={Store} />
-          <MetricCard title="Pending" value={dealers.filter(d => d.status === 'Pending').length} icon={Clock} />
-          <MetricCard title="Avg Sales/Dealer" value={`£${(avgSales / 1000).toFixed(0)}K`} icon={DollarSign} />
-        </div>
+        <motion.div
+          className="grid grid-cols-2 lg:grid-cols-4 gap-3"
+          initial="hidden" animate="show"
+          variants={{ hidden: {}, show: { transition: { staggerChildren: 0.05 } } }}
+        >
+          {[
+            <MetricCard key="a" title="Active Dealers" value={active} icon={Store} />,
+            <MetricCard key="t" title="Total Dealers" value={dealers.length} icon={Store} />,
+            <MetricCard key="p" title="Pending" value={dealers.filter(d => d.status === 'Pending').length} icon={Clock} />,
+            <MetricCard key="s" title="Avg Sales/Dealer" value={`�$${(avgSales / 1000).toFixed(0)}K`} icon={DollarSign} />,
+          ].map((card, i) => (
+            <motion.div key={i} variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}>
+              {card}
+            </motion.div>
+          ))}
+        </motion.div>
 
         {/* Performance Chart */}
-        <div className="bg-card/60 border border-white/5 rounded-lg p-4">
-          <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-3">Dealer Sales Performance (£K)</h3>
+        <div className="bg-card/60 backdrop-blur-sm border border-white/[0.08] rounded-lg p-4 hover:border-white/[0.12] transition-colors">
+          <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-3">Dealer Sales Performance (�$K)</h3>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={perfData}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(0 0% 100% / 0.05)" />
               <XAxis dataKey="name" tick={{ fontSize: 10, fontFamily: 'Inter', fill: 'hsl(var(--muted-foreground))' }} />
               <YAxis tick={{ fontSize: 10, fontFamily: 'Inter', fill: 'hsl(var(--muted-foreground))' }} />
               <Tooltip
-                formatter={(v: number) => `£${v}K`}
+                formatter={(v: number) => `�$${v}K`}
                 contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', fontSize: 12, color: '#fff' }}
                 itemStyle={{ color: '#fff' }}
               />
@@ -71,7 +82,7 @@ const DealerManagement = () => {
                 <div
                   key={d.id}
                   onClick={() => navigate(`/admin/dealers/${d.id}`)}
-                  className="bg-card/60 border border-white/5 rounded-lg p-4 cursor-pointer hover:border-primary/30 transition-all group"
+                  className="bg-card/60 backdrop-blur-sm border border-white/[0.08] rounded-lg p-4 cursor-pointer hover:border-primary/30 transition-all group"
                 >
                   <div className="flex justify-between items-start mb-2">
                     <h3 className="font-display font-bold uppercase tracking-wide text-sm text-white group-hover:text-primary transition-colors">{d.name}</h3>
@@ -85,7 +96,7 @@ const DealerManagement = () => {
                       <span className="text-[9px] font-mono uppercase text-muted-foreground">Stock</span>
                     </div>
                     <div className="text-center">
-                      <span className="font-display font-bold text-sm block text-white">£{(d.totalSales / 1000).toFixed(0)}K</span>
+                      <span className="font-display font-bold text-sm block text-white">�${(d.totalSales / 1000).toFixed(0)}K</span>
                       <span className="text-[9px] font-mono uppercase text-muted-foreground">Sales</span>
                     </div>
                     <div className="text-center">
@@ -110,7 +121,7 @@ const DealerManagement = () => {
               { key: 'phone', label: 'Phone' },
               { key: 'status', label: 'Status', sortable: true, render: (d) => <StatusBadge status={d.status} /> },
               { key: 'inventoryCount', label: 'Stock', sortable: true },
-              { key: 'totalSales', label: 'Sales', sortable: true, render: (d) => `£${(d.totalSales / 1000).toFixed(0)}K` },
+              { key: 'totalSales', label: 'Sales', sortable: true, render: (d) => `�$${(d.totalSales / 1000).toFixed(0)}K` },
             ]}
             data={dealers}
             onRowClick={(d) => navigate(`/admin/dealers/${d.id}`)}

@@ -8,6 +8,7 @@ import { Order } from '@/types';
 import { toast } from 'sonner';
 import { Package, Users, TrendingUp, Clock, LayoutGrid, List } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
 
 const STATUS_STEPS: Order['status'][] = ['Draft', 'Submitted', 'Under Review', 'Approved', 'In Production', 'Shipped', 'Delivered'];
 
@@ -47,7 +48,7 @@ const AdminOrders = () => {
     },
     { key: 'trailerName', label: 'Trailer', render: (o: Order) => <span className="text-xs">{o.trailerName || '—'}</span> },
     { key: 'quantity', label: 'Qty', render: (o: Order) => <span className="font-mono text-xs">{o.quantity}</span> },
-    { key: 'totalPrice', label: 'Total', sortable: true, render: (o: Order) => <span className="font-mono text-xs font-medium">£{o.totalPrice.toLocaleString()}</span> },
+    { key: 'totalPrice', label: 'Total', sortable: true, render: (o: Order) => <span className="font-mono text-xs font-medium">${o.totalPrice.toLocaleString()}</span> },
     { key: 'status', label: 'Status', render: (o: Order) => <StatusBadge status={o.status} /> },
     { key: 'createdDate', label: 'Date', sortable: true, render: (o: Order) => <span className="text-xs text-muted-foreground">{o.createdDate}</span> },
     {
@@ -69,23 +70,29 @@ const AdminOrders = () => {
       <div className="space-y-5">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <h1 className="font-display text-2xl font-bold uppercase tracking-wide">Orders</h1>
-          <button onClick={() => setView(view === 'table' ? 'grid' : 'table')} className="p-1.5 border border-border rounded-sm hover:bg-muted">
+          <button onClick={() => setView(view === 'table' ? 'grid' : 'table')} className="p-1.5 border border-white/10 rounded-sm hover:bg-white/5 transition-all active:scale-95">
             {view === 'table' ? <LayoutGrid size={14} /> : <List size={14} />}
           </button>
         </div>
 
         {/* KPIs */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {kpis.map(({ label, value, icon: Icon }) => (
-            <div key={label} className="bg-card/60 border border-white/5 rounded-lg p-4 flex items-center gap-3">
-              <Icon size={18} className="text-muted-foreground shrink-0" />
-              <div>
-                <p className="font-display text-xl font-bold text-white">{value}</p>
-                <p className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground">{label}</p>
+        <motion.div
+          className="grid grid-cols-2 md:grid-cols-4 gap-3"
+          initial="hidden" animate="show"
+          variants={{ hidden: {}, show: { transition: { staggerChildren: 0.05 } } }}
+        >
+          {kpis.map(({ label, value, icon: Icon }, i) => (
+            <motion.div key={label} variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}>
+              <div className="bg-card/60 backdrop-blur-sm border border-white/[0.08] rounded-lg p-4 flex items-center gap-3 hover:border-white/[0.12] transition-colors">
+                <Icon size={18} className="text-muted-foreground shrink-0" />
+                <div>
+                  <p className="font-display text-xl font-bold text-white">{value}</p>
+                  <p className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground">{label}</p>
+                </div>
               </div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
         {/* Tabs */}
         <div className="flex gap-2 border-b border-white/5 pb-1">
@@ -105,7 +112,7 @@ const AdminOrders = () => {
         </div>
 
         {view === 'table' ? (
-          <div className="bg-card/60 border border-white/5 rounded-lg p-4">
+          <div className="bg-card/60 backdrop-blur-sm border border-white/[0.08] rounded-lg p-4 hover:border-white/[0.12] transition-colors">
             <DataTable<Order>
               columns={columns}
               data={displayOrders}
@@ -124,7 +131,7 @@ const AdminOrders = () => {
                 <div
                   key={o.id}
                   onClick={() => setSelectedOrder(o)}
-                  className="bg-card/60 border border-white/5 rounded-lg p-4 cursor-pointer hover:border-primary/30 transition-all group"
+                  className="bg-card/60 backdrop-blur-sm border border-white/[0.08] rounded-lg p-4 cursor-pointer hover:border-primary/30 transition-all group"
                 >
                   <div className="flex justify-between items-start mb-2">
                     <span className="font-mono text-xs text-white">{o.orderNumber}</span>
@@ -138,7 +145,7 @@ const AdminOrders = () => {
                       <span className="text-[9px] font-mono uppercase text-muted-foreground">Qty</span>
                     </div>
                     <div className="text-center">
-                      <span className="font-display font-bold text-sm block text-white">£{o.totalPrice.toLocaleString()}</span>
+                      <span className="font-display font-bold text-sm block text-white">${o.totalPrice.toLocaleString()}</span>
                       <span className="text-[9px] font-mono uppercase text-muted-foreground">Total</span>
                     </div>
                     <div className="text-center">
@@ -202,8 +209,8 @@ const AdminOrders = () => {
                   <div><p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">From ({selectedOrder.fromType})</p><p className="font-medium">{fromName}</p></div>
                   <div><p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Trailer</p><p>{selectedOrder.trailerName || '—'}</p></div>
                   <div><p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Quantity</p><p className="font-mono font-bold">{selectedOrder.quantity}</p></div>
-                  <div><p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Unit Price</p><p className="font-mono">£{selectedOrder.unitPrice.toLocaleString()}</p></div>
-                  <div><p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Total Price</p><p className="font-display text-xl font-bold text-primary">£{selectedOrder.totalPrice.toLocaleString()}</p></div>
+                  <div><p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Unit Price</p><p className="font-mono">${selectedOrder.unitPrice.toLocaleString()}</p></div>
+                  <div><p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Total Price</p><p className="font-display text-xl font-bold text-primary">${selectedOrder.totalPrice.toLocaleString()}</p></div>
                   <div><p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Created</p><p>{selectedOrder.createdDate}</p></div>
                   <div><p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Est. Delivery</p><p>{selectedOrder.estimatedDelivery || '—'}</p></div>
                 </div>

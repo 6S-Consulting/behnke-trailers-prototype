@@ -9,6 +9,7 @@ import { ArrowLeft, Bell, Wrench, Download } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { toast } from 'sonner';
 import { useAppData } from '@/context/AppDataContext';
+import { motion } from 'framer-motion';
 
 const SensorDataDetail = () => {
   const { vin } = useParams();
@@ -69,7 +70,7 @@ const SensorDataDetail = () => {
             </div>
           </div>
           <div className="flex gap-2">
-            <button onClick={() => { setNotifMsg(`Your B-B Trailer ${trailer.modelNumber} (${trailer.vin}) requires attention. Please contact your dealer to schedule service.`); setNotifModal(true); }} className="flex items-center gap-1 px-3 py-1.5 bg-primary text-primary-foreground rounded-sm text-xs font-display uppercase tracking-wide">
+            <button onClick={() => { setNotifMsg(`Your B-B Trailer ${trailer.modelNumber} (${trailer.vin}) requires attention. Please contact your dealer to schedule service.`); setNotifModal(true); }} className="flex items-center gap-1 px-3 py-1.5 bg-primary text-primary-foreground rounded-sm text-xs font-display uppercase tracking-wide hover:brightness-110 transition-all active:scale-95">
               <Bell size={14} /> Push Notification
             </button>
             <button
@@ -77,18 +78,18 @@ const SensorDataDetail = () => {
                 setScheduleNotes(`Recommended due to sensor alerts on ${trailer.modelNumber}.`);
                 setScheduleModalOpen(true);
               }}
-              className="flex items-center gap-1 px-3 py-1.5 border border-border rounded-sm text-xs font-display uppercase tracking-wide hover:bg-muted"
+              className="flex items-center gap-1 px-3 py-1.5 border border-white/10 rounded-sm text-xs font-display uppercase tracking-wide hover:bg-white/5 transition-all active:scale-95"
             >
               <Wrench size={14} /> Schedule Maintenance
             </button>
-            <button className="flex items-center gap-1 px-3 py-1.5 border border-border rounded-sm text-xs font-display uppercase tracking-wide hover:bg-muted">
+            <button className="flex items-center gap-1 px-3 py-1.5 border border-white/10 rounded-sm text-xs font-display uppercase tracking-wide hover:bg-white/5 transition-all active:scale-95">
               <Download size={14} /> Export
             </button>
           </div>
         </div>
 
         {/* Info Bar */}
-        <div className="flex gap-4 flex-wrap bg-card rounded-lg shadow-industrial p-3">
+        <div className="flex gap-4 flex-wrap bg-card/60 backdrop-blur-sm border border-white/[0.08] rounded-lg p-3">
           <div><span className="text-[10px] font-mono uppercase text-muted-foreground">Purchased</span><p className="text-sm">{trailer.soldDate}</p></div>
           <div><span className="text-[10px] font-mono uppercase text-muted-foreground">Warranty</span><p className="text-sm">{trailer.warrantyExpiry}</p></div>
           <div><span className="text-[10px] font-mono uppercase text-muted-foreground">Mileage</span><p className="font-mono text-sm">{sd.mileage.toLocaleString()}</p></div>
@@ -101,14 +102,14 @@ const SensorDataDetail = () => {
           <SensorGauge label="Brake Wear" value={sd.brakePadWear} unit="%" status={sd.brakePadWear < 20 ? 'Critical' : sd.brakePadWear < 40 ? 'Warning' : 'Good'} />
           <SensorGauge label="Load Weight" value={sd.loadWeight} unit="lb" status={sd.loadWeight > 90000 ? 'Critical' : 'Good'} min={0} max={120000} />
           <SensorGauge label="Battery" value={sd.batteryVoltage} unit="V" status={sd.batteryVoltage < 11.5 ? 'Critical' : sd.batteryVoltage < 12 ? 'Warning' : 'Good'} min={10} max={14} />
-          <div className="bg-card rounded-lg shadow-industrial border-t-2 border-muted p-4">
+          <div className="bg-card/60 backdrop-blur-sm border border-white/[0.08] rounded-lg border-t-2 border-t-muted p-4 hover:border-white/[0.12] transition-colors">
             <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Frame Integrity</span>
             <div className="mt-3">
               <StatusBadge status={sd.frameMicrofractures ? 'Critical' : 'Good'} breathing={sd.frameMicrofractures} />
               <p className="text-xs text-muted-foreground mt-1">{sd.frameMicrofractures ? 'Microfractures detected' : 'Nominal'}</p>
             </div>
           </div>
-          <div className="bg-card rounded-lg shadow-industrial border-t-2 border-muted p-4">
+          <div className="bg-card/60 backdrop-blur-sm border border-white/[0.08] rounded-lg border-t-2 border-t-muted p-4 hover:border-white/[0.12] transition-colors">
             <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Tire Pressure</span>
             <div className="grid grid-cols-2 gap-1 mt-2">
               {sd.tirePressure.slice(0, 4).map((p, i) => (
@@ -123,7 +124,7 @@ const SensorDataDetail = () => {
 
         {/* Charts */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div className="bg-card rounded-lg shadow-industrial p-4">
+          <div className="bg-card/60 backdrop-blur-sm border border-white/[0.08] rounded-lg p-4 hover:border-white/[0.12] transition-colors">
             <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-3">Axle Temp — 30 Days</h3>
             <ResponsiveContainer width="100%" height={180}>
               <LineChart data={tempHistory}>
@@ -135,7 +136,7 @@ const SensorDataDetail = () => {
               </LineChart>
             </ResponsiveContainer>
           </div>
-          <div className="bg-card rounded-lg shadow-industrial p-4">
+          <div className="bg-card/60 backdrop-blur-sm border border-white/[0.08] rounded-lg p-4 hover:border-white/[0.12] transition-colors">
             <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-3">Brake Wear Decline</h3>
             <ResponsiveContainer width="100%" height={180}>
               <LineChart data={brakeHistory}>
@@ -150,7 +151,7 @@ const SensorDataDetail = () => {
         </div>
 
         {/* Maintenance History */}
-        <div className="bg-card rounded-lg shadow-industrial p-4">
+        <div className="bg-card/60 backdrop-blur-sm border border-white/[0.08] rounded-lg p-4 hover:border-white/[0.12] transition-colors">
           <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-3">Maintenance History</h3>
           <DataTable
             columns={[
@@ -173,13 +174,13 @@ const SensorDataDetail = () => {
             </div>
             <div>
               <label className="text-[10px] font-mono uppercase text-muted-foreground block mb-1">Message</label>
-              <textarea value={notifMsg} onChange={e => setNotifMsg(e.target.value)} rows={4} className="w-full border border-border rounded-md p-2 text-sm bg-card focus:outline-none focus:ring-1 focus:ring-ring" />
+              <textarea value={notifMsg} onChange={e => setNotifMsg(e.target.value)} rows={4} className="w-full border border-white/[0.08] rounded-md p-2 text-sm bg-card/60 focus:outline-none focus:ring-1 focus:ring-primary" />
             </div>
             <div className="flex gap-2">
-              <button onClick={handleSendNotif} className="px-4 py-2 bg-primary text-primary-foreground rounded-sm text-xs font-display uppercase tracking-wide hover:opacity-90">
+              <button onClick={handleSendNotif} className="px-4 py-2 bg-primary text-primary-foreground rounded-sm text-xs font-display uppercase tracking-wide hover:brightness-110 transition-all active:scale-95">
                 Send Notification
               </button>
-              <button onClick={() => setNotifModal(false)} className="px-4 py-2 border border-border rounded-sm text-xs font-display uppercase tracking-wide hover:bg-muted">
+              <button onClick={() => setNotifModal(false)} className="px-4 py-2 border border-white/10 rounded-sm text-xs font-display uppercase tracking-wide hover:bg-white/5 transition-all active:scale-95">
                 Cancel
               </button>
             </div>
@@ -198,7 +199,7 @@ const SensorDataDetail = () => {
               <select
                 value={scheduleType}
                 onChange={e => setScheduleType(e.target.value as 'Scheduled' | 'Inspection' | 'Emergency')}
-                className="w-full border border-border rounded-md p-2 text-sm bg-card"
+                className="w-full border border-white/[0.08] rounded-md p-2 text-sm bg-card/60 focus:outline-none focus:ring-1 focus:ring-primary"
               >
                 <option value="Scheduled">Scheduled</option>
                 <option value="Inspection">Inspection</option>
@@ -211,7 +212,7 @@ const SensorDataDetail = () => {
                 type="date"
                 value={scheduleDate}
                 onChange={e => setScheduleDate(e.target.value)}
-                className="w-full border border-border rounded-md p-2 text-sm bg-card"
+                className="w-full border border-white/[0.08] rounded-md p-2 text-sm bg-card/60 focus:outline-none focus:ring-1 focus:ring-primary"
               />
             </div>
             <div>
@@ -220,13 +221,13 @@ const SensorDataDetail = () => {
                 rows={3}
                 value={scheduleNotes}
                 onChange={e => setScheduleNotes(e.target.value)}
-                className="w-full border border-border rounded-md p-2 text-sm bg-card"
+                className="w-full border border-white/[0.08] rounded-md p-2 text-sm bg-card/60 focus:outline-none focus:ring-1 focus:ring-primary"
               />
             </div>
             <div className="flex gap-2">
               <button
                 onClick={() => setScheduleModalOpen(false)}
-                className="px-4 py-2 border border-border rounded-sm text-xs font-display uppercase tracking-wide hover:bg-muted"
+                className="px-4 py-2 border border-white/10 rounded-sm text-xs font-display uppercase tracking-wide hover:bg-white/5 transition-all active:scale-95"
               >
                 Cancel
               </button>
@@ -245,7 +246,7 @@ const SensorDataDetail = () => {
                   setScheduleModalOpen(false);
                   toast.success('Maintenance request submitted');
                 }}
-                className="px-4 py-2 bg-primary text-primary-foreground rounded-sm text-xs font-display uppercase tracking-wide hover:opacity-90"
+                className="px-4 py-2 bg-primary text-primary-foreground rounded-sm text-xs font-display uppercase tracking-wide hover:brightness-110 transition-all active:scale-95"
               >
                 Submit Request
               </button>

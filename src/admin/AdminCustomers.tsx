@@ -8,6 +8,7 @@ import { useAppData } from '@/context/AppDataContext';
 import { Customer, SoldTrailer } from '@/types';
 import { Users, Truck, Store, Phone, Mail, MapPin, Package, LayoutGrid, List } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
 
 const AdminCustomers = () => {
   const { state } = useAppData();
@@ -46,18 +47,28 @@ const AdminCustomers = () => {
       <div className="space-y-5">
         <div className="flex items-center justify-between flex-wrap gap-2">
           <h1 className="font-display text-2xl font-bold uppercase tracking-wide">Customer Management</h1>
-          <button onClick={() => setView(view === 'table' ? 'grid' : 'table')} className="p-1.5 border border-border rounded-sm hover:bg-muted">
+          <button onClick={() => setView(view === 'table' ? 'grid' : 'table')} className="p-1.5 border border-white/10 rounded-sm hover:bg-white/5 transition-all active:scale-95">
             {view === 'table' ? <LayoutGrid size={14} /> : <List size={14} />}
           </button>
         </div>
 
         {/* KPIs */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <MetricCard title="Total Customers" value={totalCustomers} icon={Users} />
-          <MetricCard title="Sold Trailers" value={state.soldTrailers.length} icon={Truck} />
-          <MetricCard title="Active Dealers" value={state.dealers.filter(d => d.status === 'Active').length} icon={Store} />
-          <MetricCard title="Cust. Revenue" value={`£${(totalRevenue / 1000).toFixed(0)}K`} icon={Package} trendDown={false} />
-        </div>
+        <motion.div
+          className="grid grid-cols-2 md:grid-cols-4 gap-3"
+          initial="hidden" animate="show"
+          variants={{ hidden: {}, show: { transition: { staggerChildren: 0.05 } } }}
+        >
+          {[
+            <MetricCard key="cust" title="Total Customers" value={totalCustomers} icon={Users} />,
+            <MetricCard key="sold" title="Sold Trailers" value={state.soldTrailers.length} icon={Truck} />,
+            <MetricCard key="deal" title="Active Dealers" value={state.dealers.filter(d => d.status === 'Active').length} icon={Store} />,
+            <MetricCard key="rev" title="Cust. Revenue" value={`�$${(totalRevenue / 1000).toFixed(0)}K`} icon={Package} trendDown={false} />,
+          ].map((card, i) => (
+            <motion.div key={i} variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}>
+              {card}
+            </motion.div>
+          ))}
+        </motion.div>
 
         {/* Search & Filter */}
         <div className="flex flex-wrap gap-2 items-center">
@@ -67,13 +78,13 @@ const AdminCustomers = () => {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Search by name, company, email..."
-              className="w-full pl-4 pr-3 py-2 text-sm bg-card border border-white/5 rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full pl-4 pr-3 py-2 text-sm bg-card/60 border border-white/[0.08] rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </div>
           <select
             value={filterState}
             onChange={e => setFilterState(e.target.value)}
-            className="px-3 py-2 text-sm bg-card border border-white/5 rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
+            className="px-3 py-2 text-sm bg-card/60 border border-white/[0.08] rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
           >
             <option value="">All States</option>
             {allStates.map(s => <option key={s}>{s}</option>)}
@@ -93,7 +104,7 @@ const AdminCustomers = () => {
                 <div
                   key={c.id}
                   onClick={() => openCustomer(c)}
-                  className="bg-card/60 border border-white/5 rounded-lg p-4 cursor-pointer hover:border-primary/30 transition-all group"
+                  className="bg-card/60 backdrop-blur-sm border border-white/[0.08] rounded-lg p-4 cursor-pointer hover:border-primary/30 transition-all group"
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div>
@@ -243,7 +254,7 @@ const AdminCustomers = () => {
                             {d && <p className="text-[10px] text-muted-foreground">via {d.name}</p>}
                           </div>
                           <div className="text-right">
-                            <p className="font-mono text-sm font-bold text-white">£{o.totalPrice.toLocaleString()}</p>
+                            <p className="font-mono text-sm font-bold text-white">�${o.totalPrice.toLocaleString()}</p>
                             <StatusBadge status={o.status} />
                           </div>
                         </div>

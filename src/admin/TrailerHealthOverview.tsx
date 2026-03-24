@@ -9,6 +9,7 @@ import { RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Responsi
 import { useAppData } from '@/context/AppDataContext';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
 
 const getHealthReasons = (t: { sensorData: { axleTemp: number; brakePadWear: number; frameMicrofractures: boolean; tirePressure: number[]; batteryVoltage: number; overallHealth: string } }) => {
   const reasons: string[] = [];
@@ -76,21 +77,31 @@ const TrailerHealthOverview = () => {
           <h1 className="font-display text-2xl font-bold uppercase tracking-wide">Fleet Health Overview</h1>
           <div className="flex items-center gap-3">
             <span className="text-[10px] font-mono text-muted-foreground">Last sync: {new Date().toLocaleString()}</span>
-            <button onClick={() => setView(view === 'table' ? 'grid' : 'table')} className="p-1.5 border border-border rounded-sm hover:bg-muted">
+            <button onClick={() => setView(view === 'table' ? 'grid' : 'table')} className="p-1.5 border border-white/10 rounded-sm hover:bg-white/5 transition-all active:scale-95">
               {view === 'table' ? <LayoutGrid size={14} /> : <List size={14} />}
             </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <MetricCard title="Healthy" value={healthCounts.Good} icon={CheckCircle} />
-          <MetricCard title="Warning" value={healthCounts.Warning} icon={AlertTriangle} trendDown={healthCounts.Warning > 0} />
-          <MetricCard title="Critical" value={healthCounts.Critical} icon={XCircle} trendDown={healthCounts.Critical > 0} />
-          <MetricCard title="Maint. Due Soon" value={dueSoonCount} icon={Calendar} />
-        </div>
+        <motion.div
+          className="grid grid-cols-2 lg:grid-cols-4 gap-3"
+          initial="hidden" animate="show"
+          variants={{ hidden: {}, show: { transition: { staggerChildren: 0.05 } } }}
+        >
+          {[
+            <MetricCard key="h" title="Healthy" value={healthCounts.Good} icon={CheckCircle} />,
+            <MetricCard key="w" title="Warning" value={healthCounts.Warning} icon={AlertTriangle} trendDown={healthCounts.Warning > 0} />,
+            <MetricCard key="c" title="Critical" value={healthCounts.Critical} icon={XCircle} trendDown={healthCounts.Critical > 0} />,
+            <MetricCard key="m" title="Maint. Due Soon" value={dueSoonCount} icon={Calendar} />,
+          ].map((card, i) => (
+            <motion.div key={i} variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}>
+              {card}
+            </motion.div>
+          ))}
+        </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className="bg-card rounded-lg shadow-industrial p-4">
+          <div className="bg-card/60 backdrop-blur-sm border border-white/[0.08] rounded-lg p-4 hover:border-white/[0.12] transition-colors">
             <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-3">Fleet Health Radar</h3>
             <ResponsiveContainer width="100%" height={220}>
               <RadarChart data={radarData}>
@@ -103,7 +114,7 @@ const TrailerHealthOverview = () => {
           </div>
 
           {/* Alert Feed with reasons & actions */}
-          <div className="lg:col-span-2 bg-card rounded-lg shadow-industrial p-4 max-h-[340px] overflow-y-auto">
+          <div className="lg:col-span-2 bg-card/60 backdrop-blur-sm border border-white/[0.08] rounded-lg p-4 max-h-[340px] overflow-y-auto hover:border-white/[0.12] transition-colors">
             <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-3">Alert Feed</h3>
             {alertTrailers.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-6">All trailers currently healthy ✓</p>
@@ -158,7 +169,7 @@ const TrailerHealthOverview = () => {
         </div>
 
         {/* Full Fleet Table / Grid */}
-        <div className="bg-card rounded-lg shadow-industrial p-4">
+        <div className="bg-card/60 backdrop-blur-sm border border-white/[0.08] rounded-lg p-4 hover:border-white/[0.12] transition-colors">
           <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-3">All Sold Trailers</h3>
           {view === 'table' ? (
             <DataTable
@@ -205,7 +216,7 @@ const TrailerHealthOverview = () => {
                   <div
                     key={t.id}
                     onClick={() => navigate(`/admin/health/${t.vin}`)}
-                    className="bg-card/60 border border-white/5 rounded-lg p-4 cursor-pointer hover:border-primary/30 transition-all group"
+                    className="bg-card/60 backdrop-blur-sm border border-white/[0.08] rounded-lg p-4 cursor-pointer hover:border-primary/30 transition-all group"
                   >
                     <div className="flex justify-between items-start mb-2">
                       <div>
