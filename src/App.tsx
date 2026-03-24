@@ -13,6 +13,8 @@ import NotificationsPage from "./pages/Notifications.tsx";
 import { TrailersPage } from "./trailers/pages/TrailersPage.tsx";
 import { TrailerDetailLoader } from "./trailers/pages/TrailerDetailLoader.tsx";
 import { Trailer3DLoader } from "./trailers/pages/Trailer3DLoader.tsx";
+import { WalkingTandemGooseneckWagonDetails } from "./trailers/pages/WalkingTandemGooseneckWagonDetails.tsx";
+import { WalkingTandemGooseneckWagon3DPage } from "./trailers/pages/WalkingTandemGooseneckWagon3DPage.tsx";
 import { UserRole } from "./types";
 
 import AdminDashboard from "./admin/AdminDashboard";
@@ -69,7 +71,8 @@ const AppRoutes = () => {
       <Route path="/trailers" element={<TrailersPage />} />
       <Route path="/trailers/:slug" element={<TrailerDetailLoader />} />
       <Route path="/trailers/:slug/3d" element={<Trailer3DLoader />} />
-
+<Route path="/trailers/walking-tandem-gooseneck-wagon" element={<WalkingTandemGooseneckWagonDetails />} />
+      <Route path="/trailers/walking-tandem-gooseneck-wagon/3d" element={<WalkingTandemGooseneckWagon3DPage />} />
       {/* Auth */}
       <Route path="/login" element={user ? <Navigate to={`/${user.role}`} replace /> : <Login />} />
 

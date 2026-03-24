@@ -28,6 +28,15 @@ import trailer03 from "@/trailers/directionaldrill/images/trailer-03.png";
 import trailer04 from "@/trailers/directionaldrill/images/trailer-04.png";
 import trailer05 from "@/trailers/directionaldrill/images/trailer-05.png";
 import trailer06 from "@/trailers/directionaldrill/images/trailer-06.png";
+
+import image0 from "@/trailers/WalkingTandemGooseneckWagon/images/image 0.jpg";
+import image1 from "@/trailers/WalkingTandemGooseneckWagon/images/image1.jpg";
+import image2 from "@/trailers/WalkingTandemGooseneckWagon/images/image 2.jpg";
+import image3 from "@/trailers/WalkingTandemGooseneckWagon/images/image 3.jpg";
+import image4 from "@/trailers/WalkingTandemGooseneckWagon/images/image 4.jpg";
+import image5 from "@/trailers/WalkingTandemGooseneckWagon/images/image 5.jpg";
+import image6 from "@/trailers/WalkingTandemGooseneckWagon/images/image 6.jpg";
+import image7 from "@/trailers/WalkingTandemGooseneckWagon/images/image 7.jpg";
 import paverTag1 from "@/trailers/pavertag/images/1.png";
 import paverTag2 from "@/trailers/pavertag/images/2.png";
 import paverTag3 from "@/trailers/pavertag/images/3.png";
@@ -127,15 +136,15 @@ export const tubeTilt20K: TrailerProduct = {
     { label: "GVWR", value: "20,000 lbs." },
     { label: "Weight", value: "5,050 lbs." },
     { label: "Length", value: "4' stationary + 16' tilt" },
-    { label: "Width", value: "83\" between fenders" },
+    { label: "Width", value: '83" between fenders' },
     { label: "Frame", value: "8 x 2 x 1/4 tube" },
-    { label: "Unloaded Deck Height", value: "25\"" },
+    { label: "Unloaded Deck Height", value: '25"' },
     { label: "Side Rails", value: "5 x 5 x 5/16 angle (flush floor)" },
-    { label: "Crossmembers", value: "3\" channels (12\" ¢'s)" },
+    { label: "Crossmembers", value: '3" channels (12" ¢\'s)' },
     { label: "Fenders", value: "HD Fully Welded 11 gauge" },
     { label: "Jack", value: "Single 12K dropleg" },
-    { label: "Hitch", value: "2 5/16\" adj. coupler or pintle" },
-    { label: "Safety Chains", value: "(2) 3/8\" Gr. 70" },
+    { label: "Hitch", value: '2 5/16" adj. coupler or pintle' },
+    { label: "Safety Chains", value: '(2) 3/8" Gr. 70' },
     { label: "Tie-Downs", value: "stake pockets and (4) D-rings" },
     { label: "Storage", value: "Chain tray in tongue" },
     { label: "Axles", value: "10,000 lb. Dexter" },
@@ -153,7 +162,7 @@ export const tubeTilt20K: TrailerProduct = {
     "The pioneer in the tandem axle 20K GVWR low-profile tilt market",
     "Pallet fork holders and fender guides",
     "flush floor",
-    "true 83\" wide between fenders",
+    'true 83" wide between fenders',
     "Able to add bolt-on toolbox or spare tire mount on standard trailer",
   ],
   keyAdvantages: [
@@ -170,6 +179,68 @@ export const tubeTilt20K: TrailerProduct = {
   ],
   resources: ["Find a Dealer", "Download Brochure", "Explore Product Options"],
 };
+export const walkingTandemGooseneckWagon: TrailerProduct = {
+  slug: "walking-tandem-gooseneck-wagon",
+  title: "Walking Tandem Gooseneck Wagon (Twin 1450 gal. Tanks)",
+  shortDescription:
+    "Heavy-duty gooseneck wagon trailer with high-capacity walking tandem axles for superior stability.",
+  description:
+    "The GN2900TWG will be our best running gear for navigating difficult terrain. With a rear walking tandem pivoting axle, this model is versatile enough to sit on uneven terrain and built heavy enough to take the stress. Pairing the rear walking tandem with a torflex front axle will make this the smoothest riding running gear in your fleet.",
+  overview:
+    "Specialized gooseneck wagon featuring walking tandem axles for extreme terrain stability and heavy payload capacity.",
+  heroImage: image0,
+  gallery: [image0, image1, image2, image3, image4, image5, image6, image7],
+  brochureFileName: "walking-tandem-gooseneck-wagon-brochure.pdf",
+  specs: [
+    { label: "GVWR", value: "32,000 lbs" },
+    { label: "Weight", value: "8,500 lb - 12,000 lb" },
+    { label: "Length", value: "24 ft to 40 ft options" },
+    { label: "Width", value: "102 in" },
+    { label: "Unloaded Deck Height", value: "36 in" },
+    { label: "Frame", value: '12" x 22 lb. I-beam' },
+    { label: "Side Rails", value: "6 in Channel" },
+    {
+      label: "Crossmembers",
+      value: '3/8" formed crossmembers w/tank mounting holes',
+    },
+    { label: "Axles", value: "Front + walking tandem rear (8K spindles)" },
+    { label: "Suspension", value: "None (Torflex front available)" },
+    {
+      label: "Tire and Wheel",
+      value: "425 used truck tire",
+    },
+    {
+      label: "Hitch",
+      value: "Demco retractable tongue w/spring assist",
+    },
+
+    { label: "Safety Chains", value: "(2) 3/8 in Grade 70" },
+    { label: "Lights", value: "Light Kit Optional" },
+    {
+      label: "Finish and Paint",
+      value: "Bead blasted, acid washed, powder coated",
+    },
+  ],
+  details: [
+    "Comes standard with (2) steps on side",
+    "Spring assist standard on tongue",
+    "Torflex front axle popular",
+    '100 or 120" rear axle tracks',
+  ],
+  keyAdvantages: [
+    "Comes standard with (2) steps on side",
+    "Spring assist standard on tongue",
+    "Torflex front axle popular",
+    '100 or 120" rear axle tracks',
+  ],
+  optionalFeatures: [
+    "Hydraulic jacks",
+    "Custom deck widths",
+    "Winch mounts",
+    "Under-deck storage compartments",
+  ],
+  resources: ["Find a Dealer", "Download Brochure", "Explore Product Options"],
+};
 
 export const paverTagTrailer: TrailerProduct = {
   slug: "paver-tag-trailer",
@@ -177,7 +248,7 @@ export const paverTagTrailer: TrailerProduct = {
   shortDescription:
     "Ultra-low profile paver trailer with hydraulic bi-folding ramps and 50,000 lb GVWR.",
   description:
-    "Our paver tag line utilizes a 6' wood beavertail with hydraulic bi-folding ramps to achieve an 8 degree load angle. The trailer typically is set up with (3) 22,500 lb. air brake axles and dual 235/75R 17.5 tires, which provide an ultra-low 34\" unloaded deck height. These trailers feature the same one piece fabricated I-beam construction (80 ksi), 4\" jr. I-beam x-members (80 ksi) and oak decking, as our other tag trailers.",
+    'Our paver tag line utilizes a 6\' wood beavertail with hydraulic bi-folding ramps to achieve an 8 degree load angle. The trailer typically is set up with (3) 22,500 lb. air brake axles and dual 235/75R 17.5 tires, which provide an ultra-low 34" unloaded deck height. These trailers feature the same one piece fabricated I-beam construction (80 ksi), 4" jr. I-beam x-members (80 ksi) and oak decking, as our other tag trailers.',
   overview:
     "Heavy-duty 50,000 lb GVWR paver trailer featuring a 6' wood beavertail and hydraulic bi-folding ramps for an ultra-low loading angle.",
   heroImage: paverTag1,
@@ -186,22 +257,25 @@ export const paverTagTrailer: TrailerProduct = {
   specs: [
     { label: "GVWR", value: "50,000 lbs" },
     { label: "Weight", value: "Varies by length" },
-    { label: "Length", value: "25' bed + 6' wood tail w/ hydraulic bi-folding ramps" },
-    { label: "Width", value: "102\"" },
+    {
+      label: "Length",
+      value: "25' bed + 6' wood tail w/ hydraulic bi-folding ramps",
+    },
+    { label: "Width", value: '102"' },
     { label: "Frame", value: "1-Piece Fabricated (80 ksi)" },
-    { label: "Unloaded Deck Height", value: "34\"" },
-    { label: "Side Rails", value: "8\" channel" },
-    { label: "Crossmembers", value: "4\" Jr. I-beams (80 KSI)" },
-    { label: "Fenders", value: "1/4\" sheet" },
+    { label: "Unloaded Deck Height", value: '34"' },
+    { label: "Side Rails", value: '8" channel' },
+    { label: "Crossmembers", value: '4" Jr. I-beams (80 KSI)' },
+    { label: "Fenders", value: '1/4" sheet' },
     { label: "Jack", value: "Dual Speed, Semi Style" },
-    { label: "Hitch", value: "3\" Pintle Eye (90,000 lbs.)" },
-    { label: "Safety Chains", value: "(2) 1/2\" Gr. 70" },
+    { label: "Hitch", value: '3" Pintle Eye (90,000 lbs.)' },
+    { label: "Safety Chains", value: '(2) 1/2" Gr. 70' },
     { label: "Tie-Downs", value: "1\" Bent D-rings (every 4')" },
     { label: "Storage", value: "Lockable toolbox in tongue" },
     { label: "Axles", value: "(3) Dexter 22,500 lb. air brake axles" },
     { label: "Suspension", value: "Hutch H9700" },
     { label: "Tire and Wheel", value: "235/75R 17.5H dual" },
-    { label: "Decking", value: "1 1/2\" Rough Oak" },
+    { label: "Decking", value: '1 1/2" Rough Oak' },
     { label: "Lights", value: "LED flush mount" },
     { label: "Elect. Plug", value: "Semi Plug" },
     {
@@ -220,7 +294,7 @@ export const paverTagTrailer: TrailerProduct = {
     "Ultra-low 8 degree load angle",
     "50,000 lb high-capacity GVWR",
     "Extreme durability with 80 ksi steel",
-    "Low 34\" unloaded deck height",
+    'Low 34" unloaded deck height',
   ],
   optionalFeatures: [
     "Bed lengths from 20' to 32'",
@@ -235,4 +309,5 @@ export const trailers: TrailerProduct[] = [
   directionalDrillTiltTrailer,
   tubeTilt20K,
   paverTagTrailer,
+  walkingTandemGooseneckWagon,
 ];
