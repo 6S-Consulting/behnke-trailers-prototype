@@ -7,10 +7,12 @@ import { Quote } from '@/types';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
 import { useAppData } from '@/context/AppDataContext';
+import { LayoutGrid, List } from 'lucide-react';
 
 const DealerQuotes = () => {
   const [detailQuote, setDetailQuote] = useState<Quote | null>(null);
   const [createOpen, setCreateOpen] = useState(false);
+  const [view, setView] = useState<'table' | 'grid'>('table');
   const { user } = useAuth();
   const { state, actions } = useAppData();
 
@@ -26,27 +28,65 @@ const DealerQuotes = () => {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h1 className="font-display text-2xl font-bold uppercase tracking-wide">Quote Management</h1>
-          <button onClick={() => setCreateOpen(true)} className="px-3 py-1.5 bg-primary text-primary-foreground rounded-sm text-xs font-display uppercase tracking-wide">
-            Create New Quote
-          </button>
+          <div className="flex gap-2">
+            <button onClick={() => setCreateOpen(true)} className="px-3 py-1.5 bg-primary text-primary-foreground rounded-sm text-xs font-display uppercase tracking-wide">
+              Create New Quote
+            </button>
+            <button onClick={() => setView(view === 'table' ? 'grid' : 'table')} className="p-1.5 border border-border rounded-sm hover:bg-muted">
+              {view === 'table' ? <LayoutGrid size={14} /> : <List size={14} />}
+            </button>
+          </div>
         </div>
 
-        <div className="bg-card rounded-lg shadow-industrial p-4">
-          <DataTable<Quote>
-            columns={[
-              { key: 'quoteNumber', label: 'Quote #', sortable: true, render: (q) => <span className="font-mono text-xs">{q.quoteNumber}</span> },
-              { key: 'customer', label: 'Customer', render: (q) => <span className="text-xs">{state.customers.find(c => c.id === q.toId)?.name}</span> },
-              { key: 'items', label: 'Trailer', render: (q) => <span className="text-xs">{q.items[0]?.name}</span> },
-              { key: 'total', label: 'Total', sortable: true, render: (q) => <span className="font-mono text-xs font-medium">${q.total.toLocaleString()}</span> },
-              { key: 'createdDate', label: 'Created', render: (q) => <span className="text-xs">{q.createdDate}</span> },
-              { key: 'validUntil', label: 'Valid Until', render: (q) => <span className="text-xs">{q.validUntil}</span> },
-              { key: 'status', label: 'Status', render: (q) => <StatusBadge status={q.status} /> },
-            ]}
-            data={myQuotes}
-            searchable
-            onRowClick={(q) => setDetailQuote(q)}
-          />
-        </div>
+        {view === 'table' ? (
+          <div className="bg-card rounded-lg shadow-industrial p-4">
+            <DataTable<Quote>
+              columns={[
+                { key: 'quoteNumber', label: 'Quote #', sortable: true, render: (q) => <span className="font-mono text-xs">{q.quoteNumber}</span> },
+                { key: 'customer', label: 'Customer', render: (q) => <span className="text-xs">{state.customers.find(c => c.id === q.toId)?.name}</span> },
+                { key: 'items', label: 'Trailer', render: (q) => <span className="text-xs">{q.items[0]?.name}</span> },
+                { key: 'total', label: 'Total', sortable: true, render: (q) => <span className="font-mono text-xs font-medium">${q.total.toLocaleString()}</span> },
+                { key: 'createdDate', label: 'Created', render: (q) => <span className="text-xs">{q.createdDate}</span> },
+                { key: 'validUntil', label: 'Valid Until', render: (q) => <span className="text-xs">{q.validUntil}</span> },
+                { key: 'status', label: 'Status', render: (q) => <StatusBadge status={q.status} /> },
+              ]}
+              data={myQuotes}
+              searchable
+              onRowClick={(q) => setDetailQuote(q)}
+            />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+            {myQuotes.map(q => {
+              const customer = state.customers.find(c => c.id === q.toId);
+              return (
+                <div
+                  key={q.id}
+                  onClick={() => setDetailQuote(q)}
+                  className="bg-card/60 border border-white/5 rounded-lg p-4 cursor-pointer hover:border-primary/30 transition-all group"
+                >
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="font-mono text-xs text-white">{q.quoteNumber}</span>
+                    <StatusBadge status={q.status} />
+                  </div>
+                  <h3 className="font-display font-bold uppercase tracking-wide text-sm text-white group-hover:text-primary transition-colors">{q.items[0]?.name || 'Quote'}</h3>
+                  <p className="text-xs text-muted-foreground mb-3">{customer?.name}</p>
+                  <div className="grid grid-cols-2 gap-2 pt-3 border-t border-white/5">
+                    <div className="text-center">
+                      <span className="font-display font-bold text-sm block text-white">${q.total.toLocaleString()}</span>
+                      <span className="text-[9px] font-mono uppercase text-muted-foreground">Total</span>
+                    </div>
+                    <div className="text-center">
+                      <span className="font-display font-bold text-sm block text-white">{q.validUntil}</span>
+                      <span className="text-[9px] font-mono uppercase text-muted-foreground">Valid Until</span>
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground mt-2">Created: {q.createdDate}</p>
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         {/* Quote Detail */}
         <Modal isOpen={!!detailQuote} onClose={() => setDetailQuote(null)} title={`Quote ${detailQuote?.quoteNumber || ''}`} wide>

@@ -4,7 +4,7 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { MetricCard } from '@/components/shared/MetricCard';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { DataTable } from '@/components/shared/DataTable';
-import { CheckCircle, AlertTriangle, XCircle, Calendar, Bell, Wrench } from 'lucide-react';
+import { CheckCircle, AlertTriangle, XCircle, Calendar, Bell, Wrench, LayoutGrid, List } from 'lucide-react';
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
 import { useAppData } from '@/context/AppDataContext';
 import { toast } from 'sonner';
@@ -28,6 +28,7 @@ const TrailerHealthOverview = () => {
   const navigate = useNavigate();
   const { state, actions } = useAppData();
   const [notifySent, setNotifySent] = useState<Record<string, boolean>>({});
+  const [view, setView] = useState<'table' | 'grid'>('table');
 
   const healthCounts = {
     Good: state.soldTrailers.filter(t => t.sensorData.overallHealth === 'Good').length,
@@ -73,7 +74,12 @@ const TrailerHealthOverview = () => {
       <div className="space-y-5">
         <div className="flex items-center justify-between">
           <h1 className="font-display text-2xl font-bold uppercase tracking-wide">Fleet Health Overview</h1>
-          <span className="text-[10px] font-mono text-muted-foreground">Last sync: {new Date().toLocaleString()}</span>
+          <div className="flex items-center gap-3">
+            <span className="text-[10px] font-mono text-muted-foreground">Last sync: {new Date().toLocaleString()}</span>
+            <button onClick={() => setView(view === 'table' ? 'grid' : 'table')} className="p-1.5 border border-border rounded-sm hover:bg-muted">
+              {view === 'table' ? <LayoutGrid size={14} /> : <List size={14} />}
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -151,44 +157,92 @@ const TrailerHealthOverview = () => {
           </div>
         </div>
 
-        {/* Full Fleet Table */}
+        {/* Full Fleet Table / Grid */}
         <div className="bg-card rounded-lg shadow-industrial p-4">
           <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-3">All Sold Trailers</h3>
-          <DataTable
-            columns={[
-              { key: 'vin', label: 'VIN', sortable: true, render: (t) => <span className="font-mono text-xs">{t.vin}</span> },
-              { key: 'modelNumber', label: 'Model', sortable: true },
-              { key: 'category', label: 'Category', render: (t) => <StatusBadge status={t.category} /> },
-              { key: 'customer', label: 'Customer', render: (t) => <span className="text-xs">{state.customers.find(c => c.id === t.customerId)?.name}</span> },
-              { key: 'dealer', label: 'Dealer', render: (t) => <span className="text-xs">{state.dealers.find(d => d.id === t.dealerId)?.name}</span> },
-              { key: 'mileage', label: 'Mileage', sortable: true, render: (t) => <span className="font-mono text-xs">{t.sensorData.mileage.toLocaleString()}</span> },
-              {
-                key: 'brakes', label: 'Brakes', render: (t) => (
-                  <span className={cn('font-mono text-xs', t.sensorData.brakePadWear < 20 ? 'text-danger' : t.sensorData.brakePadWear < 35 ? 'text-warning' : 'text-success')}>
-                    {t.sensorData.brakePadWear}%
-                  </span>
-                )
-              },
-              { key: 'health', label: 'Health', render: (t) => <StatusBadge status={t.sensorData.overallHealth} breathing /> },
-              {
-                key: 'actions', label: '', render: (t) => (
-                  <div className="flex gap-2">
-                    <button onClick={(e) => { e.stopPropagation(); navigate(`/admin/health/${t.vin}`); }} className="text-xs text-primary hover:underline font-display uppercase tracking-wide">
-                      View
-                    </button>
+          {view === 'table' ? (
+            <DataTable
+              columns={[
+                { key: 'vin', label: 'VIN', sortable: true, render: (t) => <span className="font-mono text-xs">{t.vin}</span> },
+                { key: 'modelNumber', label: 'Model', sortable: true },
+                { key: 'category', label: 'Category', render: (t) => <StatusBadge status={t.category} /> },
+                { key: 'customer', label: 'Customer', render: (t) => <span className="text-xs">{state.customers.find(c => c.id === t.customerId)?.name}</span> },
+                { key: 'dealer', label: 'Dealer', render: (t) => <span className="text-xs">{state.dealers.find(d => d.id === t.dealerId)?.name}</span> },
+                { key: 'mileage', label: 'Mileage', sortable: true, render: (t) => <span className="font-mono text-xs">{t.sensorData.mileage.toLocaleString()}</span> },
+                {
+                  key: 'brakes', label: 'Brakes', render: (t) => (
+                    <span className={cn('font-mono text-xs', t.sensorData.brakePadWear < 20 ? 'text-danger' : t.sensorData.brakePadWear < 35 ? 'text-warning' : 'text-success')}>
+                      {t.sensorData.brakePadWear}%
+                    </span>
+                  )
+                },
+                { key: 'health', label: 'Health', render: (t) => <StatusBadge status={t.sensorData.overallHealth} breathing /> },
+                {
+                  key: 'actions', label: '', render: (t) => (
+                    <div className="flex gap-2">
+                      <button onClick={(e) => { e.stopPropagation(); navigate(`/admin/health/${t.vin}`); }} className="text-xs text-primary hover:underline font-display uppercase tracking-wide">
+                        View
+                      </button>
+                      {t.sensorData.overallHealth !== 'Good' && !notifySent[t.id] && (
+                        <button onClick={(e) => { e.stopPropagation(); sendNotification(t); }} className="text-xs text-warning hover:underline font-display uppercase tracking-wide flex items-center gap-0.5">
+                          <Bell size={10} /> Notify
+                        </button>
+                      )}
+                    </div>
+                  )
+                },
+              ]}
+              data={state.soldTrailers}
+              searchable
+              onRowClick={(t) => navigate(`/admin/health/${t.vin}`)}
+            />
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+              {state.soldTrailers.map(t => {
+                const cust = state.customers.find(c => c.id === t.customerId);
+                const dealer = state.dealers.find(d => d.id === t.dealerId);
+                return (
+                  <div
+                    key={t.id}
+                    onClick={() => navigate(`/admin/health/${t.vin}`)}
+                    className="bg-card/60 border border-white/5 rounded-lg p-4 cursor-pointer hover:border-primary/30 transition-all group"
+                  >
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <span className="font-mono text-xs text-muted-foreground">{t.vin}</span>
+                        <h3 className="font-display font-bold uppercase tracking-wide text-sm text-white group-hover:text-primary transition-colors">{t.name}</h3>
+                      </div>
+                      <StatusBadge status={t.sensorData.overallHealth} breathing />
+                    </div>
+                    <p className="text-xs text-muted-foreground">{cust?.name} · {dealer?.name}</p>
+                    <p className="text-xs text-muted-foreground mb-3">{t.modelNumber} · <StatusBadge status={t.category} /></p>
+                    <div className="grid grid-cols-3 gap-2 pt-3 border-t border-white/5">
+                      <div className="text-center">
+                        <span className="font-mono text-sm font-bold text-white">{t.sensorData.mileage.toLocaleString()}</span>
+                        <span className="text-[9px] font-mono uppercase text-muted-foreground block">Miles</span>
+                      </div>
+                      <div className="text-center">
+                        <span className={cn('font-mono text-sm font-bold', t.sensorData.brakePadWear < 20 ? 'text-danger' : t.sensorData.brakePadWear < 35 ? 'text-warning' : 'text-success')}>{t.sensorData.brakePadWear}%</span>
+                        <span className="text-[9px] font-mono uppercase text-muted-foreground block">Brakes</span>
+                      </div>
+                      <div className="text-center">
+                        <span className="font-mono text-sm font-bold text-white">{t.sensorData.batteryVoltage}V</span>
+                        <span className="text-[9px] font-mono uppercase text-muted-foreground block">Battery</span>
+                      </div>
+                    </div>
                     {t.sensorData.overallHealth !== 'Good' && !notifySent[t.id] && (
-                      <button onClick={(e) => { e.stopPropagation(); sendNotification(t); }} className="text-xs text-warning hover:underline font-display uppercase tracking-wide flex items-center gap-0.5">
-                        <Bell size={10} /> Notify
+                      <button
+                        onClick={(e) => { e.stopPropagation(); sendNotification(t); }}
+                        className="mt-3 w-full flex items-center justify-center gap-1 px-2 py-1 rounded-sm text-[10px] font-display uppercase tracking-wide bg-warning/10 text-warning border border-warning/20 hover:bg-warning/20"
+                      >
+                        <Bell size={10} /> Notify Customer
                       </button>
                     )}
                   </div>
-                )
-              },
-            ]}
-            data={state.soldTrailers}
-            searchable
-            onRowClick={(t) => navigate(`/admin/health/${t.vin}`)}
-          />
+                );
+              })}
+            </div>
+          )}
         </div>
       </div>
     </DashboardLayout>

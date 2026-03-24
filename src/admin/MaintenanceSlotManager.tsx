@@ -4,7 +4,7 @@ import { StatusBadge } from '@/components/shared/StatusBadge';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import { useAppData } from '@/context/AppDataContext';
-import { CheckCircle, XCircle, AlertTriangle } from 'lucide-react';
+import { CheckCircle, XCircle, AlertTriangle, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -12,8 +12,14 @@ const MaintenanceSlotManager = () => {
   const { state, actions } = useAppData();
   // Track current calendar month/year
   const now = new Date();
+  // Find the year with the most slots to initialise the calendar there
+  const slotYears = state.maintenanceSlots.map(s => parseInt((s.requestedDate || s.confirmedDate || '').slice(0, 4))).filter(Boolean);
+  const initYear = slotYears.length > 0 ? slotYears.sort((a, b) =>
+    slotYears.filter(y => y === b).length - slotYears.filter(y => y === a).length
+  )[0] : now.getFullYear();
+
   const [month, setMonth] = useState(now.getMonth());
-  const [year] = useState(now.getFullYear());
+  const [year, setYear] = useState(initYear);
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
   const slots = state.maintenanceSlots; // live from context state
@@ -84,60 +90,160 @@ const MaintenanceSlotManager = () => {
           </div>
         </div>
 
-        {/* Month Selector */}
-        <div className="flex items-center gap-1.5 flex-wrap">
-          {months.map((m, i) => (
+        {/* Year + Month Navigator */}
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Year nav */}
+          <div className="flex items-center gap-1 bg-card/60 border border-white/5 rounded-md px-2 py-1">
             <button
-              key={m}
-              onClick={() => { setMonth(i); setSelectedDay(null); }}
-              className={cn('px-2.5 py-1 text-xs font-display uppercase tracking-wide rounded-sm transition-colors', month === i ? 'bg-primary text-primary-foreground' : 'hover:bg-muted')}
+              onClick={() => { setYear(y => y - 1); setSelectedDay(null); }}
+              className="p-0.5 hover:text-primary transition-colors"
+              aria-label="Previous year"
             >
-              {m}
+              <ChevronLeft size={14} />
             </button>
-          ))}
+            <span className="font-display font-bold text-sm w-12 text-center">{year}</span>
+            <button
+              onClick={() => { setYear(y => y + 1); setSelectedDay(null); }}
+              className="p-0.5 hover:text-primary transition-colors"
+              aria-label="Next year"
+            >
+              <ChevronRight size={14} />
+            </button>
+          </div>
+          {/* Month pills */}
+          <div className="flex items-center gap-1 flex-wrap">
+            {months.map((m, i) => {
+              // Count how many slots are in this month+year
+              const mm = String(i + 1).padStart(2, '0');
+              const prefix = `${year}-${mm}-`;
+              const count = slots.filter(s =>
+                (s.requestedDate || '').startsWith(prefix) ||
+                (s.confirmedDate || '').startsWith(prefix)
+              ).length;
+              return (
+                <button
+                  key={m}
+                  onClick={() => { setMonth(i); setSelectedDay(null); }}
+                  className={cn(
+                    'relative px-2.5 py-1 text-xs font-display uppercase tracking-wide rounded-sm transition-colors',
+                    month === i ? 'bg-primary text-primary-foreground' : 'hover:bg-muted'
+                  )}
+                >
+                  {m}
+                  {count > 0 && (
+                    <span style={{
+                      position: 'absolute', top: -4, right: -4,
+                      backgroundColor: '#f59e0b', color: '#000',
+                      fontSize: 8, fontWeight: 700, fontFamily: 'monospace',
+                      width: 14, height: 14, borderRadius: '50%',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      lineHeight: 1,
+                    }}>{count}</span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Calendar Grid */}
           <div className="lg:col-span-2 bg-card rounded-lg shadow-industrial p-4">
             <h3 className="font-display font-bold uppercase tracking-wide mb-3">{months[month]} {year}</h3>
-            <div className="grid grid-cols-7 gap-px">
+            <div className="grid grid-cols-7 gap-1 mt-1">
               {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => (
-                <div key={d} className="text-[9px] font-mono uppercase text-muted-foreground text-center py-1">{d}</div>
+                <div key={d} className="text-[9px] font-mono uppercase text-muted-foreground text-center py-1.5">{d}</div>
               ))}
-              {Array.from({ length: firstDay }).map((_, i) => <div key={`e${i}`} />)}
+              {Array.from({ length: firstDay }).map((_, i) => <div key={`e${i}`} className="aspect-[4/3]" />)}
               {days.map(d => {
                 const ds = slotsForDate(d);
                 const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
                 const hasRequested = ds.some(s => s.status === 'Requested');
                 const hasConfirmed = ds.some(s => s.status === 'Confirmed');
+                const hasCompleted = ds.some(s => s.status === 'Completed');
+                const hasEmergency = ds.some(s => s.type === 'Emergency');
+                const isSelected = selectedDay === dateStr;
+                const isToday = dateStr === `${year}-${String(month + 1).padStart(2, '0')}-${String(new Date().getDate()).padStart(2, '0')}` &&
+                  month === new Date().getMonth() && year === new Date().getFullYear();
+
+                // Inline colors — guaranteed to render regardless of Tailwind purge
+                const dominantColor = hasEmergency ? '#ef4444'
+                  : hasRequested ? '#f59e0b'
+                  : hasConfirmed ? '#10b981'
+                  : '#6b7280';
+
+                const cellInlineStyle: React.CSSProperties = ds.length > 0 && !isSelected
+                  ? { borderLeft: `3px solid ${dominantColor}`, backgroundColor: `${dominantColor}18` }
+                  : {};
+
                 return (
                   <button
                     key={d}
-                    onClick={() => setSelectedDay(dateStr === selectedDay ? null : dateStr)}
+                    onClick={() => setSelectedDay(isSelected ? null : dateStr)}
+                    style={cellInlineStyle}
                     className={cn(
-                      'aspect-square flex flex-col items-center justify-center rounded-sm text-xs hover:bg-muted relative transition-colors',
-                      selectedDay === dateStr && 'ring-1 ring-primary bg-primary/10',
-                      ds.length > 0 && 'font-bold'
+                      'aspect-[4/3] flex flex-col items-center justify-start pt-1.5 rounded-md transition-all duration-150 relative overflow-hidden',
+                      isSelected && 'ring-2 ring-primary bg-primary/20',
+                      !isSelected && 'hover:brightness-110 hover:bg-white/5',
+                      isToday && !isSelected && 'ring-1 ring-primary/60',
                     )}
                   >
-                    {d}
+                    {/* Day number */}
+                    <span className={cn(
+                      'text-[11px] font-mono leading-none',
+                      isToday ? 'text-primary font-bold' : ds.length > 0 ? 'text-white font-semibold' : 'text-white/40'
+                    )}>
+                      {d}
+                    </span>
+
+                    {/* Colored status dots */}
                     {ds.length > 0 && (
-                      <div className="flex gap-0.5 mt-0.5">
-                        {hasRequested && <div className="w-1.5 h-1.5 rounded-full bg-warning" />}
-                        {hasConfirmed && <div className="w-1.5 h-1.5 rounded-full bg-success" />}
-                        {ds.some(s => s.status === 'Completed') && <div className="w-1.5 h-1.5 rounded-full bg-muted-foreground" />}
+                      <div style={{ display: 'flex', gap: 2, marginTop: 3, justifyContent: 'center' }}>
+                        {hasRequested && <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#f59e0b', display: 'inline-block', flexShrink: 0 }} />}
+                        {hasConfirmed && <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#10b981', display: 'inline-block', flexShrink: 0 }} />}
+                        {hasCompleted && <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#6b7280', display: 'inline-block', flexShrink: 0 }} />}
+                        {hasEmergency && <span style={{ width: 6, height: 6, borderRadius: '50%', backgroundColor: '#ef4444', display: 'inline-block', flexShrink: 0 }} />}
                       </div>
+                    )}
+
+                    {/* Count badge */}
+                    {ds.length > 0 && (
+                      <span style={{
+                        position: 'absolute', bottom: 2, right: 2,
+                        backgroundColor: dominantColor,
+                        color: hasRequested && !hasEmergency ? '#000' : '#fff',
+                        fontSize: 8, fontFamily: 'monospace', fontWeight: 700,
+                        padding: '1px 3px', borderRadius: 3, lineHeight: 1.3,
+                      }}>
+                        {ds.length}
+                      </span>
                     )}
                   </button>
                 );
               })}
             </div>
             {/* Legend */}
-            <div className="flex gap-4 mt-3 text-[10px] font-mono text-muted-foreground">
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-warning inline-block" /> Requested</span>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-success inline-block" /> Confirmed</span>
-              <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-muted-foreground inline-block" /> Completed</span>
+            <div className="flex flex-wrap gap-4 mt-4 text-[10px] font-mono text-muted-foreground border-t border-white/5 pt-3">
+              <span className="flex items-center gap-1.5">
+                <span style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#f59e0b', display: 'inline-block' }} />
+                Requested
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#10b981', display: 'inline-block' }} />
+                Confirmed
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#6b7280', display: 'inline-block' }} />
+                Completed
+              </span>
+              <span className="flex items-center gap-1.5">
+                <span style={{ width: 10, height: 10, borderRadius: '50%', backgroundColor: '#ef4444', display: 'inline-block' }} />
+                Emergency
+              </span>
+              <span className="flex items-center gap-1.5 ml-auto">
+                <span className="w-2.5 h-2.5 rounded-sm ring-1 ring-primary/60 inline-block" />
+                Today
+              </span>
             </div>
           </div>
 

@@ -4,7 +4,7 @@ import { DataTable } from '@/components/shared/DataTable';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { Modal } from '@/components/shared/Modal';
 import { Trailer, TrailerCategory } from '@/types';
-import { Plus, Download, LayoutGrid, List, Pencil, Save } from 'lucide-react';
+import { Plus, Download, LayoutGrid, List, Pencil, Save, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAppData } from '@/context/AppDataContext';
 import { toast } from 'sonner';
@@ -28,14 +28,18 @@ const InventoryManagement = () => {
   const { state, actions } = useAppData();
   const [view, setView] = useState<'table' | 'grid'>('table');
   const [filterCat, setFilterCat] = useState<string>('');
+  const [filterStatus, setFilterStatus] = useState<string>('');
   const [detailTrailer, setDetailTrailer] = useState<Trailer | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
   const [editMode, setEditMode] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
   const [editForm, setEditForm] = useState<Partial<Trailer>>({});
 
   const trailers = state.trailers;
-  const filtered = filterCat ? trailers.filter(t => t.category === filterCat) : trailers;
+  const filtered = trailers
+    .filter(t => !filterCat || t.category === filterCat)
+    .filter(t => !filterStatus || t.status === filterStatus);
 
   const catCounts: Record<string, number> = {};
   trailers.forEach(t => { catCounts[t.category] = (catCounts[t.category] || 0) + t.inStock; });
@@ -44,7 +48,7 @@ const InventoryManagement = () => {
   const exportCSV = () => {
     const cols = ['modelNumber', 'name', 'category', 'subType', 'gvw', 'price', 'inStock', 'leadTimeDays', 'status'];
     const header = cols.join(',');
-    const rows = filtered.map(t => cols.map(c => `"${(t as Record<string, unknown>)[c] ?? ''}"`).join(','));
+    const rows = filtered.map(t => cols.map(c => `"${(t as unknown as Record<string, unknown>)[c] ?? ''}"`).join(','));
     const csv = [header, ...rows].join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
@@ -78,10 +82,21 @@ const InventoryManagement = () => {
     setDetailTrailer(state.trailers.find(t => t.id === detailTrailer.id) ?? null);
   };
 
+  // ── Delete Trailer ───────────────────────────────────────────────────────────
+  const handleDelete = () => {
+    if (!detailTrailer) return;
+    actions.deleteTrailer({ id: detailTrailer.id });
+    toast.success(`Trailer "${detailTrailer.name}" deleted`);
+    setDetailTrailer(null);
+    setEditMode(false);
+    setConfirmDelete(false);
+  };
+
   const openDetail = (t: Trailer) => {
     setDetailTrailer(t);
     setEditForm({ name: t.name, modelNumber: t.modelNumber, subType: t.subType, gvw: t.gvw, price: t.price, inStock: t.inStock, leadTimeDays: t.leadTimeDays, status: t.status, description: t.description });
     setEditMode(false);
+    setConfirmDelete(false);
   };
 
   const Field = ({ label, value }: { label: string; value: React.ReactNode }) => (
@@ -115,26 +130,59 @@ const InventoryManagement = () => {
           </div>
         </div>
 
-        {/* Summary strip */}
+        {/* Summary strip — all cards clickable */}
         <div className="grid grid-cols-3 md:grid-cols-6 gap-2">
-          {[{ label: 'Total Models', v: trailers.length }, { label: 'Total Units', v: trailers.reduce((s, t) => s + t.inStock, 0) }, { label: 'Available', v: trailers.filter(t => t.status === 'Available').length }, { label: 'Low Stock', v: trailers.filter(t => t.status === 'Low Stock').length }, { label: 'Out of Stock', v: trailers.filter(t => t.status === 'Out of Stock').length }, { label: 'Custom Order', v: trailers.filter(t => t.status === 'Custom Order').length }].map(({ label, v }) => (
-            <div key={label} className="bg-card/60 border border-white/5 rounded-lg p-3 text-center">
-              <p className="font-mono text-lg font-bold text-white">{v}</p>
-              <p className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground">{label}</p>
-            </div>
-          ))}
+          {[
+            { label: 'Total Models', v: trailers.length, status: 'ALL' },
+            { label: 'Total Units', v: trailers.reduce((s, t) => s + t.inStock, 0), status: 'ALL' },
+            { label: 'Available', v: trailers.filter(t => t.status === 'Available').length, status: 'Available' },
+            { label: 'Low Stock', v: trailers.filter(t => t.status === 'Low Stock').length, status: 'Low Stock' },
+            { label: 'Out of Stock', v: trailers.filter(t => t.status === 'Out of Stock').length, status: 'Out of Stock' },
+            { label: 'Custom Order', v: trailers.filter(t => t.status === 'Custom Order').length, status: 'Custom Order' },
+          ].map(({ label, v, status }) => {
+            const isAll = status === 'ALL';
+            const isActive = isAll ? (!filterStatus && !filterCat) : filterStatus === status;
+            return (
+              <div
+                key={label}
+                onClick={() => {
+                  if (isAll) { setFilterStatus(''); setFilterCat(''); }
+                  else setFilterStatus(filterStatus === status ? '' : status);
+                }}
+                className={cn(
+                  'rounded-lg p-3 text-center transition-all cursor-pointer',
+                  isActive
+                    ? 'bg-primary/20 border border-primary/50 ring-1 ring-primary/30'
+                    : 'bg-card/60 border border-white/5 hover:border-white/20'
+                )}
+              >
+                <p className={cn('font-mono text-lg font-bold', isActive ? 'text-primary' : 'text-white')}>{v}</p>
+                <p className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground">{label}</p>
+                {isActive && <p className="text-[8px] font-mono text-primary/70 mt-0.5">▲ active filter</p>}
+              </div>
+            );
+          })}
         </div>
 
-        {/* Filters */}
-        <div className="flex gap-2 flex-wrap">
-          <button onClick={() => setFilterCat('')} className={cn('px-3 py-1 rounded-sm text-xs font-display uppercase tracking-wide', !filterCat ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80')}>
+        {/* Category Filters */}
+        <div className="flex gap-2 flex-wrap items-center">
+          <button
+            onClick={() => { setFilterCat(''); setFilterStatus(''); }}
+            className={cn('px-3 py-1 rounded-sm text-xs font-display uppercase tracking-wide', !filterCat && !filterStatus ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80')}
+          >
             All ({trailers.length})
           </button>
           {categories.map(cat => (
-            <button key={cat} onClick={() => setFilterCat(cat)} className={cn('px-3 py-1 rounded-sm text-xs font-display uppercase tracking-wide', filterCat === cat ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80')}>
+            <button key={cat} onClick={() => setFilterCat(filterCat === cat ? '' : cat)} className={cn('px-3 py-1 rounded-sm text-xs font-display uppercase tracking-wide', filterCat === cat ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80')}>
               {cat} ({catCounts[cat] || 0})
             </button>
           ))}
+          {filterStatus && (
+            <span className="ml-auto flex items-center gap-1.5 text-[10px] font-mono text-primary">
+              Showing: <span className="font-bold">{filterStatus}</span>
+              <button onClick={() => setFilterStatus('')} className="text-muted-foreground hover:text-foreground text-xs ml-1">✕ clear</button>
+            </span>
+          )}
         </div>
 
         {view === 'table' ? (
@@ -189,12 +237,40 @@ const InventoryManagement = () => {
                   <StatusBadge status={detailTrailer.status} />
                   <span className="font-mono text-xs text-muted-foreground">{detailTrailer.modelNumber}</span>
                 </div>
-                <button
-                  onClick={() => setEditMode(!editMode)}
-                  className={cn('flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-display uppercase tracking-wide transition-all', editMode ? 'bg-muted' : 'bg-primary text-primary-foreground hover:opacity-90')}
-                >
-                  <Pencil size={12} /> {editMode ? 'Cancel Edit' : 'Edit'}
-                </button>
+                <div className="flex items-center gap-2">
+                  {confirmDelete ? (
+                    <>
+                      <span className="text-xs text-danger font-mono">Permanently delete?</span>
+                      <button
+                        onClick={handleDelete}
+                        className="flex items-center gap-1 px-3 py-1.5 bg-danger text-white rounded-sm text-xs font-display uppercase tracking-wide hover:opacity-90 transition-opacity"
+                      >
+                        <Trash2 size={12} /> Confirm
+                      </button>
+                      <button
+                        onClick={() => setConfirmDelete(false)}
+                        className="px-3 py-1.5 bg-muted rounded-sm text-xs font-display uppercase tracking-wide"
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => { setConfirmDelete(true); setEditMode(false); }}
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-display uppercase tracking-wide border border-danger/40 text-danger hover:bg-danger/10 transition-colors"
+                      >
+                        <Trash2 size={12} /> Delete
+                      </button>
+                      <button
+                        onClick={() => setEditMode(!editMode)}
+                        className={cn('flex items-center gap-1.5 px-3 py-1.5 rounded-sm text-xs font-display uppercase tracking-wide transition-all', editMode ? 'bg-muted' : 'bg-primary text-primary-foreground hover:opacity-90')}
+                      >
+                        <Pencil size={12} /> {editMode ? 'Cancel Edit' : 'Edit'}
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
 
               {editMode ? (

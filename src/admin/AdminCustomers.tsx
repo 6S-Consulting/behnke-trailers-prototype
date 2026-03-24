@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { MetricCard } from '@/components/shared/MetricCard';
+import { DataTable } from '@/components/shared/DataTable';
 import { Modal } from '@/components/shared/Modal';
 import { useAppData } from '@/context/AppDataContext';
 import { Customer, SoldTrailer } from '@/types';
-import { Users, Truck, Store, Phone, Mail, MapPin, Package } from 'lucide-react';
+import { Users, Truck, Store, Phone, Mail, MapPin, Package, LayoutGrid, List } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const AdminCustomers = () => {
@@ -14,6 +15,7 @@ const AdminCustomers = () => {
   const [selected, setSelected] = useState<Customer | null>(null);
   const [tab, setTab] = useState<'overview' | 'trailers' | 'orders'>('overview');
   const [filterState, setFilterState] = useState('');
+  const [view, setView] = useState<'table' | 'grid'>('table');
 
   const allStates = [...new Set(state.customers.map(c => c.state))].sort();
 
@@ -42,7 +44,12 @@ const AdminCustomers = () => {
   return (
     <DashboardLayout>
       <div className="space-y-5">
-        <h1 className="font-display text-2xl font-bold uppercase tracking-wide">Customer Management</h1>
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <h1 className="font-display text-2xl font-bold uppercase tracking-wide">Customer Management</h1>
+          <button onClick={() => setView(view === 'table' ? 'grid' : 'table')} className="p-1.5 border border-border rounded-sm hover:bg-muted">
+            {view === 'table' ? <LayoutGrid size={14} /> : <List size={14} />}
+          </button>
+        </div>
 
         {/* KPIs */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -74,55 +81,73 @@ const AdminCustomers = () => {
           <span className="text-xs text-muted-foreground">{filtered.length} customers</span>
         </div>
 
-        {/* Customer Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-          {filtered.map(c => {
-            const dealer = getDealer(c);
-            const trailers = getTrailers(c);
-            const criticalT = trailers.filter(t => t.sensorData.overallHealth === 'Critical');
-            const orders = getOrders(c);
-            return (
-              <div
-                key={c.id}
-                onClick={() => openCustomer(c)}
-                className="bg-card/60 border border-white/5 rounded-lg p-4 cursor-pointer hover:border-primary/30 transition-all group"
-              >
-                <div className="flex items-start justify-between mb-2">
-                  <div>
-                    <h3 className="font-display font-bold uppercase tracking-wide text-sm text-white group-hover:text-primary transition-colors">{c.name}</h3>
-                    <p className="text-xs text-muted-foreground">{c.company}</p>
+        {/* Customer Grid / Table */}
+        {view === 'grid' ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+            {filtered.map(c => {
+              const dealer = getDealer(c);
+              const trailers = getTrailers(c);
+              const criticalT = trailers.filter(t => t.sensorData.overallHealth === 'Critical');
+              const orders = getOrders(c);
+              return (
+                <div
+                  key={c.id}
+                  onClick={() => openCustomer(c)}
+                  className="bg-card/60 border border-white/5 rounded-lg p-4 cursor-pointer hover:border-primary/30 transition-all group"
+                >
+                  <div className="flex items-start justify-between mb-2">
+                    <div>
+                      <h3 className="font-display font-bold uppercase tracking-wide text-sm text-white group-hover:text-primary transition-colors">{c.name}</h3>
+                      <p className="text-xs text-muted-foreground">{c.company}</p>
+                    </div>
+                    {criticalT.length > 0 && (
+                      <span className="px-1.5 py-0.5 bg-danger/20 text-danger text-[10px] font-mono rounded-sm border border-danger/20">
+                        {criticalT.length} Critical
+                      </span>
+                    )}
                   </div>
-                  {criticalT.length > 0 && (
-                    <span className="px-1.5 py-0.5 bg-danger/20 text-danger text-[10px] font-mono rounded-sm border border-danger/20">
-                      {criticalT.length} Critical
-                    </span>
-                  )}
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-3">
+                    <MapPin size={10} />
+                    <span>{c.state}</span>
+                    <span className="mx-1">·</span>
+                    <Store size={10} />
+                    <span>{dealer?.name ?? '—'}</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 pt-3 border-t border-white/5">
+                    <div className="text-center">
+                      <p className="font-mono text-sm font-bold text-white">{trailers.length}</p>
+                      <p className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground">Trailers</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="font-mono text-sm font-bold text-white">{orders.length}</p>
+                      <p className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground">Orders</p>
+                    </div>
+                    <div className="text-center">
+                      <p className="font-mono text-sm font-bold text-white">{c.ownedTrailers.length}</p>
+                      <p className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground">Owned</p>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-3">
-                  <MapPin size={10} />
-                  <span>{c.state}</span>
-                  <span className="mx-1">·</span>
-                  <Store size={10} />
-                  <span>{dealer?.name ?? '—'}</span>
-                </div>
-                <div className="grid grid-cols-3 gap-2 pt-3 border-t border-white/5">
-                  <div className="text-center">
-                    <p className="font-mono text-sm font-bold text-white">{trailers.length}</p>
-                    <p className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground">Trailers</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="font-mono text-sm font-bold text-white">{orders.length}</p>
-                    <p className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground">Orders</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="font-mono text-sm font-bold text-white">{c.ownedTrailers.length}</p>
-                    <p className="text-[9px] font-mono uppercase tracking-widest text-muted-foreground">Owned</p>
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        ) : (
+          <DataTable<Customer>
+            columns={[
+              { key: 'name', label: 'Name', sortable: true, render: (c) => <span className="font-display font-bold uppercase tracking-wide text-white">{c.name}</span> },
+              { key: 'company', label: 'Company', sortable: true, render: (c) => <span className="text-xs">{c.company || '—'}</span> },
+              { key: 'email', label: 'Email', render: (c) => <span className="text-xs">{c.email}</span> },
+              { key: 'phone', label: 'Phone', render: (c) => <span className="text-xs">{c.phone}</span> },
+              { key: 'state', label: 'State', sortable: true },
+              { key: 'dealer', label: 'Dealer', render: (c) => <span className="text-xs">{getDealer(c)?.name ?? '—'}</span> },
+              { key: 'ownedTrailers', label: 'Trailers', sortable: true, render: (c) => <span className="font-mono text-xs">{c.ownedTrailers.length}</span> },
+            ]}
+            data={filtered}
+            searchable
+            searchPlaceholder="Search customers..."
+            onRowClick={(c) => openCustomer(c)}
+          />
+        )}
 
         {/* Customer Detail Modal */}
         <Modal isOpen={!!selected} onClose={() => setSelected(null)} title={selected?.name ?? ''} wide>

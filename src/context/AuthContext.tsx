@@ -31,15 +31,23 @@ const AuthContext = createContext<AuthContextType>({
 });
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<AuthUser | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(() => {
+    const saved = sessionStorage.getItem('auth_role');
+    return saved && saved in roleUsers ? roleUsers[saved as UserRole] : null;
+  });
 
   const login = (role: UserRole) => {
+    sessionStorage.setItem('auth_role', role);
     setUser(roleUsers[role]);
   };
 
-  const logout = () => setUser(null);
+  const logout = () => {
+    sessionStorage.removeItem('auth_role');
+    setUser(null);
+  };
 
   const switchRole = (role: UserRole) => {
+    sessionStorage.setItem('auth_role', role);
     setUser(roleUsers[role]);
   };
 

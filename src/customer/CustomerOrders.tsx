@@ -7,7 +7,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useAppData } from '@/context/AppDataContext';
 import { Order } from '@/types';
 import { cn } from '@/lib/utils';
-import { Package, Truck, CheckCircle2, Clock, Factory, ClipboardCheck, FileText, ArrowRight } from 'lucide-react';
+import { Package, Truck, CheckCircle2, Clock, Factory, ClipboardCheck, FileText, ArrowRight, LayoutGrid, List } from 'lucide-react';
 
 const PIPELINE_STAGES: { status: Order['status']; label: string; icon: React.ElementType }[] = [
     { status: 'Submitted', label: 'Submitted', icon: FileText },
@@ -27,6 +27,7 @@ const CustomerOrders = () => {
     const { user } = useAuth();
     const { state } = useAppData();
     const [detail, setDetail] = useState<Order | null>(null);
+    const [view, setView] = useState<'table' | 'grid'>('table');
 
     const customerId = user?.id ?? '';
 
@@ -41,7 +42,12 @@ const CustomerOrders = () => {
     return (
         <DashboardLayout>
             <div className="space-y-6">
-                <h1 className="font-display text-2xl font-bold uppercase tracking-wide">My Orders</h1>
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                    <h1 className="font-display text-2xl font-bold uppercase tracking-wide">My Orders</h1>
+                    <button onClick={() => setView(view === 'table' ? 'grid' : 'table')} className="p-1.5 border border-border rounded-sm hover:bg-muted">
+                        {view === 'table' ? <LayoutGrid size={14} /> : <List size={14} />}
+                    </button>
+                </div>
 
                 {/* Active Orders — visual tracker */}
                 {activeOrders.length > 0 && (
@@ -122,21 +128,50 @@ const CustomerOrders = () => {
                 {completedOrders.length > 0 && (
                     <div>
                         <h2 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-3">Order History</h2>
-                        <div className="bg-card rounded-lg shadow-industrial p-4">
-                            <DataTable<Order>
-                                columns={[
-                                    { key: 'orderNumber', label: 'Order #', sortable: true, render: (o) => <span className="font-mono text-xs">{o.orderNumber}</span> },
-                                    { key: 'trailerName', label: 'Trailer', render: (o) => <span className="text-xs">{o.trailerName || o.modelNumber || '—'}</span> },
-                                    { key: 'quantity', label: 'Qty', render: (o) => <span className="font-mono text-xs">{o.quantity}</span> },
-                                    { key: 'totalPrice', label: 'Total', sortable: true, render: (o) => <span className="font-mono text-xs font-medium">${o.totalPrice.toLocaleString()}</span> },
-                                    { key: 'status', label: 'Status', render: (o) => <StatusBadge status={o.status} /> },
-                                    { key: 'createdDate', label: 'Date', sortable: true, render: (o) => <span className="text-xs">{o.createdDate}</span> },
-                                ]}
-                                data={completedOrders}
-                                searchable
-                                onRowClick={(o) => setDetail(o)}
-                            />
-                        </div>
+                        {view === 'table' ? (
+                            <div className="bg-card rounded-lg shadow-industrial p-4">
+                                <DataTable<Order>
+                                    columns={[
+                                        { key: 'orderNumber', label: 'Order #', sortable: true, render: (o) => <span className="font-mono text-xs">{o.orderNumber}</span> },
+                                        { key: 'trailerName', label: 'Trailer', render: (o) => <span className="text-xs">{o.trailerName || o.modelNumber || '—'}</span> },
+                                        { key: 'quantity', label: 'Qty', render: (o) => <span className="font-mono text-xs">{o.quantity}</span> },
+                                        { key: 'totalPrice', label: 'Total', sortable: true, render: (o) => <span className="font-mono text-xs font-medium">${o.totalPrice.toLocaleString()}</span> },
+                                        { key: 'status', label: 'Status', render: (o) => <StatusBadge status={o.status} /> },
+                                        { key: 'createdDate', label: 'Date', sortable: true, render: (o) => <span className="text-xs">{o.createdDate}</span> },
+                                    ]}
+                                    data={completedOrders}
+                                    searchable
+                                    onRowClick={(o) => setDetail(o)}
+                                />
+                            </div>
+                        ) : (
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                                {completedOrders.map(o => (
+                                    <div
+                                        key={o.id}
+                                        onClick={() => setDetail(o)}
+                                        className="bg-card/60 border border-white/5 rounded-lg p-4 cursor-pointer hover:border-primary/30 transition-all group"
+                                    >
+                                        <div className="flex justify-between items-start mb-2">
+                                            <span className="font-mono text-xs text-white">{o.orderNumber}</span>
+                                            <StatusBadge status={o.status} />
+                                        </div>
+                                        <h3 className="font-display font-bold uppercase tracking-wide text-sm text-white group-hover:text-primary transition-colors">{o.trailerName || o.modelNumber || '—'}</h3>
+                                        <div className="grid grid-cols-2 gap-2 pt-3 mt-3 border-t border-white/5">
+                                            <div className="text-center">
+                                                <span className="font-display font-bold text-sm block text-white">{o.quantity}</span>
+                                                <span className="text-[9px] font-mono uppercase text-muted-foreground">Qty</span>
+                                            </div>
+                                            <div className="text-center">
+                                                <span className="font-display font-bold text-sm block text-white">${o.totalPrice.toLocaleString()}</span>
+                                                <span className="text-[9px] font-mono uppercase text-muted-foreground">Total</span>
+                                            </div>
+                                        </div>
+                                        <p className="text-[10px] text-muted-foreground mt-2">{o.createdDate}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 )}
 

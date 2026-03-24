@@ -70,6 +70,7 @@ type PushHealthWarningInput = {
 
 type AddTrailerInput = Omit<Trailer, 'id'>;
 type UpdateTrailerInput = Partial<Omit<Trailer, 'id'>> & { id: string };
+type DeleteTrailerInput = { id: string };
 
 type AppDataContextType = {
   state: AppDataState;
@@ -88,6 +89,7 @@ type AppDataContextType = {
     pushHealthWarning: (input: PushHealthWarningInput) => Notification | null;
     addTrailer: (input: AddTrailerInput) => Trailer;
     updateTrailer: (input: UpdateTrailerInput) => Trailer | null;
+    deleteTrailer: (input: DeleteTrailerInput) => void;
   };
 };
 
@@ -123,6 +125,7 @@ const AppDataContext = createContext<AppDataContextType>({
     pushHealthWarning: () => null,
     addTrailer: () => { throw new Error('AppDataContext not initialized'); },
     updateTrailer: () => null,
+    deleteTrailer: () => { },
   },
 });
 
@@ -656,6 +659,10 @@ const AppDataProviderImpl = ({ children }: { children: React.ReactNode }) => {
         const updated: Trailer = { ...existing, ...input };
         setState(s => ({ ...s, trailers: s.trailers.map(t => (t.id === input.id ? updated : t)) }));
         return updated;
+      },
+
+      deleteTrailer: ({ id }: DeleteTrailerInput) => {
+        setState(s => ({ ...s, trailers: s.trailers.filter(t => t.id !== id) }));
       },
     };
   }, [state]);

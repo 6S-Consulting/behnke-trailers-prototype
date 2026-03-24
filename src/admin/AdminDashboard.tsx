@@ -88,7 +88,7 @@ const AdminDashboard = () => {
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(0 0% 100% / 0.05)" />
                 <XAxis dataKey="month" tick={{ fontSize: 11, fontFamily: 'Inter', fill: 'hsl(var(--muted-foreground))' }} />
                 <YAxis tick={{ fontSize: 11, fontFamily: 'Inter', fill: 'hsl(var(--muted-foreground))' }} />
-                <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', fontSize: 12, fontFamily: 'Inter' }} />
+                <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', fontSize: 12, fontFamily: 'Inter', color: '#fff' }} itemStyle={{ color: '#fff' }} />
                 <Bar dataKey="Agricultural" fill="hsl(var(--primary))" radius={[2, 2, 0, 0]} />
                 <Bar dataKey="Construction" fill="hsl(240,6%,20%)" radius={[2, 2, 0, 0]} />
                 <Bar dataKey="Heavy Haul" fill="hsl(38,92%,50%)" radius={[2, 2, 0, 0]} />
@@ -105,7 +105,7 @@ const AdminDashboard = () => {
                   {categoryData.map((_, i) => <Cell key={i} fill={COLORS[i % COLORS.length]} />)}
                 </Pie>
                 <Legend iconSize={8} wrapperStyle={{ fontSize: 11, fontFamily: 'Inter' }} />
-                <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', fontSize: 12, color: 'hsl(var(--foreground))' }} />
+                <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', fontSize: 12, color: '#fff' }} itemStyle={{ color: '#fff' }} labelStyle={{ color: '#fff' }} />
               </PieChart>
             </ResponsiveContainer>
           </div>

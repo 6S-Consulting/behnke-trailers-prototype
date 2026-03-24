@@ -130,7 +130,7 @@ const SensorDataDetail = () => {
                 <CartesianGrid strokeDasharray="3 3" stroke="hsl(240,5%,84%)" />
                 <XAxis dataKey="day" tick={{ fontSize: 9 }} interval={6} />
                 <YAxis tick={{ fontSize: 9 }} domain={[100, 250]} />
-                <Tooltip contentStyle={{ fontSize: 11 }} />
+                <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', fontSize: 11, color: '#fff' }} itemStyle={{ color: '#fff' }} />
                 <Line type="monotone" dataKey="temp" stroke="hsl(0,66%,45%)" strokeWidth={1.5} dot={false} />
               </LineChart>
             </ResponsiveContainer>

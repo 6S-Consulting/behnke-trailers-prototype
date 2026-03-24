@@ -8,11 +8,13 @@ import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
 import { useAppData } from '@/context/AppDataContext';
 import { Order } from '@/types';
+import { LayoutGrid, List } from 'lucide-react';
 
 const DealerOrders = () => {
   const { user } = useAuth();
   const { state, actions } = useAppData();
   const [tab, setTab] = useState<'behnke' | 'customer'>('behnke');
+  const [view, setView] = useState<'table' | 'grid'>('table');
   const [wizardOpen, setWizardOpen] = useState(false);
   const [wizardStep, setWizardStep] = useState(1);
   const [selectedTrailer, setSelectedTrailer] = useState<string | null>(null);
@@ -30,9 +32,14 @@ const DealerOrders = () => {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h1 className="font-display text-2xl font-bold uppercase tracking-wide">Order Management</h1>
-          <button onClick={() => { setWizardOpen(true); setWizardStep(1); }} className="px-3 py-1.5 bg-primary text-primary-foreground rounded-sm text-xs font-display uppercase tracking-wide">
-            New Order to Behnke
-          </button>
+          <div className="flex gap-2">
+            <button onClick={() => { setWizardOpen(true); setWizardStep(1); }} className="px-3 py-1.5 bg-primary text-primary-foreground rounded-sm text-xs font-display uppercase tracking-wide">
+              New Order to Behnke
+            </button>
+            <button onClick={() => setView(view === 'table' ? 'grid' : 'table')} className="p-1.5 border border-border rounded-sm hover:bg-muted">
+              {view === 'table' ? <LayoutGrid size={14} /> : <List size={14} />}
+            </button>
+          </div>
         </div>
 
         <div className="flex gap-2">
@@ -44,21 +51,50 @@ const DealerOrders = () => {
           </button>
         </div>
 
-        <div className="bg-card rounded-lg shadow-industrial p-4">
-          <DataTable<Order>
-            columns={[
-              { key: 'orderNumber', label: 'Order #', sortable: true, render: (o) => <span className="font-mono text-xs">{o.orderNumber}</span> },
-              { key: 'trailerName', label: 'Trailer', render: (o) => <span className="text-xs">{o.trailerName}</span> },
-              { key: 'type', label: 'Type', render: (o) => <StatusBadge status={o.type} /> },
-              { key: 'quantity', label: 'Qty', render: (o) => <span className="font-mono text-xs">{o.quantity}</span> },
-              { key: 'totalPrice', label: 'Total', sortable: true, render: (o) => <span className="font-mono text-xs">${o.totalPrice.toLocaleString()}</span> },
-              { key: 'status', label: 'Status', render: (o) => <StatusBadge status={o.status} /> },
-              { key: 'createdDate', label: 'Date', render: (o) => <span className="text-xs">{o.createdDate}</span> },
-            ]}
-            data={tab === 'behnke' ? myOrders : custOrders}
-            searchable
-          />
-        </div>
+        {view === 'table' ? (
+          <div className="bg-card rounded-lg shadow-industrial p-4">
+            <DataTable<Order>
+              columns={[
+                { key: 'orderNumber', label: 'Order #', sortable: true, render: (o) => <span className="font-mono text-xs">{o.orderNumber}</span> },
+                { key: 'trailerName', label: 'Trailer', render: (o) => <span className="text-xs">{o.trailerName}</span> },
+                { key: 'type', label: 'Type', render: (o) => <StatusBadge status={o.type} /> },
+                { key: 'quantity', label: 'Qty', render: (o) => <span className="font-mono text-xs">{o.quantity}</span> },
+                { key: 'totalPrice', label: 'Total', sortable: true, render: (o) => <span className="font-mono text-xs">${o.totalPrice.toLocaleString()}</span> },
+                { key: 'status', label: 'Status', render: (o) => <StatusBadge status={o.status} /> },
+                { key: 'createdDate', label: 'Date', render: (o) => <span className="text-xs">{o.createdDate}</span> },
+              ]}
+              data={tab === 'behnke' ? myOrders : custOrders}
+              searchable
+            />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+            {(tab === 'behnke' ? myOrders : custOrders).map(o => (
+              <div
+                key={o.id}
+                className="bg-card/60 border border-white/5 rounded-lg p-4 hover:border-primary/30 transition-all group cursor-pointer"
+              >
+                <div className="flex justify-between items-start mb-2">
+                  <span className="font-mono text-xs text-white">{o.orderNumber}</span>
+                  <StatusBadge status={o.status} />
+                </div>
+                <h3 className="font-display font-bold uppercase tracking-wide text-sm text-white group-hover:text-primary transition-colors">{o.trailerName || '—'}</h3>
+                <p className="text-xs text-muted-foreground mb-3"><StatusBadge status={o.type} /></p>
+                <div className="grid grid-cols-2 gap-2 pt-3 border-t border-white/5">
+                  <div className="text-center">
+                    <span className="font-display font-bold text-sm block text-white">{o.quantity}</span>
+                    <span className="text-[9px] font-mono uppercase text-muted-foreground">Qty</span>
+                  </div>
+                  <div className="text-center">
+                    <span className="font-display font-bold text-sm block text-white">${o.totalPrice.toLocaleString()}</span>
+                    <span className="text-[9px] font-mono uppercase text-muted-foreground">Total</span>
+                  </div>
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-2">{o.createdDate}</p>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Order Wizard */}
         <Modal isOpen={wizardOpen} onClose={() => setWizardOpen(false)} title="New Order to Behnke" wide>

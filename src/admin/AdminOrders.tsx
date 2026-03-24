@@ -6,7 +6,7 @@ import { Modal } from '@/components/shared/Modal';
 import { useAppData } from '@/context/AppDataContext';
 import { Order } from '@/types';
 import { toast } from 'sonner';
-import { Package, Users, TrendingUp, Clock } from 'lucide-react';
+import { Package, Users, TrendingUp, Clock, LayoutGrid, List } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const STATUS_STEPS: Order['status'][] = ['Draft', 'Submitted', 'Under Review', 'Approved', 'In Production', 'Shipped', 'Delivered'];
@@ -14,6 +14,7 @@ const STATUS_STEPS: Order['status'][] = ['Draft', 'Submitted', 'Under Review', '
 const AdminOrders = () => {
   const { state, actions } = useAppData();
   const [tab, setTab] = useState<'dealer' | 'customer' | 'all'>('all');
+  const [view, setView] = useState<'table' | 'grid'>('table');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
   const dealerOrders = state.orders.filter(o => o.fromType === 'Dealer');
@@ -79,7 +80,12 @@ const AdminOrders = () => {
   return (
     <DashboardLayout>
       <div className="space-y-5">
-        <h1 className="font-display text-2xl font-bold uppercase tracking-wide">Orders</h1>
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <h1 className="font-display text-2xl font-bold uppercase tracking-wide">Orders</h1>
+          <button onClick={() => setView(view === 'table' ? 'grid' : 'table')} className="p-1.5 border border-border rounded-sm hover:bg-muted">
+            {view === 'table' ? <LayoutGrid size={14} /> : <List size={14} />}
+          </button>
+        </div>
 
         {/* KPIs */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -111,15 +117,56 @@ const AdminOrders = () => {
           ))}
         </div>
 
-        <div className="bg-card/60 border border-white/5 rounded-lg p-4">
-          <DataTable<Order>
-            columns={columns}
-            data={displayOrders}
-            searchable
-            searchPlaceholder="Search orders..."
-            onRowClick={(o) => setSelectedOrder(o)}
-          />
-        </div>
+        {view === 'table' ? (
+          <div className="bg-card/60 border border-white/5 rounded-lg p-4">
+            <DataTable<Order>
+              columns={columns}
+              data={displayOrders}
+              searchable
+              searchPlaceholder="Search orders..."
+              onRowClick={(o) => setSelectedOrder(o)}
+            />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+            {displayOrders.map(o => {
+              const fromName = o.fromType === 'Dealer'
+                ? state.dealers.find(d => d.id === o.fromId)?.name
+                : state.customers.find(c => c.id === o.fromId)?.name;
+              return (
+                <div
+                  key={o.id}
+                  onClick={() => setSelectedOrder(o)}
+                  className="bg-card/60 border border-white/5 rounded-lg p-4 cursor-pointer hover:border-primary/30 transition-all group"
+                >
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="font-mono text-xs text-white">{o.orderNumber}</span>
+                    <StatusBadge status={o.status} />
+                  </div>
+                  <p className="font-display font-bold uppercase tracking-wide text-sm text-white group-hover:text-primary transition-colors">{o.trailerName || '—'}</p>
+                  <p className="text-xs text-muted-foreground mb-3">{fromName} <span className="px-1 py-0.5 rounded-sm bg-white/5 text-[10px] ml-1">{o.fromType}</span></p>
+                  <div className="grid grid-cols-3 gap-2 pt-3 border-t border-white/5">
+                    <div className="text-center">
+                      <span className="font-display font-bold text-sm block text-white">{o.quantity}</span>
+                      <span className="text-[9px] font-mono uppercase text-muted-foreground">Qty</span>
+                    </div>
+                    <div className="text-center">
+                      <span className="font-display font-bold text-sm block text-white">£{o.totalPrice.toLocaleString()}</span>
+                      <span className="text-[9px] font-mono uppercase text-muted-foreground">Total</span>
+                    </div>
+                    <div className="text-center">
+                      <span className="font-display font-bold text-sm block text-white">
+                        <StatusBadge status={o.type} />
+                      </span>
+                      <span className="text-[9px] font-mono uppercase text-muted-foreground">Type</span>
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground mt-2">{o.createdDate}</p>
+                </div>
+              );
+            })}
+          </div>
+        )}
 
         {/* Order Detail Modal */}
         <Modal isOpen={!!selectedOrder} onClose={() => setSelectedOrder(null)} title={selectedOrder?.orderNumber ?? ''} wide>

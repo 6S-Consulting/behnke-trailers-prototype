@@ -10,6 +10,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { useAuth } from '@/context/AuthContext';
 import { useAppData } from '@/context/AppDataContext';
 import { MaintenanceRecord, SoldTrailer } from '@/types';
+import { LayoutGrid, List } from 'lucide-react';
 
 const CustomerHealth = () => {
   const { user } = useAuth();
@@ -19,6 +20,7 @@ const CustomerHealth = () => {
   const [serviceType, setServiceType] = useState<'Scheduled' | 'Inspection' | 'Emergency'>('Scheduled');
   const [preferredDate, setPreferredDate] = useState(() => new Date().toISOString().slice(0, 10));
   const [notes, setNotes] = useState('');
+  const [view, setView] = useState<'table' | 'grid'>('table');
 
   const myTrailers = state.soldTrailers.filter(t => t.customerId === (user?.id ?? ''));
   const trailer = myTrailers[selected];
@@ -43,7 +45,12 @@ const CustomerHealth = () => {
   return (
     <DashboardLayout>
       <div className="space-y-4">
-        <h1 className="font-display text-2xl font-bold uppercase tracking-wide">Trailer Health & Service</h1>
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <h1 className="font-display text-2xl font-bold uppercase tracking-wide">Trailer Health & Service</h1>
+          <button onClick={() => setView(view === 'table' ? 'grid' : 'table')} className="p-1.5 border border-border rounded-sm hover:bg-muted">
+            {view === 'table' ? <LayoutGrid size={14} /> : <List size={14} />}
+          </button>
+        </div>
 
         {/* Trailer tabs */}
         {myTrailers.length > 1 && (
@@ -97,7 +104,7 @@ const CustomerHealth = () => {
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(240,5%,84%)" />
               <XAxis dataKey="day" tick={{ fontSize: 9 }} />
               <YAxis tick={{ fontSize: 9 }} domain={[100, 250]} />
-              <Tooltip contentStyle={{ fontSize: 11 }} />
+              <Tooltip contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', fontSize: 11, color: '#fff' }} itemStyle={{ color: '#fff' }} />
               <Line type="monotone" dataKey="temp" stroke="hsl(0,66%,45%)" strokeWidth={1.5} dot={false} />
             </LineChart>
           </ResponsiveContainer>
@@ -106,16 +113,35 @@ const CustomerHealth = () => {
         {/* Maintenance History */}
         <div className="bg-card rounded-lg shadow-industrial p-4">
           <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-3">Maintenance History</h3>
-          <DataTable<MaintenanceRecord>
-            columns={[
-              { key: 'date', label: 'Date', sortable: true },
-              { key: 'type', label: 'Type', render: (m) => <StatusBadge status={m.type} /> },
-              { key: 'description', label: 'Description' },
-              { key: 'technicianName', label: 'Technician' },
-              { key: 'cost', label: 'Cost', render: (m) => <span className="font-mono text-xs">${m.cost.toLocaleString()}</span> },
-            ]}
-            data={trailer.maintenanceHistory}
-          />
+          {view === 'table' ? (
+            <DataTable<MaintenanceRecord>
+              columns={[
+                { key: 'date', label: 'Date', sortable: true },
+                { key: 'type', label: 'Type', render: (m) => <StatusBadge status={m.type} /> },
+                { key: 'description', label: 'Description' },
+                { key: 'technicianName', label: 'Technician' },
+                { key: 'cost', label: 'Cost', render: (m) => <span className="font-mono text-xs">${m.cost.toLocaleString()}</span> },
+              ]}
+              data={trailer.maintenanceHistory}
+            />
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+              {trailer.maintenanceHistory.map(m => (
+                <div key={m.id} className="bg-card/60 border border-white/5 rounded-lg p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <span className="text-xs text-muted-foreground">{m.date}</span>
+                    <StatusBadge status={m.type} />
+                  </div>
+                  <p className="text-sm font-medium text-white mb-1">{m.description}</p>
+                  <p className="text-xs text-muted-foreground mb-3">Technician: {m.technicianName}</p>
+                  <div className="pt-3 border-t border-white/5">
+                    <span className="font-display font-bold text-sm text-white">${m.cost.toLocaleString()}</span>
+                    <span className="text-[9px] font-mono uppercase text-muted-foreground ml-2">Cost</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Schedule CTA */}
