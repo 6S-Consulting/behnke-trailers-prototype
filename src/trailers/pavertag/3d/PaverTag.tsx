@@ -18,8 +18,7 @@ export type TrailerViewerProps = {
   axleRating?: AxleRating;
   deckWood?: DeckWood;
   hitchType?: HitchType;
-  tiltSide?: TiltSide;
-  tiltAngleDeg?: number;
+  isUnfolded?: boolean;
   cameraView?: CameraView;
   autoRotate?: boolean;
   showHoverLabels?: boolean;
@@ -152,7 +151,9 @@ function deriveDimensions(
   deckWood: DeckWood,
 ): TrailerDimensions {
   const frontDeckLength = frontDeckLengthFt * 12;
-  const deckLength = 18 * 12 + frontDeckLength;
+  // User asked for increased length. Brochures usually say 25' + 6' tail.
+  // We'll set the base deck length to 30 feet as requested.
+  const deckLength = 30 * 12 + frontDeckLength;
 
   const tireData =
     axleRating === 8000
@@ -160,23 +161,23 @@ function deriveDimensions(
       : { tireRadius: 15.2, tireWidth: 9.2 };
 
   return {
-    deckHeight: 25,
+    deckHeight: 34, // brochure says 34" unloaded height
     deckLength,
     frontDeckLength,
-    tiltDeckWidth: 83,
+    tiltDeckWidth: 102, // full width deck over wheels
     stationaryDeckWidth: 0,
-    betweenFenders: 83,
-    lowerRailHeight: 8,
+    betweenFenders: 102,
+    lowerRailHeight: 4, // Reduced height
     lowerRailWidth: 2,
-    upperRailSize: 5,
+    upperRailSize: 2.5, // Reduced size (thinner/sharper)
     crossmemberDepth: 3,
     plankThickness: deckWood === "white-oak" ? 3.375 : 3.0,
-    axleSpacing: 34,
-    axleCenterZ: deckLength * 0.23,
+    axleSpacing: 34, // Tightened axle spacing
+    axleCenterZ: deckLength * 0.18, // Shift forward towards the front of the trailer
     tireRadius: tireData.tireRadius,
     tireWidth: tireData.tireWidth,
-    wheelTrackHalf: 48.8,
-    tongueLength: 64,
+    wheelTrackHalf: 48.5, // WHEEL END: pushed to the absolute widest left and right edges of 102" deck
+    tongueLength: 72,
     jackHeight: 24,
   };
 }
@@ -262,7 +263,7 @@ function SideReflectorStrip({
         return (
           <mesh
             key={i}
-            position={[x, y + 7, z]}
+            position={[x, y, z]}
             material={material}
             onPointerOver={
               onPartHover
@@ -432,16 +433,14 @@ function Wheel({
 
 function FrameAssembly({
   dims,
-  tiltSide,
-  tiltAngleDeg,
+  isUnfolded,
   deckWood,
   hitchType,
   onPartHover,
   onPartLeave,
 }: {
   dims: TrailerDimensions;
-  tiltSide: TiltSide;
-  tiltAngleDeg: number;
+  isUnfolded: boolean;
   deckWood: DeckWood;
   hitchType: HitchType;
   onPartHover: PartHoverFn;
@@ -460,7 +459,7 @@ function FrameAssembly({
 
   const tiltPivotX = 0;
   const tiltPivotZ = dims.axleCenterZ - 8;
-  const tiltAngle = (Math.PI / 180) * tiltAngleDeg;
+  const tiltAngle = isUnfolded ? 0 : 0; // We will use isUnfolded for ramps later
 
   const tongueBaseZ = -deckHalfLen + 15;
   const tongueHalfAngle = (Math.PI / 180) * 34;
@@ -470,17 +469,17 @@ function FrameAssembly({
   const tongueBeamLength = 54; // Adjusted length
   const tongueBeamCenterZ = tongueBaseZ - tongueBeamLength * 0.5 - 6;
   const hitchPlateZ = tongueBaseZ - tongueBeamLength - 1.5; // Apex connection point
-  const hitchCenterY = frameTopY - 4.5; // Lowered to align with tongue
+  const hitchCenterY = frameTopY - 0.2; // Almost flush with top of wood deck
 
   const jackSleeveWidth = 3.95;
-  const jackSleeveHeight = 23.6;
+  const jackSleeveHeight =10.0;
   const jackInnerWidth = 3.55;
-  const jackInnerHeight = 16;
+  const jackInnerHeight = 26; // Extended long stroke
   const jackFootSize = 9.9;
   const jackCenterZ = tongueBaseZ - 33;
-  const jackSleeveBottomY = frameTopY - 2.1;
+  const jackSleeveBottomY = frameTopY + 2.2; // Even higher clearance for jack housing
   const jackSleeveCenterY = jackSleeveBottomY + jackSleeveHeight / 2;
-  const jackInnerCenterY = jackSleeveBottomY - jackInnerHeight / 2 + 3.5; // Retracted
+  const jackInnerCenterY = jackSleeveBottomY - jackInnerHeight / 2; // Fully extended to ground
   const jackFootCenterY = jackInnerCenterY - jackInnerHeight / 2 - 0.55;
 
   const chainAnchorZ = tongueBaseZ - 20;
@@ -500,12 +499,8 @@ function FrameAssembly({
   const tiltGap = 0.24;
   const tiltPlankWidth =
     (dims.tiltDeckWidth - tiltGap * (tiltPlankCount - 1)) / tiltPlankCount;
-  const tiltDeckLength = dims.deckLength * 0.75;
-  const frontFixedLength = dims.deckLength - tiltDeckLength;
-  const tiltDeckCenterZ = -deckHalfLen + frontFixedLength + tiltDeckLength / 2;
-  const frontFixedCenterZ = -deckHalfLen + frontFixedLength / 2;
-  const rearTiltEdgeZ = tiltDeckCenterZ + tiltDeckLength / 2;
-  const beavertailLength = 27;
+  const beavertailLength = 72; // 6' wood beavertail
+  const deckCenterZ = 0; // The deck occupies the full length centered
 
   const hp = (name: string) => ({
     onPointerOver: (e: { stopPropagation: () => void }) => {
@@ -517,66 +512,61 @@ function FrameAssembly({
 
   return (
     <group>
-      {/* Main lower rails */}
-      {/* Left Main Rail — front 80% only, rear 20% removed (tilts with deck) */}
-      <mesh
-        position={[
-          leftEdge,
-          lowerRailCenterY,
-          -deckHalfLen + (dims.deckLength * 0.75) / 2,
-        ]}
-        material={frameMaterial}
-        castShadow
-        receiveShadow
-        {...hp("Left Main Rail")}
-      >
-        <boxGeometry
-          args={[
-            dims.lowerRailWidth,
-            dims.lowerRailHeight,
-            dims.deckLength * 0.75,
-          ]}
-        />
-      </mesh>
-      <mesh
-        position={[rightEdge, lowerRailCenterY, -deckHalfLen + (dims.deckLength * 0.75) / 2]}
-        material={frameMaterial}
-        castShadow
-        receiveShadow
-        {...hp("Right Main Rail")}
-      >
-        <boxGeometry
-          args={[dims.lowerRailWidth, dims.lowerRailHeight, dims.deckLength * 0.75]}
-        />
-      </mesh>
+      {/* Main lower rails — Split for beavertail bend */}
+      {[-1, 1].map((side) => {
+        const x = side * dims.betweenFenders / 2;
+        const flatLen = dims.deckLength - beavertailLength;
+        const zFlatCenter = -deckHalfLen + flatLen / 2;
+        return (
+          <group key={`lower-rail-${side}`}>
+            {/* Flat section */}
+            <mesh
+              position={[x, lowerRailCenterY, zFlatCenter]}
+              material={frameMaterial}
+              castShadow receiveShadow
+              {...hp(side < 0 ? "Left Main Rail" : "Right Main Rail")}
+            >
+              <boxGeometry args={[dims.lowerRailWidth, dims.lowerRailHeight, flatLen]} />
+            </mesh>
+            {/* Beavertail sloped section */}
+            <group position={[side * dims.betweenFenders / 2, lowerRailCenterY, -deckHalfLen + (dims.deckLength - beavertailLength)]} rotation={[0.26, 0, 0]}>
+              <mesh position={[0, 0, beavertailLength / 2]} material={frameMaterial} castShadow receiveShadow>
+                <boxGeometry args={[dims.lowerRailWidth, dims.lowerRailHeight, beavertailLength]} />
+              </mesh>
+            </group>
+          </group>
+        );
+      })}
 
-      {/* Upper rails / rub rails */}
-      {/* Left Rub Rail — front 25% static; rear 75% tilts with deck (in tilt group) */}
-      <mesh
-        position={[
-          leftEdge + 1.5,
-          upperRailCenterY,
-          -deckHalfLen + frontFixedLength / 2,
-        ]}
-        material={frameWearMaterial}
-        castShadow
-        {...hp("Left Rub Rail")}
-      >
-        <boxGeometry args={[3, dims.upperRailSize, frontFixedLength]} />
-      </mesh>
-      <mesh
-        position={[rightEdge - 1.5, upperRailCenterY, -deckHalfLen + frontFixedLength / 2]}
-        material={frameWearMaterial}
-        castShadow
-        {...hp("Right Rub Rail")}
-      >
-        <boxGeometry args={[3, dims.upperRailSize, frontFixedLength]} />
-      </mesh>
+      {/* Upper rails / rub rails — Split for beavertail bend */}
+      {[-1, 1].map((side) => {
+        const x = side * (dims.betweenFenders / 2 - 1.5);
+        const flatLen = dims.deckLength - beavertailLength;
+        const zFlatCenter = -deckHalfLen + flatLen / 2;
+        return (
+          <group key={`upper-rail-${side}`}>
+            {/* Flat section */}
+            <mesh
+              position={[x, upperRailCenterY, zFlatCenter]}
+              material={frameWearMaterial}
+              castShadow
+              {...hp(side < 0 ? "Left Rub Rail" : "Right Rub Rail")}
+            >
+              <boxGeometry args={[3, dims.upperRailSize, flatLen]} />
+            </mesh>
+            {/* Beavertail sloped section */}
+            <group position={[side * (dims.betweenFenders / 2 - 1.5), upperRailCenterY, -deckHalfLen + (dims.deckLength - beavertailLength)]} rotation={[0.26, 0, 0]}>
+               <mesh position={[0, 0, beavertailLength / 2]} material={frameWearMaterial} castShadow>
+                 <boxGeometry args={[3, dims.upperRailSize, beavertailLength]} />
+               </mesh>
+            </group>
+          </group>
+        );
+      })}
 
-      {/* Crossmembers — first 60% of deck only */}
-      {Array.from({ length: crossCount }).map((_, i) => {
+      {/* Crossmembers — full length of main deck flat part */}
+      {Array.from({ length: Math.floor((dims.deckLength - beavertailLength) / 12) }).map((_, i) => {
         const z = -deckHalfLen + 6 + i * 12;
-        if (z > -deckHalfLen + dims.deckLength * 0.6) return null;
         return (
           <mesh
             key={i}
@@ -592,311 +582,216 @@ function FrameAssembly({
         );
       })}
 
-
-      {/* Reflector stripes — left front 20% static, left rear 80% in tilt group, right full length */}
-      <SideReflectorStrip
-        x={leftEdge - 0.1}
-        y={dims.deckHeight - 7}
-        zStart={-deckHalfLen + 18}
-        zEnd={-deckHalfLen + frontFixedLength}
-        xOffset={1}
-        onPartHover={onPartHover}
-        onPartLeave={onPartLeave}
-      />
-      <SideReflectorStrip
-        x={rightEdge + 0.1}
-        y={dims.deckHeight - 7}
-        zStart={-deckHalfLen + 18}
-        zEnd={-deckHalfLen + frontFixedLength}
-        xOffset={2}
-        onPartHover={onPartHover}
-        onPartLeave={onPartLeave}
-      />
+      {/* Reflector stripes — with beavertail bend */}
+      {[-1, 1].map((side) => {
+        const x = side < 0 ? leftEdge - 0.1 : rightEdge + 0.1;
+        const flatLen = dims.deckLength - beavertailLength;
+        return (
+          <group key={`reflector-side-${side}`}>
+             {/* Flat part reflectors */}
+             <SideReflectorStrip
+                x={x}
+                y={upperRailCenterY}
+                zStart={-deckHalfLen + 18}
+                zEnd={-deckHalfLen + flatLen}
+                onPartHover={onPartHover}
+                onPartLeave={onPartLeave}
+             />
+             {/* Sloped beavertail reflectors */}
+             <group position={[x, upperRailCenterY, -deckHalfLen + flatLen]} rotation={[0.26, 0, 0]}>
+                <SideReflectorStrip
+                  x={0} 
+                  y={0}
+                  zStart={0}
+                  zEnd={beavertailLength}
+                  onPartHover={onPartHover}
+                  onPartLeave={onPartLeave}
+                />
+             </group>
+          </group>
+        );
+      })}
 
       {/* Stationary deck frame top surface */}
       {/* Single, full-width front deck frame panel — no partition */}
       <mesh
-        position={[0, frameTopY - 4.2, frontFixedCenterZ]}
+        position={[0, frameTopY - 1.2, -deckHalfLen + (dims.deckLength * 0.05) / 2]}
         material={frameMaterial}
         castShadow
         receiveShadow
         {...hp("Front Main Frame Plate")}
       >
         <boxGeometry
-          args={[dims.betweenFenders, 6.2, frontFixedLength]}
+          args={[dims.betweenFenders, 3.2, dims.deckLength * 0.05]}
         />
       </mesh>
 
-      {/* Stationary deck — front 60% wood planks, rear 40% metal box */}
-      {/* Front stationary section — full width wood with all-around metal border */}
+      {/* Main Wood Deck (Full Length minus Beavertail) */}
       {(() => {
-        const fixedPlankY = dims.deckHeight - dims.plankThickness / 2 + 0.015;
-        const borderW = tiltGap * 2;
+        const deckLengthMinusBeavertail = dims.deckLength - beavertailLength;
+        const deckCenterZBeforeBeavertail = -deckHalfLen + deckLengthMinusBeavertail / 2;
+        
         return (
-          <>
-            {/* Left border */}
+          <group position={[0, dims.deckHeight, deckCenterZBeforeBeavertail]}>
+            {/* Metal frame surface underneath planks */}
             <mesh
-              position={[
-                tiltCenter - dims.tiltDeckWidth / 2 + tiltGap / 2,
-                fixedPlankY,
-                frontFixedCenterZ,
-              ]}
+              position={[0, -(dims.plankThickness + 0.02), 0]}
               material={frameMaterial}
               castShadow
               receiveShadow
+              {...hp("Main Deck Frame")}
             >
-              <boxGeometry
-                args={[borderW, dims.plankThickness, frontFixedLength]}
-              />
+              <boxGeometry args={[dims.tiltDeckWidth, 0.2, deckLengthMinusBeavertail]} />
+            </mesh>
+
+            {/* Left border */}
+            <mesh
+              position={[-dims.tiltDeckWidth / 2 + tiltGap / 2, -(dims.plankThickness / 2) + 0.015, 0]}
+              material={frameMaterial}
+              castShadow receiveShadow
+            >
+              <boxGeometry args={[tiltGap * 2, dims.plankThickness, deckLengthMinusBeavertail]} />
             </mesh>
             {/* Right border */}
             <mesh
-              position={[
-                tiltCenter + dims.tiltDeckWidth / 2 - tiltGap / 2,
-                fixedPlankY,
-                frontFixedCenterZ,
-              ]}
+              position={[dims.tiltDeckWidth / 2 - tiltGap / 2, -(dims.plankThickness / 2) + 0.015, 0]}
               material={frameMaterial}
-              castShadow
-              receiveShadow
+              castShadow receiveShadow
             >
-              <boxGeometry
-                args={[borderW, dims.plankThickness, frontFixedLength]}
-              />
+              <boxGeometry args={[tiltGap * 2, dims.plankThickness, deckLengthMinusBeavertail]} />
             </mesh>
             {/* Front border */}
             <mesh
-              position={[tiltCenter, fixedPlankY, -deckHalfLen + 1.5]}
+              position={[0, -(dims.plankThickness / 2) + 0.015, -deckLengthMinusBeavertail / 2 + 1.5]}
               material={frameMaterial}
-              castShadow
-              receiveShadow
+              castShadow receiveShadow
             >
-              <boxGeometry
-                args={[dims.tiltDeckWidth, dims.plankThickness, 3]}
-              />
+              <boxGeometry args={[dims.tiltDeckWidth, dims.plankThickness, 3]} />
             </mesh>
-            {/* Back border */}
+            {/* Rear border */}
             <mesh
-              position={[
-                tiltCenter,
-                fixedPlankY,
-                -deckHalfLen + frontFixedLength - 1.5,
-              ]}
+              position={[0, -(dims.plankThickness / 2) + 0.015, deckLengthMinusBeavertail / 2 - 1.5]}
               material={frameMaterial}
-              castShadow
-              receiveShadow
+              castShadow receiveShadow
             >
-              <boxGeometry
-                args={[dims.tiltDeckWidth, dims.plankThickness, 3]}
-              />
+              <boxGeometry args={[dims.tiltDeckWidth, dims.plankThickness, 3]} />
             </mesh>
-            {/* Wood planks */}
+
+            {/* Wood Planks */}
             {Array.from({ length: 14 }).map((_, i) => {
               const plankWidth = (dims.tiltDeckWidth - (13 * tiltGap)) / 14;
-              const x =
-                tiltCenter -
-                dims.tiltDeckWidth / 2 +
-                plankWidth / 2 +
-                i * (plankWidth + tiltGap);
-              const innerLength = frontFixedLength - 6;
-              const innerCenterZ = -deckHalfLen + 3 + innerLength / 2;
+              const x = -dims.tiltDeckWidth / 2 + plankWidth / 2 + i * (plankWidth + tiltGap);
+              const innerLength = deckLengthMinusBeavertail - 6;
+
               return (
                 <mesh
-                  key={`tilt-front-fixed-${i}`}
-                  position={[x, fixedPlankY, innerCenterZ]}
+                  key={`plank-${i}`}
+                  position={[x, -(dims.plankThickness / 2) + 0.015, 0]}
                   material={woodPlanks[(i + 2) % woodPlanks.length]}
                   castShadow
                   receiveShadow
-                  {...hp("Deck Plank (Front Stationary)")}
+                  {...hp("Deck Plank")}
                 >
-                  <boxGeometry
-                    args={[plankWidth, dims.plankThickness, innerLength]}
-                  />
+                  <boxGeometry args={[plankWidth, dims.plankThickness, innerLength]} />
                 </mesh>
               );
             })}
-          </>
+          </group>
         );
       })()}
 
+      {(() => {
+        const deckLengthMinusBeavertail = dims.deckLength - beavertailLength;
+        const beavertailCenterZ = -deckHalfLen + deckLengthMinusBeavertail + beavertailLength / 2;
+        const beavertailAngle = 0.26; // More pronounced drop (approx 15 degrees)
+        const ramp1Angle = isUnfolded ? 0.6 : Math.PI; 
+        const ramp2Angle = isUnfolded ? 0 : -Math.PI + 0.2;
 
-      {/* Tilt deck assembly */}
-      <group
-        position={[tiltPivotX, dims.deckHeight, tiltPivotZ]}
-        rotation={[tiltAngle, 0, 0]}
-      >
-        {/* Metal frame support structure for tilt deck */}
-        <mesh
-          position={[0, -2.3, -8]}
-          material={frameMaterial}
-          castShadow
-          {...hp("Tilt Deck Support Structure")}
-        >
-          <boxGeometry args={[dims.tiltDeckWidth * 0.45, 2.1, 2.2]} />
-        </mesh>
-
-        {/* Tilt deck frame top surface - positioned slightly below wood planks */}
-        <mesh
-          position={[
-            0,
-            -(dims.plankThickness + 0.02),
-            tiltDeckCenterZ - tiltPivotZ,
-          ]}
-          material={frameMaterial}
-          castShadow
-          receiveShadow
-          {...hp("Tilt Deck Frame")}
-        >
-          <boxGeometry args={[dims.tiltDeckWidth, 0.2, tiltDeckLength]} />
-        </mesh>
-
-        {/* Wood planks - with all-around metal border */}
-        {/* Left border */}
-        <mesh
-          position={[
-            -dims.tiltDeckWidth / 2 + tiltGap / 2,
-            -(dims.plankThickness / 2) + 0.015,
-            tiltDeckCenterZ - tiltPivotZ,
-          ]}
-          material={frameMaterial}
-          castShadow
-          receiveShadow
-        >
-          <boxGeometry
-            args={[tiltGap * 2, dims.plankThickness, tiltDeckLength]}
-          />
-        </mesh>
-        {/* Right border */}
-        <mesh
-          position={[
-            dims.tiltDeckWidth / 2 - tiltGap / 2,
-            -(dims.plankThickness / 2) + 0.015,
-            tiltDeckCenterZ - tiltPivotZ,
-          ]}
-          material={frameMaterial}
-          castShadow
-          receiveShadow
-        >
-          <boxGeometry
-            args={[tiltGap * 2, dims.plankThickness, tiltDeckLength]}
-          />
-        </mesh>
-        {/* Front border */}
-        <mesh
-          position={[
-            0,
-            -(dims.plankThickness / 2) + 0.015,
-            tiltDeckCenterZ - tiltPivotZ - tiltDeckLength / 2 + 1.5,
-          ]}
-          material={frameMaterial}
-          castShadow
-          receiveShadow
-        >
-          <boxGeometry args={[dims.tiltDeckWidth, dims.plankThickness, 3]} />
-        </mesh>
-        {/* Rear border */}
-        <mesh
-          position={[
-            0,
-            -(dims.plankThickness / 2) + 0.015,
-            tiltDeckCenterZ - tiltPivotZ + tiltDeckLength / 2 - 1.5,
-          ]}
-          material={frameMaterial}
-          castShadow
-          receiveShadow
-        >
-          <boxGeometry args={[dims.tiltDeckWidth, dims.plankThickness, 3]} />
-        </mesh>
-
-        {Array.from({ length: 14 }).map((_, i) => {
-          const plankWidth = (dims.tiltDeckWidth - (13 * tiltGap)) / 14;
-          const x =
-            -dims.tiltDeckWidth / 2 +
-            plankWidth / 2 +
-            i * (plankWidth + tiltGap);
-          const innerTiltLength = tiltDeckLength - 6;
-
-          return (
-            <mesh
-              key={`tilt-${i}`}
-              position={[
-                x,
-                -(dims.plankThickness / 2) + 0.015,
-                tiltDeckCenterZ - tiltPivotZ,
-              ]}
-              material={woodPlanks[(i + 2) % woodPlanks.length]}
-              castShadow
-              receiveShadow
-              {...hp("Tilt Deck Plank")}
-            >
-              <boxGeometry
-                args={[plankWidth, dims.plankThickness, innerTiltLength]}
+        return (
+        <group position={[0, dims.deckHeight-9.5, beavertailCenterZ]} rotation={[beavertailAngle, 0, 0]}>
+          {/* Rear beavertail gate — Flat wood top, wedge bottom frame */}
+          <group {...hp("Wood Beavertail")}>
+            <mesh castShadow receiveShadow>
+              <meshStandardMaterial
+                color="#1a1f25"
+                roughness={0.4}
+                metalness={0.82}
+                side={THREE.DoubleSide}
+              />
+              <bufferGeometry
+                onUpdate={(self) => {
+                  const w = dims.tiltDeckWidth / 2;
+                  const L = beavertailLength / 2;
+                         // Top of the frame is significantly below the planks
+                  const topY = -(dims.plankThickness / 2) - 0.8; 
+                  const fHBot = topY - 5.5; // Deeper front structure
+                  const rHBot = topY - 0.05; // Sharp rear
+                  
+                  const verts = new Float32Array([
+                    -w, fHBot, -L, // 0: front bottom left
+                     w, fHBot, -L, // 1: front bottom right
+                     w, topY,  -L, // 2: front top right
+                    -w, topY,  -L, // 3: front top left
+                    -w, rHBot,  L, // 4: rear bottom left
+                     w, rHBot,  L, // 5: rear bottom right
+                     w, topY,   L, // 6: rear top right
+                    -w, topY,   L, // 7: rear top left
+                  ]);
+                  const idx = [
+                    0, 1, 2, 0, 2, 3, 5, 4, 7, 5, 7, 6, 4, 5, 1, 4, 1, 0, 3, 2, 6,
+                    3, 6, 7, 4, 0, 3, 4, 3, 7, 1, 5, 6, 1, 6, 2,
+                  ];
+                  self.setAttribute("position", new THREE.BufferAttribute(verts, 3));
+                  self.setIndex(idx);
+                  self.computeVertexNormals();
+                }}
               />
             </mesh>
-          );
-        })}
+            
+            {/* Left border */}
+            <mesh
+              position={[-dims.tiltDeckWidth / 2 + tiltGap / 2, -(dims.plankThickness / 2) + 0.015, 0]}
+              material={frameMaterial}
+              castShadow receiveShadow
+            >
+              <boxGeometry args={[tiltGap * 2, dims.plankThickness, beavertailLength]} />
+            </mesh>
+            {/* Right border */}
+            <mesh
+              position={[dims.tiltDeckWidth / 2 - tiltGap / 2, -(dims.plankThickness / 2) + 0.015, 0]}
+              material={frameMaterial}
+              castShadow receiveShadow
+            >
+              <boxGeometry args={[tiltGap * 2, dims.plankThickness, beavertailLength]} />
+            </mesh>
+            {/* Rear border */}
+            <mesh
+              position={[0, -(dims.plankThickness / 2) + 0.015, beavertailLength / 2 - 1.5]}
+              material={frameMaterial}
+              castShadow receiveShadow
+            >
+              <boxGeometry args={[dims.tiltDeckWidth, dims.plankThickness, 3]} />
+            </mesh>
 
-        {/* Rear beavertail gate — wedge: thick front, sharp rear */}
-        <group
-          position={[
-            0,
-            -0.55,
-            rearTiltEdgeZ - tiltPivotZ + beavertailLength / 2,
-          ]}
-        >
-          <mesh
-            castShadow
-            receiveShadow
-            {...hp("Beavertail")}
-            geometry={(() => {
-              const w = dims.tiltDeckWidth / 2;
-              const L = beavertailLength / 2;
-              const fH = 2.2; // front half-height (thick)
-              const rH = 0.05; // rear half-height (sharp)
-              const verts = new Float32Array([
-                -w,
-                -fH,
-                -L,
-                w,
-                -fH,
-                -L,
-                w,
-                fH,
-                -L,
-                -w,
-                fH,
-                -L,
-                -w,
-                -rH,
-                L,
-                w,
-                -rH,
-                L,
-                w,
-                rH,
-                L,
-                -w,
-                rH,
-                L,
-              ]);
-              const idx = [
-                0, 1, 2, 0, 2, 3, 5, 4, 7, 5, 7, 6, 4, 5, 1, 4, 1, 0, 3, 2, 6,
-                3, 6, 7, 4, 0, 3, 4, 3, 7, 1, 5, 6, 1, 6, 2,
-              ];
-              const geo = new THREE.BufferGeometry();
-              geo.setAttribute("position", new THREE.BufferAttribute(verts, 3));
-              geo.setIndex(idx);
-              geo.computeVertexNormals();
-              return geo;
-            })()}
-          >
-            <meshStandardMaterial
-              color="#1a1f25"
-              roughness={0.4}
-              metalness={0.82}
-              side={THREE.DoubleSide}
-            />
-          </mesh>
+            {/* Wood Planks for Beavertail */}
+            {Array.from({ length: 14 }).map((_, i) => {
+              const plankWidth = (dims.tiltDeckWidth - (13 * tiltGap)) / 14;
+              const x = -dims.tiltDeckWidth / 2 + plankWidth / 2 + i * (plankWidth + tiltGap);
+              const innerLength = beavertailLength - 3; // Accounts for rear border
+
+              return (
+                <mesh
+                  key={`bt-plank-${i}`}
+                  position={[x, -(dims.plankThickness / 2) + 0.015, -1.5]}
+                  material={woodPlanks[(i + 2) % woodPlanks.length]}
+                  castShadow
+                  receiveShadow
+                >
+                  <boxGeometry args={[plankWidth, dims.plankThickness, innerLength]} />
+                </mesh>
+              );
+            })}
+          </group>
           {[-8, 0, 8].map((x, i) => (
             <mesh
               key={i}
@@ -907,425 +802,169 @@ function FrameAssembly({
               <cylinderGeometry args={[1.25, 1.25, 0.72, 18]} />
             </mesh>
           ))}
-        </group>
-
-        {/* Left Rub Rail — rear 80% tilts with deck */}
-        <mesh
-          position={[
-            1.5 - dims.tiltDeckWidth / 2,
-            -dims.plankThickness + dims.upperRailSize / 2,
-            tiltDeckCenterZ - tiltPivotZ,
-          ]}
-          material={frameWearMaterial}
-          castShadow
-          {...hp("Left Rub Rail")}
-        >
-          <boxGeometry args={[3, dims.upperRailSize, tiltDeckLength]} />
-        </mesh>
-
-        {/* Left side reflector strip — rear 80% tilts with deck */}
-        <SideReflectorStrip
-          x={leftEdge - 1 - tiltPivotX}
-          y={-7}
-          zStart={-deckHalfLen + frontFixedLength - tiltPivotZ}
-          zEnd={deckHalfLen - 10 - tiltPivotZ}
-          xOffset={1}
-          onPartHover={onPartHover}
-          onPartLeave={onPartLeave}
-        />
-
-        {/* Left fender — tilts with deck. Same geometry as right fender, mirrored X */}
+        {/* Foldable Ramps: Highly Detailed Wood and Steel Bi-Fold */}
         {(() => {
-          const fW = (dims.tireWidth + 7) * 0.8; // Reduced width by 20%
-          const fThick = 1.4;
-          const topYWorld = axleCenterY + dims.tireRadius + 5;
-          const topYLocal = topYWorld - dims.deckHeight;
-          const rubRailTopYWorld = upperRailCenterY + dims.upperRailSize / 2;
-          const dropH = topYWorld - rubRailTopYWorld;
-          const horizLen = 10;
-          const hyp = Math.sqrt(dropH * dropH + horizLen * horizLen);
-          const ang = Math.atan2(dropH, horizLen) + 3.6;
-          const skirtCenterYLocal = topYLocal - dropH / 2;
-          const fzFrontLocal =
-            dims.axleCenterZ -
-            dims.axleSpacing / 2 -
-            dims.tireRadius +
-            10 -
-            23 -
-            tiltPivotZ;
-          const fzRearLocal =
-            dims.axleCenterZ +
-            dims.axleSpacing / 2 +
-            dims.tireRadius -
-            10 -
-            17 -
-            tiltPivotZ;
-          const fTopLen = fzRearLocal - fzFrontLocal;
-          const fCenterZLocal = (fzFrontLocal + fzRearLocal) / 2;
-          // Mirror of right: outer edge ≈ outer tire edge, inner side toward frame
-          const xLocal =
-            -dims.wheelTrackHalf + fW / 2 - dims.tireWidth / 2 - 2 - tiltPivotX;
-          return (
-            <>
-              {/* Flat top plate */}
-              <mesh
-                position={[xLocal, topYLocal, fCenterZLocal]}
-                material={frameMaterial}
-                castShadow
-                receiveShadow
-                {...hp("Fender")}
-              >
-                <boxGeometry args={[fW, fThick + 1, fTopLen + 1]} />
-              </mesh>
-              {/* Front lip */}
-              <mesh
-                position={[
-                  xLocal,
-                  skirtCenterYLocal - 7,
-                  fzFrontLocal - horizLen / 2,
-                ]}
-                rotation={[-ang, 0, 0]}
-                material={frameMaterial}
-                castShadow
-                receiveShadow
-                {...hp("Fender")}
-              >
-                <boxGeometry args={[fW, fThick, hyp + 13]} />
-              </mesh>
-              {/* Inner side trapezium cover — right edge of left fender, between wheel and wooden deck */}
-              {(() => {
-                // Right (inner/inboard) edge of fender, facing toward the wooden board
-                const panelX = xLocal + fW / 2 - 1.0; // inner face of cover, moved towards wheel
-                const panelX2 = panelX + 1.4; // 1.4 unit thick toward deck
-                // Y extents in local tilt coords
-                const yTop = topYLocal - 0.5;
-                const yBot = -dims.plankThickness + dims.upperRailSize - 7;
-                // Z extents: top span = fender plate, bottom span extends with lips
-                const zTopFront = fzFrontLocal;
-                const zTopRear = fzRearLocal;
-                const zBotFront = fzFrontLocal - horizLen * 0.7;
-                const zBotRear = fzRearLocal + horizLen * 0.7;
+          const r1Angle = isUnfolded ? 2.9 : -Math.PI*1.6;
+          const r2Angle = isUnfolded ? 0.2 : Math.PI - 0.1;
 
-                const v = new Float32Array([
-                  // inner face (x = panelX)
-                  panelX,
-                  yTop,
-                  zTopFront, // 0
-                  panelX,
-                  yTop,
-                  zTopRear, // 1
-                  panelX,
-                  yBot,
-                  zBotRear, // 2
-                  panelX,
-                  yBot,
-                  zBotFront, // 3
-                  // outer face (x = panelX2)
-                  panelX2,
-                  yTop,
-                  zTopFront, // 4
-                  panelX2,
-                  yTop,
-                  zTopRear, // 5
-                  panelX2,
-                  yBot,
-                  zBotRear, // 6
-                  panelX2,
-                  yBot,
-                  zBotFront, // 7
-                ]);
-                const idx = [
-                  // inner face (winding flipped for inward normal)
-                  0, 2, 1, 0, 3, 2,
-                  // outer face
-                  4, 5, 6, 4, 6, 7,
-                  // top face
-                  0, 1, 5, 0, 5, 4,
-                  // bottom face
-                  3, 7, 6, 3, 6, 2,
-                  // front face
-                  0, 4, 7, 0, 7, 3,
-                  // rear face
-                  1, 2, 6, 1, 6, 5,
-                ];
-                const geo = new THREE.BufferGeometry();
-                geo.setAttribute("position", new THREE.BufferAttribute(v, 3));
-                geo.setIndex(idx);
-                geo.computeVertexNormals();
+          const rWidth = 46;
+          const rGap = 4;
+          const rLen1 = beavertailLength - 4; // First segment
+          const rLen2 = rLen1 * 0.65; // User asked to reduce size of second ramp
+          const wedgeLen = 14; // Sharp end beaver tail like thing
+          const rThick = 4.5;
+          const woodThick = 3.0;
+          
+          return (
+            <group position={[0, -rThick / 2, beavertailLength / 2]} rotation={[r1Angle, 0, 0]}>
+              {[-1, 1].map((side) => {
+                const xPos = side * (rWidth / 2 + rGap / 2);
                 return (
-                  <mesh
-                    geometry={geo}
-                    material={hardwareSteelMaterial}
-                    castShadow
-                    receiveShadow
-                  />
+                  <group key={side} position={[xPos, 0, 0]}>
+                    <group position={[0, -rThick / 2, -rLen1 / 2]}>
+                      
+                      {/* Section 1: Main Ramp Segment */}
+                      <group>
+                        <mesh position={[-rWidth / 2 + 1.5, 0, 0]} material={frameMaterial} castShadow receiveShadow>
+                          <boxGeometry args={[3, rThick, rLen1]} />
+                        </mesh>
+                        <mesh position={[rWidth / 2 - 1.5, 0, 0]} material={frameMaterial} castShadow receiveShadow>
+                          <boxGeometry args={[3, rThick, rLen1]} />
+                        </mesh>
+                        <mesh position={[0, 0, -rLen1 / 2 + 1.5]} material={frameMaterial} castShadow receiveShadow>
+                          <boxGeometry args={[rWidth - 6, rThick, 3]} />
+                        </mesh>
+                        <mesh position={[0, 0, rLen1 / 2 - 1.5]} material={frameMaterial} castShadow receiveShadow>
+                          <boxGeometry args={[rWidth - 6, rThick, 3]} />
+                        </mesh>
+                        
+                        {/* 4 Support Stands (Stabilizer Legs) — 2 per ramp at the corners */}
+                        {[-1, 1].map((xSide) => (
+                           <group key={`stand-${xSide}`} position={[xSide * (rWidth / 2 - 4.5), rThick / 2 + 6.5, rLen1 / 2 - 6]}>
+                              <mesh material={hardwareSteelMaterial} castShadow>
+                                 <boxGeometry args={[3.2, 14.0, 3.2]} />
+                              </mesh>
+                              <mesh position={[0, 7.0, 0]} material={hardwareSteelMaterial} castShadow>
+                                 <boxGeometry args={[5.2, 1.2, 5.2]} />
+                              </mesh>
+                           </group>
+                        ))}
+                        
+                        {Array.from({ length: 4 }).map((_, cIdx) => (
+                           <mesh key={`cross-${cIdx}`} position={[0, rThick / 2 - 0.2, -rLen1 / 2 + 10 + cIdx * 12]} material={hardwareSteelMaterial} castShadow>
+                              <boxGeometry args={[rWidth - 6, 0.4, 2]} />
+                           </mesh>
+                        ))}
+                        
+                        {[-rWidth / 2 + 2.5, rWidth / 2 - 2.5].map((hx, hi) => (
+                           <mesh key={`hinge-${hi}`} position={[hx, 0, rLen1 / 2]} rotation={[0, Math.PI / 2, 0]} material={hardwareSteelMaterial} castShadow>
+                              <cylinderGeometry args={[2.5, 2.5, 4, 16]} />
+                           </mesh>
+                        ))}
+
+                        {Array.from({ length: 4 }).map((_, wIdx) => {
+                          const wCount = 4;
+                          const wWidth = (rWidth - 6 - (0.24 * (wCount - 1))) / wCount;
+                          const wx = -rWidth / 2 + 3 + wWidth / 2 + wIdx * (wWidth + 0.24);
+                          return (
+                            <mesh key={`wood-${wIdx}`} position={[wx, (woodThick - rThick) / 2 + 0.5, 0]} material={woodPlanks[(wIdx + side + 3) % woodPlanks.length]} castShadow receiveShadow>
+                                <boxGeometry args={[wWidth, woodThick, rLen1 - 6]} />
+                            </mesh>
+                          );
+                        })}
+
+                        {/* Section 2: Bi-fold Segment (Reduced Size) */}
+                        <group position={[0, rThick / 2, -rLen1 / 2]} rotation={[r2Angle, 0, 0]}>
+                          <group position={[0, -rThick / 2, -rLen2 / 2]}>
+                             {[-rWidth / 2 + 2.5, rWidth / 2 - 2.5].map((hx, hi) => (
+                               <mesh key={`hinge-mid-${hi}`} position={[hx, 0, rLen2 / 2]} rotation={[0, Math.PI / 2, 0]} material={hardwareSteelMaterial} castShadow>
+                                  <cylinderGeometry args={[2.5, 2.5, 4, 16]} />
+                               </mesh>
+                             ))}
+                             
+                             <mesh position={[0, rThick / 2 + 1.5, rLen2 / 2 - 3]} material={frameMaterial} castShadow>
+                                <boxGeometry args={[8, 4, 3]} />
+                             </mesh>
+
+                             <mesh position={[-rWidth / 2 + 1.5, 0, 0]} material={frameMaterial} castShadow receiveShadow>
+                               <boxGeometry args={[3, rThick, rLen2]} />
+                             </mesh>
+                             <mesh position={[rWidth / 2 - 1.5, 0, 0]} material={frameMaterial} castShadow receiveShadow>
+                               <boxGeometry args={[3, rThick, rLen2]} />
+                             </mesh>
+                             <mesh position={[0, 0, -rLen2 / 2 + 1.5]} material={frameMaterial} castShadow receiveShadow>
+                               <boxGeometry args={[rWidth - 6, rThick, 3]} />
+                             </mesh>
+                             <mesh position={[0, 0, rLen2 / 2 - 1.5]} material={frameMaterial} castShadow receiveShadow>
+                               <boxGeometry args={[rWidth - 6, rThick, 3]} />
+                             </mesh>
+
+                             {Array.from({ length: 4 }).map((_, wIdx) => {
+                                const wCount = 4;
+                                const wWidth = (rWidth - 6 - (0.24 * (wCount - 1))) / wCount;
+                                const wx = -rWidth / 2 + 3 + wWidth / 2 + wIdx * (wWidth + 0.24);
+                                return (
+                                  <mesh key={`wood-2-${wIdx}`} position={[wx, (woodThick - rThick) / 2 + 0.5, 0]} material={woodPlanks[(wIdx + side + 1) % woodPlanks.length]} castShadow receiveShadow>
+                                      <boxGeometry args={[wWidth, woodThick, rLen2 - 6]} />
+                                  </mesh>
+                                );
+                             })}
+
+                             {/* Section 3: Sharp end beaver tail like thing */}
+                             <group position={[0, 0, -rLen2 / 2]}>
+                                <mesh castShadow receiveShadow>
+                                  <meshStandardMaterial color="#1a1f25" roughness={0.4} metalness={0.82} side={THREE.DoubleSide} />
+                                  <bufferGeometry onUpdate={(self) => {
+                                    const w = rWidth / 2;
+                                    const L = wedgeLen;
+                                    const t = rThick;
+                                    const rHBot = t/2 - 0.1; // almost top
+                                    
+                                    const verts = new Float32Array([
+                                      -w, -t/2, 0,  // 0: bottom front left
+                                       w, -t/2, 0,  // 1: bottom front right
+                                       w,  t/2, 0,  // 2: top front right
+                                      -w,  t/2, 0,  // 3: top front left
+                                      -w,  rHBot, -L, // 4: bottom rear left (sharp)
+                                       w,  rHBot, -L, // 5: bottom rear right (sharp)
+                                       w,  t/2,  -L, // 6: top rear right
+                                      -w,  t/2,  -L, // 7: top rear left
+                                    ]);
+                                    const idx = [
+                                      0, 1, 2, 0, 2, 3, // front
+                                      5, 4, 7, 5, 7, 6, // back (tiny)
+                                      4, 5, 1, 4, 1, 0, // bottom
+                                      3, 2, 6, 3, 6, 7, // top
+                                      4, 0, 3, 4, 3, 7, // left
+                                      1, 5, 6, 1, 6, 2  // right
+                                    ];
+                                    self.setAttribute("position", new THREE.BufferAttribute(verts, 3));
+                                    self.setIndex(idx);
+                                    self.computeVertexNormals();
+                                  }} />
+                                </mesh>
+                             </group>
+                          </group>
+                        </group>
+                      </group>
+                    </group>
+                  </group>
                 );
-              })()}
-              {/* Rear lip */}
-              <mesh
-                position={[
-                  xLocal,
-                  skirtCenterYLocal - 7,
-                  fzRearLocal + horizLen / 2,
-                ]}
-                rotation={[ang, 0, 0]}
-                material={frameMaterial}
-                castShadow
-                receiveShadow
-                {...hp("Fender")}
-              >
-                <boxGeometry args={[fW, fThick, hyp + 13]} />
-              </mesh>
-            </>
-          );
-        })()}
-
-        {/* Left tail light — tilts with deck */}
-        {(() => {
-          const tW = 8; // local X → world height (Now even more reduced)
-          const tH = 14.5; // local Y → world width (Increased width)
-          const tD = 4.5; // depth
-          const lightY = dims.deckHeight - 8;
-          const localX = leftEdge - 13 - tiltPivotX; // Moved 3 units further left
-          const localY = lightY + 7 - dims.deckHeight;
-          const localZ = deckHalfLen - 5 - tiltPivotZ;
-          return (
-            <group
-              position={[localX + 6, localY, localZ]}
-              rotation={[0, 0, Math.PI / 2]}
-            >
-              {/* Vertical housing body */}
-              <mesh
-                position={[0, 0, tD / 2]}
-                material={tailLightBaseMaterial}
-                castShadow
-                receiveShadow
-                {...hp("Tail Light Housing")}
-              >
-                <boxGeometry args={[tW, tH, tD]} />
-              </mesh>
-              {/* Two wide rectangular LED bars — much tighter spacing for low-profile look */}
-              {[1.8, -1.8].map((lx, li) => (
-                <group key={li} position={[lx, 0, tD]}>
-                  {/* Black border: very wide pill */}
-                  <mesh material={tailLightBaseMaterial} castShadow>
-                    <boxGeometry args={[1.6, 11.0, 0.38]} />
-                  </mesh>
-                  {[-5.5, 5.5].map((cy, ci2) => (
-                    <mesh
-                      key={ci2}
-                      position={[0, cy, 0]}
-                      rotation={[Math.PI / 2, 0, 0]}
-                      material={tailLightBaseMaterial}
-                      castShadow
-                    >
-                      <cylinderGeometry args={[0.8, 0.8, 0.38, 18]} />
-                    </mesh>
-                  ))}
-                  {/* Red emissive LED fill */}
-                  <mesh
-                    position={[0, 0, 0.22]}
-                    material={tailLightMaterial}
-                    castShadow
-                  >
-                    <boxGeometry args={[0.95, 9.5, 0.22]} />
-                  </mesh>
-                  {[-4.75, 4.75].map((cy, ci2) => (
-                    <mesh
-                      key={ci2}
-                      position={[0, cy, 0.22]}
-                      rotation={[Math.PI / 2, 0, 0]}
-                      material={tailLightMaterial}
-                      castShadow
-                    >
-                      <cylinderGeometry args={[0.475, 0.475, 0.22, 18]} />
-                    </mesh>
-                  ))}
-                </group>
-              ))}
+              })}
             </group>
           );
         })()}
 
-        {/* Right rub rail — rear tilting part */}
-        <mesh
-          position={[
-            -1.5 + dims.tiltDeckWidth / 2,
-            -dims.plankThickness + dims.upperRailSize / 2,
-            tiltDeckCenterZ - tiltPivotZ,
-          ]}
-          material={frameWearMaterial}
-          castShadow
-          {...hp("Right Rub Rail")}
-        >
-          <boxGeometry args={[3, dims.upperRailSize, tiltDeckLength]} />
-        </mesh>
+        </group>
+        );
+      })()}
 
-        {/* Right side reflector strip — tilts with deck */}
-        <SideReflectorStrip
-          x={rightEdge + 1 - tiltPivotX}
-          y={-7}
-          zStart={-deckHalfLen + frontFixedLength - tiltPivotZ}
-          zEnd={deckHalfLen - 10 - tiltPivotZ}
-          xOffset={-1}
-          onPartHover={onPartHover}
-          onPartLeave={onPartLeave}
-        />
 
-        {/* Right fender — tilts with deck */}
-        {(() => {
-          const fW = (dims.tireWidth + 7) * 0.8; // Reduced width by 20%
-          const fThick = 1.4;
-          const topYWorld = axleCenterY + dims.tireRadius + 5;
-          const topYLocal = topYWorld - dims.deckHeight;
-          const rubRailTopYWorld = upperRailCenterY + dims.upperRailSize / 2;
-          const dropH = topYWorld - rubRailTopYWorld;
-          const horizLen = 10;
-          const hyp = Math.sqrt(dropH * dropH + horizLen * horizLen);
-          const ang = Math.atan2(dropH, horizLen) + 3.6;
-          const skirtCenterYLocal = topYLocal - dropH / 2;
-          const fzFrontLocal =
-            dims.axleCenterZ -
-            dims.axleSpacing / 2 -
-            dims.tireRadius +
-            10 -
-            23 -
-            tiltPivotZ;
-          const fzRearLocal =
-            dims.axleCenterZ +
-            dims.axleSpacing / 2 +
-            dims.tireRadius -
-            10 -
-            17 -
-            tiltPivotZ;
-          const fTopLen = fzRearLocal - fzFrontLocal;
-          const fCenterZLocal = (fzFrontLocal + fzRearLocal) / 2;
-          const xLocal =
-            dims.wheelTrackHalf - fW / 2 + dims.tireWidth / 2 + 2 - tiltPivotX;
-          return (
-            <>
-              {/* Flat top plate */}
-              <mesh
-                position={[xLocal, topYLocal, fCenterZLocal]}
-                material={frameMaterial}
-                castShadow
-                receiveShadow
-                {...hp("Fender")}
-              >
-                <boxGeometry args={[fW, fThick + 1, fTopLen + 1]} />
-              </mesh>
-              {/* Front lip */}
-              <mesh
-                position={[
-                  xLocal,
-                  skirtCenterYLocal - 7,
-                  fzFrontLocal - horizLen / 2,
-                ]}
-                rotation={[-ang, 0, 0]}
-                material={frameMaterial}
-                castShadow
-                receiveShadow
-                {...hp("Fender")}
-              >
-                <boxGeometry args={[fW, fThick, hyp + 13]} />
-              </mesh>
-              {/* Inner side trapezium cover */}
-              {(() => {
-                const panelX = xLocal - fW / 2 + 1.0; // inner face, moved towards wheel
-                const panelX2 = panelX - 1.4; // toward deck
-                const yTop = topYLocal - 0.5;
-                const yBot = -dims.plankThickness + dims.upperRailSize - 7;
-                const zTopFront = fzFrontLocal;
-                const zTopRear = fzRearLocal;
-                const zBotFront = fzFrontLocal - horizLen * 0.7;
-                const zBotRear = fzRearLocal + horizLen * 0.7;
-
-                const v = new Float32Array([
-                  panelX, yTop, zTopFront, // 0
-                  panelX, yTop, zTopRear, // 1
-                  panelX, yBot, zBotRear, // 2
-                  panelX, yBot, zBotFront, // 3
-                  panelX2, yTop, zTopFront, // 4
-                  panelX2, yTop, zTopRear, // 5
-                  panelX2, yBot, zBotRear, // 6
-                  panelX2, yBot, zBotFront, // 7
-                ]);
-                const idx = [
-                  0, 1, 2, 0, 2, 3, 4, 6, 5, 4, 7, 6, 0, 5, 1, 0, 4, 5, 3, 6, 7, 3, 2, 6, 0, 3, 7, 0, 7, 4, 1, 5, 6, 1, 6, 2,
-                ];
-                const geo = new THREE.BufferGeometry();
-                geo.setAttribute("position", new THREE.BufferAttribute(v, 3));
-                geo.setIndex(idx);
-                geo.computeVertexNormals();
-                return <mesh geometry={geo} material={hardwareSteelMaterial} castShadow receiveShadow />;
-              })()}
-              {/* Rear lip */}
-              <mesh
-                position={[
-                  xLocal,
-                  skirtCenterYLocal - 7,
-                  fzRearLocal + horizLen / 2,
-                ]}
-                rotation={[ang, 0, 0]}
-                material={frameMaterial}
-                castShadow
-                receiveShadow
-                {...hp("Fender")}
-              >
-                <boxGeometry args={[fW, fThick, hyp + 13]} />
-              </mesh>
-            </>
-          );
-        })()}
-
-        {/* Right tail light — tilts with deck */}
-        {(() => {
-          const tW = 8;
-          const tH = 14.5;
-          const tD = 4.5;
-          const lightY = dims.deckHeight - 8;
-          const localX = rightEdge + 13 - tiltPivotX;
-          const localY = lightY + 7 - dims.deckHeight;
-          const localZ = deckHalfLen - 5 - tiltPivotZ;
-          return (
-            <group
-              position={[localX - 6, localY, localZ]}
-              rotation={[0, 0, -Math.PI / 2]}
-            >
-              {/* Vertical housing body */}
-              <mesh
-                position={[0, 0, tD / 2]}
-                material={tailLightBaseMaterial}
-                castShadow
-                receiveShadow
-                {...hp("Tail Light Housing")}
-              >
-                <boxGeometry args={[tW, tH, tD]} />
-              </mesh>
-              {/* LED bars */}
-              {[-2.6, 2.6].map((lx, li) => (
-                <group key={li} position={[lx, 0, tD]}>
-                  <mesh material={tailLightBaseMaterial} castShadow>
-                    <boxGeometry args={[1.6, 11.0, 0.38]} />
-                  </mesh>
-                  {[-5.0, 5.0].map((cy, ci2) => (
-                    <mesh key={ci2} position={[0, cy, 0]} rotation={[Math.PI/2,0,0]} material={tailLightBaseMaterial}>
-                      <cylinderGeometry args={[0.8, 0.8, 0.38, 18]} />
-                    </mesh>
-                  ))}
-                  <mesh position={[0, 0, 0.22]} material={tailLightMaterial}>
-                    <boxGeometry args={[0.95, 9.5, 0.22]} />
-                  </mesh>
-                </group>
-              ))}
-            </group>
-          );
-        })()}
-      </group>
-      {/* Axles and wheels */}
+      {/* Axles and wheels: Triple 22.5k setup with Dual Tires */}
       {[
-        dims.axleCenterZ - (dims.axleSpacing - 4) / 2 - 20,
-        dims.axleCenterZ + (dims.axleSpacing - 4) / 2 - 20,
+        dims.axleCenterZ - dims.axleSpacing,
+        dims.axleCenterZ,
+        dims.axleCenterZ + dims.axleSpacing,
       ].map((z, idx) => (
         <group key={`axle-${idx}`} position={[0, axleCenterY, z]}>
           <mesh
@@ -1334,20 +973,25 @@ function FrameAssembly({
             castShadow
             {...hp("Axle Shaft")}
           >
-            <cylinderGeometry args={[1.35, 1.35, 84, 20]} />
+            <cylinderGeometry args={[1.8, 1.8, 102, 22]} />
           </mesh>
-          {[-dims.wheelTrackHalf, dims.wheelTrackHalf].map((x, wheelIdx) => (
+          {[-dims.wheelTrackHalf, dims.wheelTrackHalf].map((x, sideIdx) => (
             <group
-              key={wheelIdx}
+              key={sideIdx}
               position={[x, 0, 0]}
               rotation={[0, x < 0 ? Math.PI : 0, 0]} // Face hubs outwards
             >
-              <Wheel
-                tireRadius={dims.tireRadius}
-                tireWidth={dims.tireWidth}
-                onPartHover={onPartHover}
-                onPartLeave={onPartLeave}
-              />
+              {/* Dual Tire Setup: Inner and Outer wheels */}
+              {[0, -11.5].map((xOffset, dualIdx) => (
+                <group key={dualIdx} position={[xOffset, 0, 0]}>
+                  <Wheel
+                    tireRadius={dims.tireRadius}
+                    tireWidth={dims.tireWidth}
+                    onPartHover={onPartHover}
+                    onPartLeave={onPartLeave}
+                  />
+                </group>
+              ))}
             </group>
           ))}
         </group>
@@ -1362,7 +1006,7 @@ function FrameAssembly({
           key={`tongue-beam-${side}`}
           position={[
             side * tongueBeamSpreadX,
-            frameTopY - 4.5,
+            hitchCenterY,
             tongueBeamCenterZ,
           ]}
           rotation={[0, side * tongueHalfAngle, 0]}
@@ -1397,59 +1041,59 @@ function FrameAssembly({
         <boxGeometry args={[8.8, 6.4, 6.2]} />
       </mesh>
 
-      {/* Vertical drop-leg jack with crank handle */}
-      <group position={[-7, -7, jackCenterZ - 10]} rotation={[0, Math.PI, 0]}>
-        <mesh
-          position={[0, jackSleeveCenterY, 0]}
-          material={hardwareSteelMaterial}
-          castShadow
-          {...hp("Jack Sleeve")}
-        >
-          <boxGeometry
-            args={[jackSleeveWidth, jackSleeveHeight, jackSleeveWidth]}
-          />
-        </mesh>
-        <mesh
-          position={[0, jackInnerCenterY, 0]}
-          material={frameWearMaterial}
-          castShadow
-          {...hp("Jack Inner Leg")}
-        >
-          <boxGeometry
-            args={[jackInnerWidth, jackInnerHeight, jackInnerWidth]}
-          />
-        </mesh>
-        <mesh
-          position={[0, jackFootCenterY, 0]}
-          material={hardwareSteelMaterial}
-          castShadow
-          {...hp("Jack Foot Plate")}
-        >
-          <boxGeometry args={[jackFootSize, 0.4, jackFootSize]} />
-        </mesh>
+      {/* Dual tongue-mounted stabilizing jacks */}
+      {[-1, 1].map((side) => (
+        <group key={`front-jack-${side}`} position={[side * 26.5, -7, -deckHalfLen - 4]} rotation={[0, Math.PI, 0]}>
+          <mesh
+            position={[0, jackSleeveCenterY, 0]}
+            material={hardwareSteelMaterial}
+            castShadow
+            {...hp("Corner Jack Sleeve")}
+          >
+            <boxGeometry
+              args={[jackSleeveWidth, jackSleeveHeight, jackSleeveWidth]}
+            />
+          </mesh>
+          <mesh
+            position={[0, jackInnerCenterY, 0]}
+            material={frameWearMaterial}
+            castShadow
+            {...hp("Corner Jack Inner Leg")}
+          >
+            <boxGeometry
+              args={[jackInnerWidth, jackInnerHeight, jackInnerWidth]}
+            />
+          </mesh>
+          <mesh
+            position={[0, jackFootCenterY, 0]}
+            material={hardwareSteelMaterial}
+            castShadow
+            {...hp("Corner Jack Foot Plate")}
+          >
+            <boxGeometry args={[jackFootSize, 0.4, jackFootSize]} />
+          </mesh>
 
-        {/* Crank shaft */}
-        <mesh
-          position={[jackSleeveWidth / 2 + 1.5, jackSleeveCenterY + 4.4, 0]}
-          rotation={[0, 0, Math.PI / 2]}
-          material={frameMaterial}
-          castShadow
-          {...hp("Jack Crank Shaft")}
-        >
-          <cylinderGeometry args={[0.21, 0.21, 4.8, 12]} />
-        </mesh>
+          {/* Crank shaft */}
+          <mesh
+            position={[jackSleeveWidth / 2 + 1.5, jackSleeveCenterY + 4.4, 0]}
+            rotation={[0, 0, Math.PI / 2]}
+            material={frameMaterial}
+            castShadow
+          >
+            <cylinderGeometry args={[0.21, 0.21, 4.8, 12]} />
+          </mesh>
 
-        {/* Crank grip */}
-        <mesh
-          position={[jackSleeveWidth / 2 + 4, jackSleeveCenterY + 4.4, 0]}
-          rotation={[Math.PI / 2, 0, Math.PI / 2]}
-          material={frameWearMaterial}
-          castShadow
-          {...hp("Jack Crank Handle")}
-        >
-          <capsuleGeometry args={[0.42, 1.8, 8, 14]} />
-        </mesh>
-      </group>
+          {/* Crank grip */}
+          <mesh
+            position={[jackSleeveWidth / 2 + 4, jackSleeveCenterY + 4.4, 0]}
+            rotation={[Math.PI / 2, 0, Math.PI / 2]}
+            material={frameWearMaterial}
+            castShadow
+          >
+            <capsuleGeometry args={[0.42, 1.8, 8, 14]} />
+          </mesh>
+        </group>
+      ))}
 
       {/* Hitch */}
       {hitchType === "coupler" ? (
@@ -1538,8 +1182,7 @@ function TrailerModel({
   axleRating,
   deckWood,
   hitchType,
-  tiltSide,
-  tiltAngleDeg,
+  isUnfolded,
   autoRotate,
   onPartHover,
   onPartLeave,
@@ -1550,8 +1193,7 @@ function TrailerModel({
     | "axleRating"
     | "deckWood"
     | "hitchType"
-    | "tiltSide"
-    | "tiltAngleDeg"
+    | "isUnfolded"
     | "autoRotate"
   >
 > & {
@@ -1575,8 +1217,7 @@ function TrailerModel({
     <group ref={groupRef}>
       <FrameAssembly
         dims={dims}
-        tiltSide={tiltSide}
-        tiltAngleDeg={tiltAngleDeg}
+        isUnfolded={isUnfolded}
         deckWood={deckWood}
         hitchType={hitchType}
         onPartHover={onPartHover}
@@ -1591,8 +1232,7 @@ export default function TrailerViewer({
   axleRating = 10000,
   deckWood = "treated-pine",
   hitchType = "coupler",
-  tiltSide = "driver",
-  tiltAngleDeg = 13,
+  isUnfolded = false,
   cameraView = "perspective",
   autoRotate = false,
   showHoverLabels = true,
@@ -1663,8 +1303,7 @@ export default function TrailerViewer({
               axleRating={axleRating}
               deckWood={deckWood}
               hitchType={hitchType}
-              tiltSide={tiltSide}
-              tiltAngleDeg={tiltAngleDeg}
+              isUnfolded={isUnfolded}
               autoRotate={autoRotate}
               onPartHover={handlePartHover}
               onPartLeave={handlePartLeave}
@@ -1755,8 +1394,7 @@ export default function TrailerViewer({
                 axleRating={axleRating}
                 deckWood={deckWood}
                 hitchType={hitchType}
-                tiltSide={tiltSide}
-                tiltAngleDeg={tiltAngleDeg}
+                isUnfolded={isUnfolded}
                 autoRotate={true}
                 onPartHover={handlePartHover}
                 onPartLeave={handlePartLeave}

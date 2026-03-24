@@ -7,7 +7,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 
 export function PaverTag3DPage() {
-  const [tiltAngleDeg, setTiltAngleDeg] = useState(8);
+  const [isUnfolded, setIsUnfolded] = useState(false);
   const [cameraView, setCameraView] = useState<CameraView>("perspective");
   const [autoRotate, setAutoRotate] = useState(false);
   const [showHoverLabels, setShowHoverLabels] = useState(true);
@@ -20,7 +20,7 @@ export function PaverTag3DPage() {
         <div className="container mx-auto max-w-7xl">
           <div className="relative mb-6">
             <TrailerViewer
-              tiltAngleDeg={tiltAngleDeg}
+              isUnfolded={isUnfolded}
               cameraView={cameraView}
               autoRotate={autoRotate}
               showHoverLabels={showHoverLabels}
@@ -46,18 +46,17 @@ export function PaverTag3DPage() {
                 </select>
               </label>
 
-              <label className="font-display text-xs font-bold text-muted-foreground block">
-                Tilt Angle: {tiltAngleDeg.toFixed(1)}°
-                <input
-                  type="range"
-                  min={0}
-                  max={13}
-                  step={0.5}
-                  value={tiltAngleDeg}
-                  onChange={(e) => setTiltAngleDeg(Number(e.target.value))}
-                  className="mt-1 w-full accent-[#bf1e2e]"
-                />
-              </label>
+              <div className="flex flex-col gap-2 pt-1">
+                <label className="inline-flex items-center gap-2 font-display text-xs text-muted-foreground font-semibold">
+                  <input
+                    type="checkbox"
+                    checked={isUnfolded}
+                    onChange={(e) => setIsUnfolded(e.target.checked)}
+                    className="accent-[#bf1e2e]"
+                  />
+                  Unfold Ramps
+                </label>
+              </div>
 
               <div className="flex flex-col gap-2 pt-1">
                 <label className="inline-flex items-center gap-2 font-display text-xs text-muted-foreground font-semibold">
