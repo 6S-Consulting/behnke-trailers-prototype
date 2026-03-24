@@ -23,14 +23,6 @@ const AdminOrders = () => {
 
   const displayOrders = tab === 'dealer' ? dealerOrders : tab === 'customer' ? customerOrders : allOrders;
 
-  const advance = (o: Order) => {
-    if (!window.confirm(`Advance ${o.orderNumber} to next stage?`)) return;
-    const updated = actions.advanceOrderStatus({ orderId: o.id });
-    if (!updated) { toast.error('Could not advance order'); return; }
-    toast.success(`Order advanced to: ${updated.status}`);
-    setSelectedOrder(updated);
-  };
-
   const kpis = [
     { label: 'Total Orders', value: allOrders.length, icon: Package },
     { label: 'Dealer Orders', value: dealerOrders.length, icon: TrendingUp },
@@ -59,21 +51,16 @@ const AdminOrders = () => {
     { key: 'status', label: 'Status', render: (o: Order) => <StatusBadge status={o.status} /> },
     { key: 'createdDate', label: 'Date', sortable: true, render: (o: Order) => <span className="text-xs text-muted-foreground">{o.createdDate}</span> },
     {
-      key: 'actions', label: '', render: (o: Order) => {
-        const canAdvance = o.toType === 'Admin' && !['Delivered', 'Cancelled'].includes(o.status);
-        return (
-          <div className="flex gap-2 justify-end">
-            {canAdvance && (
-              <button
-                onClick={(e) => { e.stopPropagation(); advance(o); }}
-                className="text-xs text-primary hover:underline font-display uppercase tracking-wide"
-              >
-                Advance
-              </button>
-            )}
-          </div>
-        );
-      },
+      key: 'actions', label: '', render: (o: Order) => (
+        <div className="flex gap-2 justify-end">
+          <button
+            onClick={(e) => { e.stopPropagation(); setSelectedOrder(o); }}
+            className="text-xs text-primary hover:underline font-display uppercase tracking-wide"
+          >
+            View
+          </button>
+        </div>
+      )
     },
   ];
 
@@ -177,29 +164,35 @@ const AdminOrders = () => {
             const dealer = selectedOrder.fromType === 'Dealer'
               ? state.dealers.find(d => d.id === selectedOrder.fromId)
               : state.dealers.find(d => d.id === state.customers.find(c => c.id === selectedOrder.fromId)?.assignedDealerId);
-            const currentIdx = STATUS_STEPS.indexOf(selectedOrder.status);
-            const canAdvance = selectedOrder.toType === 'Admin' && !['Delivered', 'Cancelled'].includes(selectedOrder.status);
             return (
               <div className="space-y-5">
-                {/* Status progress */}
-                <div>
-                  <div className="flex items-center gap-1">
-                    {STATUS_STEPS.map((stage, i) => (
-                      <div key={stage} className="flex items-center flex-1">
-                        <div className={cn('flex-1 h-1.5 rounded-full transition-colors', i <= currentIdx ? 'bg-primary' : 'bg-white/10')} />
-                      </div>
-                    ))}
-                  </div>
-                  <div className="flex justify-between mt-1 text-[8px] font-mono uppercase text-muted-foreground">
-                    <span>Draft</span><span>Delivered</span>
-                  </div>
-                  <div className="flex items-center gap-2 mt-2">
-                    <StatusBadge status={selectedOrder.status} />
-                    {canAdvance && (
-                      <button onClick={() => advance(selectedOrder)} className="px-3 py-1 bg-primary text-primary-foreground rounded-sm text-xs font-display uppercase tracking-wide hover:opacity-90">
-                        Advance to {STATUS_STEPS[Math.min(currentIdx + 1, STATUS_STEPS.length - 1)]}
-                      </button>
-                    )}
+                {/* Status Selection */}
+                <div className="space-y-3">
+                  <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-widest">Update Order Status</p>
+                  <div className="flex flex-wrap gap-2">
+                    {STATUS_STEPS.map((stage) => {
+                      const isCurrent = selectedOrder.status === stage;
+                      return (
+                        <button
+                          key={stage}
+                          onClick={() => {
+                            const updated = actions.setOrderStatus(selectedOrder.id, stage);
+                            if (updated) {
+                              toast.success(`Order moved to ${stage}`);
+                              setSelectedOrder(updated);
+                            }
+                          }}
+                          className={cn(
+                            'px-3 py-1.2 bg-card border text-[10px] font-display uppercase tracking-wider transition-all',
+                            isCurrent
+                              ? 'bg-primary/20 border-primary text-primary shadow-[0_0_10px_rgba(var(--primary),0.2)]'
+                              : 'border-white/10 text-muted-foreground hover:border-white/30 hover:text-white'
+                          )}
+                        >
+                          {stage}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 

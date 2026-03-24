@@ -140,7 +140,7 @@ export const DashboardLayout = ({ children }: { children: ReactNode }) => {
       {/* Main */}
       <div className="flex-1 flex flex-col overflow-hidden min-w-0">
         {/* Header */}
-        <header className="h-14 bg-card/50 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-4 lg:px-8 shrink-0">
+        <header className="h-14 bg-card/50 backdrop-blur-md border-b border-white/5 flex items-center justify-between px-4 lg:px-8 shrink-0 relative z-50">
           <div className="text-[10px] font-mono text-muted-foreground uppercase tracking-[0.2em] pl-10 lg:pl-0">
             {location.pathname.split('/').filter(Boolean).map(seg => {
               const labels: Record<string, string> = {
@@ -163,7 +163,7 @@ export const DashboardLayout = ({ children }: { children: ReactNode }) => {
                 {role} <ChevronDown size={12} />
               </button>
               {roleDrop && (
-                <div className="absolute right-0 mt-1 bg-card border border-border rounded-md shadow-industrial-md py-1 z-50 w-40">
+                <div className="absolute right-0 mt-1 bg-card border border-border rounded-md shadow-industrial-md py-1 z-[100] w-40">
                   {(['admin', 'dealer', 'customer'] as UserRole[]).map(r => (
                     <button
                       key={r}
@@ -195,7 +195,7 @@ export const DashboardLayout = ({ children }: { children: ReactNode }) => {
                 )}
               </button>
               {notifDrop && (
-                <div className="absolute right-0 mt-1 bg-card border border-border rounded-md shadow-industrial-md py-1 z-50 w-80 max-h-80 overflow-y-auto">
+                <div className="absolute right-0 mt-1 bg-card border border-border rounded-md shadow-industrial-md py-1 z-[100] w-80 max-h-80 overflow-y-auto">
                   <div className="px-3 py-2 border-b border-border">
                     <span className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Notifications</span>
                   </div>

@@ -16,7 +16,11 @@ const CustomerQuotes = () => {
   const { user } = useAuth();
   const { state, actions } = useAppData();
 
-  const myQuotes = state.quotes.filter(q => q.toId === (user?.id ?? ''));
+  const myQuotes = state.quotes.filter(q => q.fromId === (user?.id ?? ''));
+
+  const getDealerForQuote = (q: Quote) => {
+    return state.dealers.find(d => d.id === q.toId);
+  };
 
   const handleAccept = (q: Quote) => {
     const updated = actions.updateQuoteStatus(q.id, 'Accepted');
@@ -53,10 +57,10 @@ const CustomerQuotes = () => {
             <DataTable<Quote>
               columns={[
                 { key: 'quoteNumber', label: 'Quote #', sortable: true, render: (q) => <span className="font-mono text-xs">{q.quoteNumber}</span> },
+                { key: 'dealer', label: 'Dealer', render: (q) => <span className="text-xs">{getDealerForQuote(q)?.name ?? '—'}</span> },
                 { key: 'trailer', label: 'Trailer', render: (q) => <span className="text-xs">{q.items[0]?.name}</span> },
-                { key: 'createdDate', label: 'Created', render: (q) => <span className="text-xs">{q.createdDate}</span> },
-                { key: 'validUntil', label: 'Valid Until', render: (q) => <span className="text-xs">{q.validUntil}</span> },
                 { key: 'total', label: 'Total', sortable: true, render: (q) => <span className="font-mono text-xs font-medium">${q.total.toLocaleString()}</span> },
+                { key: 'createdDate', label: 'Created', render: (q) => <span className="text-xs">{q.createdDate}</span> },
                 { key: 'status', label: 'Status', render: (q) => <StatusBadge status={q.status} /> },
                 {
                   key: 'actions', label: '', render: (q) => (
@@ -71,7 +75,7 @@ const CustomerQuotes = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
             {myQuotes.map(q => {
-              const dealer = state.dealers.find(d => d.id === q.fromId);
+              const dealer = getDealerForQuote(q);
               return (
                 <div
                   key={q.id}
@@ -116,9 +120,15 @@ const CustomerQuotes = () => {
                   </div>
                 </div>
                 <div className="mb-4 text-sm">
-                  <span className="text-[10px] font-mono uppercase text-muted-foreground block">From</span>
-                  {state.dealers.find(d => d.id === detail.fromId)?.name}
+                  <span className="text-[10px] font-mono uppercase text-muted-foreground block">Dealer</span>
+                  {getDealerForQuote(detail)?.name ?? '—'}
                 </div>
+                {detail.status === 'Requested' && (
+                  <div className="bg-warning/10 border border-warning/20 rounded-md p-3 mb-4">
+                    <p className="text-xs text-warning font-display uppercase tracking-wide">Awaiting dealer response</p>
+                    <p className="text-xs text-muted-foreground mt-1">Your quote request has been sent. The dealer will review and respond with pricing.</p>
+                  </div>
+                )}
                 <table className="w-full text-sm mb-4">
                   <thead><tr className="border-b border-border">
                     <th className="text-left py-2 text-[10px] font-mono uppercase text-muted-foreground">Item</th>
@@ -147,11 +157,24 @@ const CustomerQuotes = () => {
                 {detail.notes && <p className="text-xs text-muted-foreground mt-4 italic">"{detail.notes}"</p>}
               </div>
 
-              <div className="flex gap-2">
-                <button onClick={() => handleAccept(detail)} className="px-4 py-2 bg-success text-success-foreground rounded-sm text-xs font-display uppercase tracking-wide">✅ Accept Quote</button>
-                <button onClick={() => handleReject(detail)} className="px-4 py-2 bg-danger text-danger-foreground rounded-sm text-xs font-display uppercase tracking-wide">❌ Reject Quote</button>
-                <button onClick={() => { setDetail(null); setModOpen(true); }} className="px-4 py-2 border border-border rounded-sm text-xs font-display uppercase tracking-wide hover:bg-muted">💬 Request Changes</button>
-              </div>
+              {(detail.status === 'Sent' || detail.status === 'Viewed') && (
+                <div className="flex gap-2">
+                  <button onClick={() => handleAccept(detail)} className="px-4 py-2 bg-success text-success-foreground rounded-sm text-xs font-display uppercase tracking-wide">✅ Accept Quote</button>
+                  <button onClick={() => handleReject(detail)} className="px-4 py-2 bg-danger text-danger-foreground rounded-sm text-xs font-display uppercase tracking-wide">❌ Reject Quote</button>
+                  <button onClick={() => { setDetail(null); setModOpen(true); }} className="px-4 py-2 border border-border rounded-sm text-xs font-display uppercase tracking-wide hover:bg-muted">💬 Request Changes</button>
+                </div>
+              )}
+              {detail.status === 'Accepted' && (
+                <div className="bg-success/10 border border-success/20 rounded-md p-3">
+                  <p className="text-xs text-success font-display uppercase tracking-wide">Quote Accepted</p>
+                  <p className="text-xs text-muted-foreground mt-1">Your dealer will convert this to an order. Track progress in My Orders.</p>
+                </div>
+              )}
+              {detail.status === 'Requested' && (
+                <div className="bg-muted/30 border border-white/5 rounded-md p-3">
+                  <p className="text-xs text-muted-foreground">Waiting for dealer to respond with pricing...</p>
+                </div>
+              )}
             </div>
           )}
         </Modal>

@@ -31,7 +31,7 @@ function CameraRig({ cameraView }: { cameraView: CameraView }) {
     } else {
       camera.position.set(18, 14, 22);
     }
-    
+
     if (controls) {
       // @ts-expect-error - OrbitControls type is not fully compatible with Drei's version
       controls.update();
@@ -52,11 +52,11 @@ export default function WalkingTandemScene({
   const handlePointerOver = (e: ThreeEvent<PointerEvent>) => {
     if (!showHoverLabels) return;
     e.stopPropagation();
-    
+
     // Improved logic to find a meaningful name by traversing up the parent tree
     let current: THREE.Object3D | null = e.object;
     let name = current.name;
-    
+
     // Traverse up to find a named group if the leaf mesh isn't named specifically
     while (current && (!name || name === "Scene" || name.includes("Object") || name === "")) {
       current = current.parent;
@@ -84,7 +84,7 @@ export default function WalkingTandemScene({
       <Canvas shadows dpr={[1, 2]} camera={{ position: [18, 14, 22], fov: 35 }}>
         <CameraRig cameraView={cameraView} />
         <color attach="background" args={["#9ca3af"]} />
-        
+
         <Suspense
           fallback={
             <Html center>
@@ -97,7 +97,7 @@ export default function WalkingTandemScene({
             </Html>
           }
         >
-          <group 
+          <group
             position={[0, 0.6, 0]}
             onPointerOver={handlePointerOver}
             onPointerOut={handlePointerOut}

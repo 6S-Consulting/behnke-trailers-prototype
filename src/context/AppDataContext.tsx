@@ -20,10 +20,10 @@ type AppDataState = {
   notifications: Notification[];
 };
 
-type CreateQuoteInput = {
-  dealerId: string;
+type RequestQuoteFromCustomerInput = {
   customerId: string;
-  trailerId: string; // Trailer.id
+  dealerId: string;
+  trailerId: string;
   quantity: number;
   notes?: string;
 };
@@ -77,11 +77,13 @@ type AppDataContextType = {
   actions: {
     markNotificationRead: (id: string) => void;
     markAllNotificationsRead: () => void;
-    createQuoteFromDealer: (input: CreateQuoteInput) => Quote;
+    requestQuoteFromCustomer: (input: RequestQuoteFromCustomerInput) => Quote;
+    respondToQuoteRequest: (quoteId: string, dealerNotes?: string) => Quote | null;
     updateQuoteStatus: (quoteId: string, status: Quote['status']) => Quote | null;
     convertQuoteToOrder: (input: ConvertQuoteToOrderInput) => Order | null;
     submitDealerOrderToBehnke: (input: SubmitDealerOrderToBehnkeInput) => Order;
     advanceOrderStatus: (input: AdvanceOrderInput) => Order | null;
+    setOrderStatus: (orderId: string, status: Order['status']) => Order | null;
     requestMaintenanceSlot: (input: RequestMaintenanceSlotInput) => MaintenanceSlot;
     confirmMaintenanceSlot: (input: ConfirmMaintenanceSlotInput) => MaintenanceSlot | null;
     completeMaintenanceSlot: (input: CompleteMaintenanceSlotInput) => MaintenanceSlot | null;
@@ -107,9 +109,10 @@ const AppDataContext = createContext<AppDataContextType>({
   actions: {
     markNotificationRead: () => { },
     markAllNotificationsRead: () => { },
-    createQuoteFromDealer: () => {
+    requestQuoteFromCustomer: () => {
       throw new Error('AppDataContext not initialized');
     },
+    respondToQuoteRequest: () => null,
     updateQuoteStatus: () => null,
     convertQuoteToOrder: () => null,
     submitDealerOrderToBehnke: () => {
@@ -126,10 +129,11 @@ const AppDataContext = createContext<AppDataContextType>({
     addTrailer: () => { throw new Error('AppDataContext not initialized'); },
     updateTrailer: () => null,
     deleteTrailer: () => { },
+    setOrderStatus: () => null,
   },
 });
 
-const STORAGE_KEY = 'bb_appdata_v1';
+const STORAGE_KEY = 'bb_appdata_v3';
 
 const todayISO = () => new Date().toISOString().slice(0, 10);
 
@@ -265,7 +269,7 @@ const AppDataProviderImpl = ({ children }: { children: React.ReactNode }) => {
         }));
       },
 
-      createQuoteFromDealer: (input: CreateQuoteInput) => {
+      requestQuoteFromCustomer: (input: RequestQuoteFromCustomerInput) => {
         const trailer = state.trailers.find(t => t.id === input.trailerId);
         if (!trailer) throw new Error('Trailer not found');
 
@@ -285,9 +289,9 @@ const AppDataProviderImpl = ({ children }: { children: React.ReactNode }) => {
         const quote: Quote = {
           id: uid('q'),
           quoteNumber: makeQuoteNumber(),
-          status: 'Sent',
-          fromId: input.dealerId,
-          toId: input.customerId,
+          status: 'Requested',
+          fromId: input.customerId,
+          toId: input.dealerId,
           items,
           subtotal,
           tax,
@@ -299,18 +303,45 @@ const AppDataProviderImpl = ({ children }: { children: React.ReactNode }) => {
         };
 
         setState(s => ({ ...s, quotes: [quote, ...s.quotes] }));
-        // Notify customer that the dealer sent a quote.
-        const dealer = state.dealers.find(d => d.id === input.dealerId);
+        const customer = state.customers.find(c => c.id === input.customerId);
         pushNotification({
-          recipientId: input.customerId,
-          recipientType: 'Customer',
+          recipientId: input.dealerId,
+          recipientType: 'Dealer',
           type: 'QuoteReceived',
-          title: 'New Quote Received',
-          message: `New quote ${quote.quoteNumber} from ${dealer?.name ?? 'your dealer'}: $${quote.total.toLocaleString()}.`,
-          actionUrl: '/customer/quotes',
+          title: 'New Quote Request',
+          message: `${customer?.name ?? 'A customer'} requested a quote for ${trailer.name} (${trailer.modelNumber}).`,
+          actionUrl: '/dealer/quotes',
         });
 
         return quote;
+      },
+
+      respondToQuoteRequest: (quoteId: string, dealerNotes?: string) => {
+        const existing = state.quotes.find(q => q.id === quoteId);
+        if (!existing || existing.status !== 'Requested') return null;
+
+        const updated: Quote = {
+          ...existing,
+          status: 'Sent',
+          notes: dealerNotes ?? existing.notes,
+          validUntil: addDaysISO(todayISO(), 30),
+        };
+        setState(s => ({
+          ...s,
+          quotes: s.quotes.map(q => (q.id === quoteId ? updated : q)),
+        }));
+
+        const dealer = state.dealers.find(d => d.id === existing.toId);
+        pushNotification({
+          recipientId: existing.fromId,
+          recipientType: 'Customer',
+          type: 'QuoteReceived',
+          title: 'Quote Ready',
+          message: `${dealer?.name ?? 'Your dealer'} has responded to your quote request ${updated.quoteNumber}: $${updated.total.toLocaleString()}.`,
+          actionUrl: '/customer/quotes',
+        });
+
+        return updated;
       },
 
       updateQuoteStatus: (quoteId: string, status: Quote['status']) => {
@@ -323,20 +354,23 @@ const AppDataProviderImpl = ({ children }: { children: React.ReactNode }) => {
           quotes: s.quotes.map(q => (q.id === quoteId ? updated : q)),
         }));
 
-        // Side notifications for key state transitions.
+        // Resolve dealer and customer IDs (fromId=customer, toId=dealer)
+        const dealerId = existing.toId;
+        const customerId = existing.fromId;
+
         if (status === 'Accepted') {
           pushNotification({
-            recipientId: updated.fromId,
+            recipientId: dealerId,
             recipientType: 'Dealer',
             type: 'OrderUpdate',
             title: 'Quote Accepted',
-            message: `Customer accepted ${updated.quoteNumber}. Dealer will convert it to an order.`,
+            message: `Customer accepted ${updated.quoteNumber}. You can now convert it to an order.`,
             actionUrl: '/dealer/quotes',
           });
         }
         if (status === 'Rejected') {
           pushNotification({
-            recipientId: updated.fromId,
+            recipientId: dealerId,
             recipientType: 'Dealer',
             type: 'OrderUpdate',
             title: 'Quote Rejected',
@@ -346,7 +380,7 @@ const AppDataProviderImpl = ({ children }: { children: React.ReactNode }) => {
         }
         if (status === 'Sent') {
           pushNotification({
-            recipientId: updated.toId,
+            recipientId: customerId,
             recipientType: 'Customer',
             type: 'QuoteReceived',
             title: 'Quote Sent',
@@ -367,6 +401,10 @@ const AppDataProviderImpl = ({ children }: { children: React.ReactNode }) => {
         const trailer = state.trailers.find(t => t.id === firstItem.trailerId);
         if (!trailer) return null;
 
+        // fromId=customer, toId=dealer
+        const dealerId = quote.toId;
+        const customerId = quote.fromId;
+
         const orderNumber = makeOrderNumber('BB');
         const createdDate = todayISO();
         const unitPrice = firstItem.quantity > 0 ? Math.round(firstItem.lineTotal / firstItem.quantity) : trailer.price;
@@ -376,7 +414,7 @@ const AppDataProviderImpl = ({ children }: { children: React.ReactNode }) => {
           orderNumber,
           type: 'Standard',
           status: 'Submitted',
-          fromId: quote.fromId, // dealer
+          fromId: dealerId,
           fromType: 'Dealer',
           toId: 'admin',
           toType: 'Admin',
@@ -391,7 +429,7 @@ const AppDataProviderImpl = ({ children }: { children: React.ReactNode }) => {
           estimatedDelivery: addDaysISO(createdDate, trailer.leadTimeDays),
           notes: `Converted from quote ${quote.quoteNumber}.`,
           quoteId: quote.id,
-          customerId: quote.toId,
+          customerId,
         };
 
         setState(s => ({ ...s, orders: [order, ...s.orders] }));
@@ -400,8 +438,17 @@ const AppDataProviderImpl = ({ children }: { children: React.ReactNode }) => {
           recipientType: 'Admin',
           type: 'OrderUpdate',
           title: 'New Order Submitted',
-          message: `${order.orderNumber} submitted by ${state.dealers.find(d => d.id === order.fromId)?.name ?? 'dealer'}: ${order.quantity} × ${order.modelNumber}.`,
+          message: `${order.orderNumber} submitted by ${state.dealers.find(d => d.id === dealerId)?.name ?? 'dealer'}: ${order.quantity} × ${order.modelNumber}.`,
           actionUrl: '/admin/orders',
+        });
+        // Notify the customer their order is being processed
+        pushNotification({
+          recipientId: customerId,
+          recipientType: 'Customer',
+          type: 'OrderUpdate',
+          title: 'Order Created',
+          message: `Your quote ${quote.quoteNumber} has been converted to order ${order.orderNumber}. Track its progress in My Orders.`,
+          actionUrl: '/customer/orders',
         });
 
         return order;
@@ -663,6 +710,14 @@ const AppDataProviderImpl = ({ children }: { children: React.ReactNode }) => {
 
       deleteTrailer: ({ id }: DeleteTrailerInput) => {
         setState(s => ({ ...s, trailers: s.trailers.filter(t => t.id !== id) }));
+      },
+
+      setOrderStatus: (orderId: string, status: Order['status']) => {
+        const existing = state.orders.find(o => o.id === orderId);
+        if (!existing) return null;
+        const updated: Order = { ...existing, status, updatedDate: todayISO() };
+        setState(s => ({ ...s, orders: s.orders.map(o => (o.id === orderId ? updated : o)) }));
+        return updated;
       },
     };
   }, [state]);

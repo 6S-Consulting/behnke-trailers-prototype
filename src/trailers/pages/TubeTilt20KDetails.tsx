@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { jsPDF } from "jspdf";
-import { FileText, MapPin, Shield } from "lucide-react";
+import { FileText, MapPin, Shield, Send } from "lucide-react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { tubeTilt20K } from "@/trailers/data/trailerData";
@@ -140,15 +140,16 @@ export function TubeTilt20KDetails() {
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <motion.a
-                  href="#"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="inline-flex items-center gap-2 bg-card text-foreground px-4 py-3 font-display font-bold hover:bg-card/80 transition-colors border border-border"
-                >
-                  <MapPin size={18} className="text-[#bf1e2e]" />
-                  Find a Dealer
-                </motion.a>
+                <Link to="/customer/contact">
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="inline-flex items-center gap-2 bg-[#bf1e2e] text-white px-4 py-3 font-display font-bold hover:bg-[#bf1e2e]/90 transition-colors border border-[#bf1e2e]"
+                  >
+                    <Send size={18} />
+                    Request a Quote
+                  </motion.div>
+                </Link>
                 <motion.button
                   type="button"
                   onClick={handleDownloadBrochure}

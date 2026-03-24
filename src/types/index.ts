@@ -157,8 +157,10 @@ export interface QuoteItem {
 export interface Quote {
   id: string;
   quoteNumber: string;
-  status: 'Draft' | 'Sent' | 'Viewed' | 'Accepted' | 'Rejected' | 'Expired';
+  status: 'Requested' | 'Draft' | 'Sent' | 'Viewed' | 'Accepted' | 'Rejected' | 'Expired';
+  /** Customer who requested the quote */
   fromId: string;
+  /** Dealer who receives the quote request */
   toId: string;
   items: QuoteItem[];
   subtotal: number;

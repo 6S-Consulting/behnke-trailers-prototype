@@ -50,21 +50,21 @@ const ContactDealer = () => {
     if (!user || !dealer) return;
 
     if (tab === 0) {
-      // Request a Quote — actually creates a quote in the system
+      // Request a Quote — customer initiates a quote request to dealer
       if (!selectedTrailerId) {
         toast.error('Please select a trailer');
         return;
       }
-      const quote = actions.createQuoteFromDealer({
-        dealerId: dealer.id,
+      const quote = actions.requestQuoteFromCustomer({
         customerId: user.id,
+        dealerId: dealer.id,
         trailerId: selectedTrailerId,
         quantity: 1,
-        notes: quoteNotes || `Quote requested by customer via Contact Dealer form.`,
+        notes: quoteNotes || `Quote requested via Contact Dealer form.`,
       });
       setRefNumber(quote.quoteNumber);
     } else if (tab === 1) {
-      // Order a Trailer — submits a customer→dealer order
+      // Order a Trailer — customer requests quote, auto-accepts, dealer converts
       if (!orderTrailerId) {
         toast.error('Please select a trailer');
         return;
@@ -72,15 +72,16 @@ const ContactDealer = () => {
       const trailer = state.trailers.find(t => t.id === orderTrailerId);
       if (!trailer) return;
 
-      // Create quote that the customer auto-accepts, then convert
-      const quote = actions.createQuoteFromDealer({
-        dealerId: dealer.id,
+      // Create customer-initiated quote request
+      const quote = actions.requestQuoteFromCustomer({
         customerId: user.id,
+        dealerId: dealer.id,
         trailerId: orderTrailerId,
         quantity: orderQty,
         notes: orderNotes || 'Direct order from customer.',
       });
-      // Auto-accept and convert
+      // Auto-respond and accept, then convert
+      actions.respondToQuoteRequest(quote.id);
       actions.updateQuoteStatus(quote.id, 'Accepted');
       const order = actions.convertQuoteToOrder({ quoteId: quote.id });
       setRefNumber(order?.orderNumber ?? quote.quoteNumber);
