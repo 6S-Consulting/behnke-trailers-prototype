@@ -67,8 +67,7 @@ export function Wheel({
   const tireRadius = 0.71;    // Giant outer radius
   const tireWidth = 0.48;    // Extremely wide tread
   const rimRadius = 0.38;    // Massive rim
-  const rimDepth = 0.35;     // Giant, deep rim barrel
-  const lugCount = 10;
+  const lugCount = 6;
 
   return (
     <group position={position} rotation={rotation}>
@@ -135,7 +134,7 @@ export function Wheel({
               return (
                 <mesh
                   key={`lug-${side}-${i}`}
-                  position={[Math.cos(angle) * lugRingRadius, 0.05, Math.sin(angle) * lugRingRadius]}
+                  position={[Math.cos(angle) * lugRingRadius, 0.025, Math.sin(angle) * lugRingRadius]}
                 >
                   <cylinderGeometry args={[0.018, 0.018, 0.06, 6]} />
                   <meshStandardMaterial color="#ddd" metalness={1} roughness={0.1} />
@@ -181,20 +180,4 @@ function Fender({ position, mirror = false }: { position: [number, number, numbe
   );
 }
 
-export function TrailerWheels() {
-  const axleSpacing = 1.9; // Matching tandem gap in Axle.tsx
-  const axleCenterX = 1.72;
-  const axleY = -0.15;
-  const wheelZ = 1.13;
 
-  return (
-    <group>
-      {/* Reference Wheel mounting logic - this logic is usually handled by Axle.tsx in your project, 
-          but if you use TrailerWheels directly somewhere, this is where they go. */}
-      {/* 
-         Note: The actual wheels you saw in the image were likely from Axle.tsx.
-         I've fixed the Wheel component itself so it aligns correctly wherever it's used.
-      */}
-    </group>
-  );
-}

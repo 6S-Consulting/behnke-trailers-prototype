@@ -16,6 +16,7 @@ export function TrailersPage() {
             "walking-tandem-gooseneck-wagon",
             "tandem-gooseneck-wagon",
             "sprayer-trailer-40k-50k",
+            "single-cone-trailer",
           ].includes(t.slug)
       ),
     },

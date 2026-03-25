@@ -43,6 +43,14 @@ import paverTag3 from "@/trailers/pavertag/images/3.jpg";
 import paverTag4 from "@/trailers/pavertag/images/4.jpg";
 import paverTag5 from "@/trailers/pavertag/images/5.jpg";
 
+import coneImage1 from "@/trailers/SingleConeTrailer/images/Single-Cone-1.jpg";
+import coneImage2 from "@/trailers/SingleConeTrailer/images/Single-Cone-2.jpg";
+import coneImage3 from "@/trailers/SingleConeTrailer/images/Single-Cone-3.jpg";
+import coneImage4 from "@/trailers/SingleConeTrailer/images/Single-Cone-4.jpg";
+import coneImage5 from "@/trailers/SingleConeTrailer/images/Single-Cone-5.jpg";
+// Using WalkingTandemGooseneckWagon images as placeholders for SingleConeTrailer
+
+
 export const directionalDrillTiltTrailer: TrailerProduct = {
   slug: "directional-drill-tilt-trailer",
   title: "Directional Drill Tilt Trailer",
@@ -242,6 +250,53 @@ export const walkingTandemGooseneckWagon: TrailerProduct = {
   resources: ["Find a Dealer", "Download Brochure", "Explore Product Options"],
 };
 
+export const singleConeTrailer: TrailerProduct = {
+  slug: "single-cone-trailer",
+  title: "Single Cone Trailer",
+  shortDescription:
+    "Our single cone trailer is designed for an end user who needs a one tank storage solution that will only move the trailer a few times a season.",
+  description:
+    "Our single cone trailer is designed for an end user who needs a one tank storage solution that will only move the trailer a few times a season.",
+  overview:
+    "Our single cone trailer is designed for an end user who needs a one tank storage solution that will only move the trailer a few times a season.",
+  heroImage: coneImage1,
+  gallery: [coneImage1, coneImage2, coneImage3, coneImage4, coneImage5],
+  brochureFileName: "single-cone-trailer-brochure.pdf",
+  specs: [
+    { label: "GVWR", value: "7,000 lbs" },
+    { label: "Weight", value: "960 lbs" },
+    { label: "Width", value: '92" overall' },
+    { label: "Axles", value: "3,500 lb. spindles" },
+    { label: "Hitch", value: "Adjustable Clevis" },
+    { label: "Frame", value: "Channel" },
+    { label: "Lights", value: "Optional LED Safety Lighting" },
+    {
+      label: "Finish and Paint",
+      value: "Bead blasted, acid washed, powder coated",
+    },
+  ],
+  details: [
+    "Hand pump for single lift cylinder",
+    "Dual cylinders available",
+    "Can make to any cone manufacturer's specs."
+  ],
+  keyAdvantages: [
+    "Compact single-cone design for easy maneuverability",
+    "Efficient discharge pattern with hydraulic control",
+    "Heavy-duty construction rated for continuous use",
+    "Low-maintenance design with quality bearings",
+    "Compatible with most field spreader receiver systems",
+  ],
+  optionalFeatures: [
+    "Extended coverage hood",
+    "Hydraulic spreader drive system",
+    "LED lighting package",
+    "Stainless steel discharge tube",
+    "Custom decals and branding",
+  ],
+  resources: ["Find a Dealer", "Download Brochure", "Explore Product Options"],
+};
+
 export const paverTagTrailer: TrailerProduct = {
   slug: "paver-tag-trailer",
   title: "Paver Tag Trailer",
@@ -325,7 +380,7 @@ export const tandemGooseneckWagon: TrailerProduct = {
     { label: "Hitch", value: "Gooseneck" },
     { label: "Length", value: "24 ft" },
     { label: "Width", value: "102 in" },
-    { label: "Track", value: "92-120\"  adjustable rear axle" },
+    { label: "Track", value: '92-120"  adjustable rear axle' },
   ],
   details: [
     "Comes standard with (2) steps on side",
@@ -406,7 +461,7 @@ export const deckoверGooseneck: TrailerProduct = {
     { label: "Axle", value: "Tandem 15K" },
     { label: "Hitch", value: "Gooseneck" },
     { label: "GVWR", value: "30,000 lb" },
-    { label: "Width", value: "102\" between fenders" },
+    { label: "Width", value: '102" between fenders' },
   ],
   details: [
     "Heavy-duty construction",
@@ -421,7 +476,7 @@ export const deckoверGooseneck: TrailerProduct = {
     "Professional appearance",
   ],
   optionalFeatures: [
-    "Stake pockets every 24\"",
+    'Stake pockets every 24"',
     "Extended tongue",
     "Spare tire mounts",
     "Toolbox attachments",
@@ -437,8 +492,7 @@ export const tagTrailer60Ton: TrailerProduct = {
     "Heavy-duty 60-ton capacity tag trailer for the most demanding equipment hauling.",
   description:
     "60-ton capacity tag trailer with 8×33 ft deck and triple axle configuration. Built from premium materials to handle the heaviest loads with confidence.",
-  overview:
-    "Premium 60-ton tag trailer for serious heavy haul requirements.",
+  overview: "Premium 60-ton tag trailer for serious heavy haul requirements.",
   heroImage: heroImage,
   gallery: [heroImage, trailer03, trailer04, trailer05],
   brochureFileName: "tag-trailer-60-ton-brochure.pdf",
@@ -485,13 +539,13 @@ export const directionalDrillRampTrailer: TrailerProduct = {
   brochureFileName: "directional-drill-ramp-brochure.pdf",
   specs: [
     { label: "Models", value: "18', 20', 24'" },
-    { label: "Ramp Width", value: "HD 23\" tube" },
+    { label: "Ramp Width", value: 'HD 23" tube' },
     { label: "GVWR", value: "20,000-24,000 lb" },
     { label: "Deck Height", value: "Industry low on spring suspension" },
     { label: "Customization", value: "Full dealer-specific options" },
   ],
   details: [
-    "HD 23\" wide tube ramps w/pin style lock",
+    'HD 23" wide tube ramps w/pin style lock',
     "Completely drill ready with mixer, reel, and toolbox mounts",
     "Boring rod holders and machine stops",
     "Trailer can be customized to meet dealer mounting specs",
@@ -652,10 +706,10 @@ export const dumpTrailer: TrailerProduct = {
     { label: "Bed Length", value: "14', 16' or 18'" },
     { label: "Sides", value: "2-3' adjustable" },
     { label: "Hitch", value: "Pull-type or Gooseneck" },
-    { label: "Hoist", value: "Champion scissors hoist w/ 6\" cylinder" },
+    { label: "Hoist", value: 'Champion scissors hoist w/ 6" cylinder' },
   ],
   details: [
-    "Champion Scissors Hoist w/ 6\" cylinder",
+    'Champion Scissors Hoist w/ 6" cylinder',
     "MTE hydraulic unit for raising/lowering",
     "3-way combination gate",
     "Available in 14', 16' or 18' lengths w/2-3' sides",
@@ -681,6 +735,7 @@ export const trailers: TrailerProduct[] = [
   tubeTilt20K,
   paverTagTrailer,
   walkingTandemGooseneckWagon,
+  singleConeTrailer,
   tandemGooseneckWagon,
   sprayerTrailer40K50K,
   deckoверGooseneck,
