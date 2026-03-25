@@ -3,11 +3,13 @@
     {
       "id": "agriculture",
       "name": "Agriculture",
+      "image": "/data/images/industries/agriculture.webp",
       "description": "Agricultural trailers for a number of uses including nurse tank trailers, sprayer trailers, tender trailers, anhydrous applicators, and more.",
       "useCases": [
         {
           "id": "anhydrous_wagons",
           "name": "Anhydrous Wagons",
+          "image": "/data/images/categories/agricultre.webp",
           "description": "Behnke manufactures anhydrous ammonia wagons for the agricultural industry. Available in a variety of tank configurations and track widths for easy field transport.",
           "trailerTypes": [
             {
@@ -17,6 +19,7 @@
               "products": [
                 {
                   "model": "Tandem Gooseneck Wagon (Twin 1450 gal. Tanks)",
+                  "modelId": "GN2900WG",
                   "url": "https://behnkeenterprises.com/trailers/tandem-gooseneck-wagon-twin-1450-gal-tanks/",
                   "gvwr": "32,000 lbs",
                   "frame": "12\" x 22 lb. I-beam",
@@ -25,23 +28,31 @@
                   "axles": "Front + rear axle (8K spindles)",
                   "suspension": "None (Torflex front available)",
                   "finish": "Bead blasted, acid washed, powder coated",
+                  "image": "/data/images/categories/agriculture/anhydrous/gn_wagon_1.jpg",
+                  "description": "",
                   "features": ["Comes standard with (2) steps on side", "Spring assist standard on tongue", "Torflex front axle popular", "92-120\" adjustable rear axle is standard"]
                 },
                 {
                   "model": "Walking Tandem Gooseneck Wagon (Twin 1450 gal. Tanks)",
+                  "modelId": "GN2900TWG",
                   "url": "https://behnkeenterprises.com/trailers/walking-tandem-gooseneck-wagon-twin-1450-gal-tanks/",
+                  "image": "/data/images/categories/agriculture/anhydrous/gn_wagon_2.jpg",
                   "gvwr": "32,000 lbs",
                   "features": ["Walking tandem axle", "Twin 1450 gal tanks", "Gooseneck hitch"]
                 },
                 {
                   "model": "Walking Tandem Gooseneck Wagon (Single 3000 gal. Tank)",
+                  "modelId": "GN3000TWG",
                   "url": "https://behnkeenterprises.com/trailers/walking-tandem-goosneck-wagon-single-3000-gal-tank/",
+                  "image": "/data/images/categories/agriculture/anhydrous/gn_wagon_3.jpg",
                   "gvwr": "32,000 lbs",
                   "features": ["Walking tandem axle", "Single 3000 gal tank", "Gooseneck hitch"]
                 },
                 {
                   "model": "Walking Tandem Gooseneck Wagon (Twin 2,000 gal. Tanks)",
+                  "modelId": "GN4000TWG",
                   "url": "https://behnkeenterprises.com/trailers/walking-tandem-goosneck-wagon-twin-2000-gal-tanks/",
+                  "image": "/data/images/categories/agriculture/anhydrous/gn_wagon_4.jpg",
                   "gvwr": "40,000 lbs",
                   "features": ["Walking tandem axle", "Twin 2000 gal tanks", "Gooseneck hitch"]
                 }
@@ -54,22 +65,30 @@
               "products": [
                 {
                   "model": "Fixed Wagon (Single 2000 gal. Tank)",
+                  "modelId": "WG2000F",
                   "url": "https://behnkeenterprises.com/trailers/fixed-wagon-single-2000-gal-tank/",
+                  "image": "/data/images/categories/agriculture/anhydrous/fixed_adjustable_4.jpg",
                   "features": ["Fixed frame", "Single 2000 gal tank"]
                 },
                 {
                   "model": "Fixed Wagon (Twin 1000 gal. Tank)",
+                  "modelId": "WG2000FT",
                   "url": "https://behnkeenterprises.com/trailers/fixed-wagon-twin-1000-gal-tank/",
+                  "image": "/data/images/categories/agriculture/anhydrous/fixed_adjustable_3.jpg",
                   "features": ["Fixed frame", "Twin 1000 gal tanks"]
                 },
                 {
                   "model": "Fixed Wagon (Single 1000 or 1450 gal. Tank)",
+                  "modelId": "Varies",
                   "url": "https://behnkeenterprises.com/trailers/fixed-wagon-single-1000-or-1450-gal-tank/",
+                  "image": "/data/images/categories/agriculture/anhydrous/fixed_adjustable_2.jpg",
                   "features": ["Fixed frame", "Single 1000 or 1450 gal tank options"]
                 },
                 {
                   "model": "AA Wagon (Adjustable 60-80\", Single 1000 or 1450 Tank)",
+                  "modelId": "AA Wagon",
                   "url": "https://behnkeenterprises.com/trailers/aa-wagon-adjustable-60-80-single-1000-or-1450-tank/",
+                  "image": "/data/images/categories/agriculture/anhydrous/fixed_adjustable_1.jpg",
                   "features": ["60-80\" adjustable width", "Single 1000 or 1450 gal tank"]
                 }
               ]
@@ -81,7 +100,9 @@
               "products": [
                 {
                   "model": "Low Profile Wagon (Twin 1,000 gal Tanks)",
+                  "modelId": "LPWG2000FT",
                   "url": "https://behnkeenterprises.com/trailers/low-profile-wagon-twin-1000-gal-tanks/",
+                  "image": "/data/images/categories/agriculture/anhydrous/low_1.jpg", 
                   "features": ["Low profile design", "Twin 1000 gal tanks"]
                 }
               ]
@@ -91,6 +112,7 @@
         {
           "id": "sprayer_trailers",
           "name": "Sprayer Trailers",
+          "image": "/data/images/categories/agricultre.webp",
           "description": "As one of the pioneers in the sprayer trailer market, Behnke offers easily customizable trailers available in a variety of lengths, capacities, and hitch styles.",
           "trailerTypes": [
             {
@@ -102,6 +124,7 @@
                   "model": "14,000-16,000 lb. Pull-type Sprayer Trailers",
                   "url": "https://behnkeenterprises.com/trailers/14000-16000-lb-pull-type-sprayer-trailers/",
                   "gvwr": "14,000 - 16,000 lbs",
+                  "image": "/data/images/categories/agriculture/sprayer/pull_1.jpg",
                   "features": ["Pull-type hitch", "Flip-up outriggers", "LED lighting"]
                 },
                 {
@@ -119,18 +142,21 @@
                   "tireWheel": "235/80R-16E duals",
                   "lights": "LED flush mount",
                   "finish": "Bead blasted, acid washed, zinc rich primed, powder coated",
+                  "image": "/data/images/categories/agriculture/sprayer/pull_2.jpg",
                   "features": ["20\" flip-up outriggers", "Legal width when empty", "Gooseneck coupler available", "HD fenders optional", "Wood deck in front of outriggers available"]
                 },
                 {
                   "model": "24,000-30,000 lb. Pull-type Sprayer Trailers",
                   "url": "https://behnkeenterprises.com/trailers/24000-30000-lb-pull-type-sprayer-trailers/",
                   "gvwr": "24,000 - 30,000 lbs",
+                  "image": "/data/images/categories/agriculture/sprayer/pull_3.jpg",
                   "features": ["Pull-type hitch", "Outriggers", "Electric or air brakes"]
                 },
                 {
                   "model": "40,000-50,000 lb. Pull-type Sprayer Trailers",
                   "url": "https://behnkeenterprises.com/trailers/40000-50000-lb-pull-type-sprayer-trailers/",
                   "gvwr": "40,000 - 50,000 lbs",
+                  "image": "/data/images/categories/agriculture/sprayer/pull_4.jpg",
                   "features": ["Heavy duty frame", "Air brakes", "Custom build options"]
                 }
               ]
@@ -144,18 +170,21 @@
                   "model": "24,000-30,000 lb. Drive-over Sprayer Trailers",
                   "url": "https://behnkeenterprises.com/trailers/24000-30000-lb-drive-over-sprayer-trailers/",
                   "gvwr": "24,000 - 30,000 lbs",
+                  "image": "/data/images/categories/agriculture/sprayer/drive_1.jpg",
                   "features": ["Drive-over fenders", "Electric or air brakes"]
                 },
                 {
                   "model": "40,000 lb. Drive-over Sprayer Trailers",
                   "url": "https://behnkeenterprises.com/trailers/40000-lb-drive-over-sprayer-trailers/",
                   "gvwr": "40,000 lbs",
+                  "image": "/data/images/categories/agriculture/sprayer/drive_2.jpg",
                   "features": ["Drive-over steel fenders", "Air brakes", "Heavy-duty transport"]
                 },
                 {
                   "model": "60,000 lb. Semi-style Drive-over Sprayer Trailers",
                   "url": "https://behnkeenterprises.com/trailers/60000-lb-semi-style-drive-over-sprayer-trailers/",
                   "gvwr": "60,000 lbs",
+                  "image": "/data/images/categories/agriculture/sprayer/drive_3.jpg",
                   "features": ["Semi-style hitch", "Drive-over fenders", "Air brakes"]
                 }
               ]
@@ -169,6 +198,7 @@
                   "model": "Semi-Style Sprayer Trailers (60-80K)",
                   "url": "https://behnkeenterprises.com/trailers/semi-style-sprayer-trailers-60-80k/",
                   "gvwr": "60,000 - 80,000 lbs",
+                  "image": "/data/images/categories/agriculture/sprayer/semi_1.jpg",
                   "features": ["Semi-style hitch", "Air ride suspension", "Heavy duty construction"]
                 }
               ]
@@ -178,6 +208,7 @@
         {
           "id": "tender_trailers",
           "name": "Tender Trailers",
+          "image": "/data/images/categories/agricultre.webp",
           "description": "Tender trailers built to accommodate dry or liquid fertilizer tenders. Available in a variety of lengths and weight capacities with laser cut holes for easy tank mounting.",
           "trailerTypes": [
             {
@@ -188,6 +219,7 @@
                 {
                   "model": "Pull-type Tender Trailers",
                   "url": "https://behnkeenterprises.com/trailers/pull-type-tender-trailers/",
+                  "image": "/data/images/categories/agriculture/tender/pull_1.jpg",
                   "features": ["Dry or liquid fertilizer tenders", "Multiple lengths available", "Laser cut holes for mounting"]
                 }
               ]
@@ -200,6 +232,7 @@
                 {
                   "model": "Semi-Style Tender Trailers (60-80K)",
                   "url": "https://behnkeenterprises.com/trailers/semi-style-sprayer-trailers-60-80k-2/",
+                  "image": "/data/images/categories/agriculture/tender/semi_1.jpg",
                   "gvwr": "60,000 - 80,000 lbs",
                   "features": ["Semi-style hitch", "High capacity", "Air brakes"]
                 }
@@ -210,6 +243,7 @@
         {
           "id": "cone_trailers",
           "name": "Cone Trailers",
+          "image": "/data/images/industries/agriculture.webp",
           "description": "Vertical cone tank trailers available in single, double, and triple configurations to carry whatever brand tank you desire. A portable fertilizer storage solution.",
           "trailerTypes": [
             {
@@ -220,6 +254,7 @@
                 {
                   "model": "Single Cone Trailer",
                   "url": "https://behnkeenterprises.com/trailers/single-cone-trailer/",
+                  "image": "/data/images/categories/agriculture/cone/single_cone_1.jpg",
                   "features": ["Single vertical cone tank", "Portable fertilizer storage", "Multiple configurations available"]
                 }
               ]
@@ -232,6 +267,7 @@
                 {
                   "model": "Double Cone Trailer",
                   "url": "https://behnkeenterprises.com/trailers/double-cone-trailer/",
+                  "image": "/data/images/categories/agriculture/cone/double_cone_1.jpg",
                   "features": ["Dual vertical cone tanks", "Portable fertilizer storage"]
                 }
               ]
@@ -244,6 +280,7 @@
                 {
                   "model": "Triple Cone Trailer",
                   "url": "https://behnkeenterprises.com/trailers/triple-cone-trailer/",
+                  "image": "/data/images/categories/agriculture/cone/triple_cone_1.jpg",
                   "features": ["Triple vertical cone tanks", "High capacity fertilizer storage"]
                 }
               ]
@@ -253,6 +290,7 @@
         {
           "id": "liquid_transport",
           "name": "Liquid Transport",
+          "image": "/data/images/industries/agriculture.webp",
           "description": "Liquid transport trailers for easily moving fertilizer between fields. Available for ag use or fully DOT compliant with poly or stainless steel tanks.",
           "trailerTypes": [
             {
@@ -263,6 +301,7 @@
                 {
                   "model": "14,000 lb. Tank Trailer (1,000 gal. Tank)",
                   "url": "https://behnkeenterprises.com/trailers/14000-lb-tank-trailer-1000-gal-tank/",
+                  "image": "/data/images/categories/agriculture/liquid/nurse_1.jpg",
                   "gvwr": "14,000 lbs",
                   "capacity": "1,000 gallons",
                   "features": ["Poly or stainless tank", "DOT compliant options", "Ag use options"]
@@ -270,6 +309,7 @@
                 {
                   "model": "16,000 lb. Tank Trailer (1,200 gal. Tank)",
                   "url": "https://behnkeenterprises.com/trailers/16000-lb-tank-trailer-1200-gal-tank/",
+                  "image": "/data/images/categories/agriculture/liquid/nurse_4.jpg",
                   "gvwr": "16,000 lbs",
                   "capacity": "1,200 gallons",
                   "features": ["Poly or stainless tank", "DOT compliant options"]
@@ -277,6 +317,7 @@
                 {
                   "model": "18,000 lb. Tank Trailer (1,600 gal. Tank)",
                   "url": "https://behnkeenterprises.com/trailers/18000-lb-tank-trailer-1600-gal-tank/",
+                  "image": "/data/images/categories/agriculture/liquid/nurse_3.jpg",
                   "gvwr": "18,000 lbs",
                   "capacity": "1,600 gallons",
                   "features": ["Poly or stainless tank", "DOT compliant options"]
@@ -284,6 +325,7 @@
                 {
                   "model": "20,000 lb. Tank Trailer (1,800-2,000 gal. Tank)",
                   "url": "https://behnkeenterprises.com/trailers/20000-lb-tank-trailer-1800-2000-gal-tank/",
+                  "image": "/data/images/categories/agriculture/liquid/nurse_2.jpg",
                   "gvwr": "20,000 lbs",
                   "capacity": "1,800 - 2,000 gallons",
                   "features": ["Poly or stainless tank", "DOT compliant options"]
@@ -291,6 +333,7 @@
                 {
                   "model": "24,000 lb. Tank Trailer (2,000-2,200 gal. Tank)",
                   "url": "https://behnkeenterprises.com/trailers/24000-lb-tank-trailer-2000-2200-gal-tank/",
+                  "image": "/data/images/categories/agriculture/liquid/nurse_2.jpg",
                   "gvwr": "24,000 lbs",
                   "capacity": "2,000 - 2,200 gallons",
                   "features": ["Poly or stainless tank", "DOT compliant options"]
@@ -305,6 +348,7 @@
                 {
                   "model": "Single Cone Transport Trailers (14-18K)",
                   "url": "https://behnkeenterprises.com/trailers/single-cone-transport-trailers-14-18k-2/",
+                  "image": "/data/images/categories/agriculture/liquid/single_cone_1.jpg",
                   "gvwr": "14,000 - 18,000 lbs",
                   "features": ["Single cone tank", "Transport configuration"]
                 }
@@ -318,6 +362,7 @@
                 {
                   "model": "Semi-style Liquid Tank Transport Trailers",
                   "url": "https://behnkeenterprises.com/trailers/semi-style-liquid-tank-transport-trailers/",
+                   "image": "/data/images/categories/agriculture/liquid/semi_1.jpg",
                   "gvwr": "60,000 - 80,000 lbs",
                   "features": ["Semi-style hitch", "Multiple large tanks", "Poly or stainless options"]
                 }
@@ -330,6 +375,7 @@
     {
       "id": "construction",
       "name": "Construction",
+      "image": "/data/images/industries/construction.webp",
       "description": "Construction trailers for a variety of applications with 3,000–80,000 GVWs, manufactured for dealers across the US & Canada.",
       "useCases": [
         {
@@ -345,12 +391,14 @@
                 {
                   "model": "14-16K Flatbeds",
                   "url": "https://behnkeenterprises.com/trailers/14-16k-flatbeds/",
+                   "image": "/data/images/categories/construction/deckovers/flatbeds_1.jpg",
                   "gvwr": "14,000 - 16,000 lbs",
                   "features": ["Deckover design", "Multiple hitch options", "Treated pine decking"]
                 },
                 {
                   "model": "20K Flatbed",
                   "url": "https://behnkeenterprises.com/trailers/20k-flatbed/",
+                   "image": "/data/images/categories/construction/deckovers/flatbeds_2.jpg",
                   "gvwr": "20,000 lbs",
                   "weight": "7,520 lbs",
                   "length": "25' bed + 5' wood tail",
@@ -369,17 +417,20 @@
                   "model": "24-30K Flatbed",
                   "url": "https://behnkeenterprises.com/trailers/24-30k-flatbed/",
                   "gvwr": "24,000 - 30,000 lbs",
+                  "image": "/data/images/categories/construction/deckovers/flatbeds_3.jpg",
                   "features": ["Heavy duty I-beam frame", "Multiple hitch options", "Heavy duty beavertail options"]
                 },
                 {
                   "model": "Super Duty Flatbed",
                   "url": "https://behnkeenterprises.com/trailers/super-duty-flatbed/",
+                   "image": "/data/images/categories/construction/deckovers/flatbeds_4.jpg",
                   "features": ["Heavy duty construction", "Multiple axle options", "Gooseneck or pintle hitch"]
                 },
                 {
                   "model": "Semi-Style Flatbed",
                   "url": "https://behnkeenterprises.com/trailers/semi-style-flatbed/",
                   "gvwr": "60,000 - 80,000 lbs",
+                  "image": "/data/images/categories/construction/deckovers/flatbeds_5.jpg",
                   "features": ["Semi-style hitch", "Air ride suspension", "Apitong decking"]
                 }
               ]
@@ -393,6 +444,7 @@
                   "model": "BCT (8\" Channel) Deckovers (10-16K)",
                   "url": "https://behnkeenterprises.com/trailers/8-channel-deckovers-10-16k/",
                   "gvwr": "10,000 - 16,000 lbs",
+                  "image": "/data/images/categories/construction/deckovers/8_inch_1.jpg",
                   "features": ["8\" channel frame", "Lightweight construction", "Multiple sizes"]
                 }
               ]
@@ -406,30 +458,35 @@
                   "model": "14,000 lb. - 16,000 lb. Flatbed Tilts",
                   "url": "https://behnkeenterprises.com/trailers/14000-lb-16000-lb-flatbed-tilts/",
                   "gvwr": "14,000 - 16,000 lbs",
+                  "image": "/data/images/categories/construction/deckovers/flatbed_tilts_1.jpg",
                   "features": ["Gravity or power tilt", "Deckover configuration"]
                 },
                 {
                   "model": "20,000 lb. Flatbed Tilt",
                   "url": "https://behnkeenterprises.com/trailers/20000-lb-flatbed-tilt-2/",
                   "gvwr": "20,000 lbs",
+                  "image": "/data/images/categories/construction/deckovers/flatbed_tilts_2.jpg",
                   "features": ["Gravity or power tilt", "Deckover configuration"]
                 },
                 {
                   "model": "24,000 lb. - 30,000 lb. Flatbed Tilts",
                   "url": "https://behnkeenterprises.com/trailers/24-30k-flatbed-tilts/",
                   "gvwr": "24,000 - 30,000 lbs",
+                  "image": "/data/images/categories/construction/deckovers/flatbed_tilts_3.jpg",
                   "features": ["Gravity or power tilt", "Deckover configuration"]
                 },
                 {
                   "model": "Tag-Style Flatbed Tilts (40-50K)",
                   "url": "https://behnkeenterprises.com/trailers/40-50k-flatbed-tilts/",
                   "gvwr": "40,000 - 50,000 lbs",
+                  "image": "/data/images/categories/construction/deckovers/flatbed_tilts_4.jpg",
                   "features": ["Tag axle configuration", "Air or gravity tilt"]
                 },
                 {
                   "model": "Step-Deck Semi Style Tilt",
                   "url": "https://behnkeenterprises.com/trailers/step-deck-semi-style-tilt/",
                   "gvwr": "60,000 - 80,000 lbs",
+                  "image": "/data/images/categories/construction/deckovers/flatbed_tilts_5.jpg",
                   "features": ["Semi-style hitch", "Step deck configuration", "Power tilt"]
                 }
               ]
@@ -442,24 +499,28 @@
                 {
                   "model": "20K Hydraulic Beavertail",
                   "url": "https://behnkeenterprises.com/trailers/20k-hydraulic-beavertail/",
+                  "image": "/data/images/categories/construction/deckovers/hyd_4.jpg",
                   "gvwr": "20,000 lbs",
                   "features": ["Hydraulic beavertail", "Easy loading", "Deckover design"]
                 },
                 {
                   "model": "24-30K Hydraulic Beavertail",
                   "url": "https://behnkeenterprises.com/trailers/24-30k-hydraulic-beavertail/",
+                  "image": "/data/images/categories/construction/deckovers/hyd_3.jpg",
                   "gvwr": "24,000 - 30,000 lbs",
                   "features": ["Hydraulic beavertail", "Heavy duty frame"]
                 },
                 {
                   "model": "Tag-Style Hydraulic Beavertail",
                   "url": "https://behnkeenterprises.com/trailers/tag-style-hydraulic-beavertail/",
+                  "image": "/data/images/categories/construction/deckovers/hyd_2.jpg",
                   "gvwr": "40,000 - 50,000 lbs",
                   "features": ["Tag axle configuration", "Hydraulic beavertail", "Air brakes"]
                 },
                 {
                   "model": "Step-Deck Semi Style Hydraulic Beavertail",
                   "url": "https://behnkeenterprises.com/trailers/step-deck-semi-style-hydraulic-beavertail/",
+                  
                   "gvwr": "60,000 - 80,000 lbs",
                   "features": ["Semi-style hitch", "Step deck", "Hydraulic beavertail"]
                 }
@@ -473,12 +534,14 @@
                 {
                   "model": "40K Tag-Style Air Tilt",
                   "url": "https://behnkeenterprises.com/trailers/40k-tag-style-air-tilt/",
+                  "image": "/data/images/categories/construction/deckovers/air_1.jpg",
                   "gvwr": "40,000 lbs",
                   "features": ["Air-powered tilt", "Low load angle", "Tag axle configuration"]
                 },
                 {
                   "model": "50K Tag-Style Air Tilt",
                   "url": "https://behnkeenterprises.com/trailers/50k-tag-style-air-tilt/",
+                  "image": "/data/images/categories/construction/deckovers/air_2.jpg",
                   "gvwr": "50,000 lbs",
                   "features": ["Air-powered tilt", "Low load angle", "Triple axle configuration"]
                 }
@@ -499,35 +562,41 @@
                 {
                   "model": "14-16K Tube Tilt",
                   "url": "https://behnkeenterprises.com/trailers/14-16k-tube-tilt/",
+                  "image": "/data/images/categories/construction/tiltbeds/tube_4.jpg",
                   "gvwr": "14,000 - 16,000 lbs",
                   "features": ["Tube frame construction", "Gravity tilt", "Drop deck design"]
                 },
                 {
                   "model": "20K HD Tube Tilt",
                   "url": "https://behnkeenterprises.com/trailers/20k-hdtube-tilt/",
+                  "image": "/data/images/categories/construction/tiltbeds/tube_5.jpg",
                   "gvwr": "20,000 lbs",
                   "features": ["Heavy duty tube frame", "Torflex suspension", "Flush floor design"]
                 },
                 {
                   "model": "24K HD Tube Tilt",
                   "url": "https://behnkeenterprises.com/trailers/24k-hdtube-tilt-2/",
+                  "image": "/data/images/categories/construction/tiltbeds/tube_3.jpg",
                   "gvwr": "24,000 lbs",
                   "features": ["Heavy duty tube frame", "Air brakes", "Super single tires"]
                 },
                 {
                   "model": "Directional Drill Tilt Trailer",
                   "url": "https://behnkeenterprises.com/trailers/directionalboring/",
+                  "image": "/data/images/categories/construction/tiltbeds/tube_1.jpg",
                   "features": ["Patented split tilt", "Directional drill mounting", "Customizable to dealer specs"]
                 },
                 {
                   "model": "Full Tilt Equipment Trailer",
                   "url": "https://behnkeenterprises.com/trailers/24k-hdtube-tilt-2-2/",
+                  "image": "/data/images/categories/construction/tiltbeds/tube_2.jpg",
                   "gvwr": "24,000 lbs",
                   "features": ["Full tilt deck", "Heavy equipment transport"]
                 },
                 {
                   "model": "Tri-axle Tube Tilt",
                   "url": "https://behnkeenterprises.com/trailers/tr-axle-tube-tilt/",
+                  "image": "/data/images/categories/construction/tiltbeds/tube_6.jpg",
                   "features": ["Triple axle configuration", "High capacity", "Tube frame"]
                 }
               ]
@@ -540,12 +609,14 @@
                 {
                   "model": "6-7K Full Utility Tilt",
                   "url": "https://behnkeenterprises.com/trailers/6-7k-full-utility-tilt/",
+                  "image": "/data/images/categories/construction/tiltbeds/tilt_2.jpg",
                   "gvwr": "6,000 - 7,000 lbs",
                   "features": ["Full tilt deck", "Great for scissor lifts", "Compact design"]
                 },
                 {
                   "model": "Partial Tilt Utility (7K)",
                   "url": "https://behnkeenterprises.com/trailers/partial-tilt-utility-7k/",
+                  "image": "/data/images/categories/construction/tiltbeds/tilt_1.jpg",
                   "gvwr": "7,000 lbs",
                   "features": ["Partial tilt", "Small wheeled equipment", "Utility use"]
                 }
@@ -559,30 +630,35 @@
                 {
                   "model": "14,000 lb. - 16,000 lb. Flatbed Tilts",
                   "url": "https://behnkeenterprises.com/trailers/14000-lb-16000-lb-flatbed-tilts-2/",
+                  "image": "/data/images/categories/construction/tiltbeds/flatbed_1.jpg",
                   "gvwr": "14,000 - 16,000 lbs",
                   "features": ["Gravity or power tilt", "GN or Pintle hitch"]
                 },
                 {
                   "model": "20,000 lb. Flatbed Tilt",
                   "url": "https://behnkeenterprises.com/trailers/20000-lb-flatbed-tilt-2-3/",
+                  "image": "/data/images/categories/construction/tiltbeds/flatbed_2.jpg",
                   "gvwr": "20,000 lbs",
                   "features": ["GN or Pintle hitch", "Power or gravity tilt"]
                 },
                 {
                   "model": "24,000 lb. - 30,000 lb. Flatbed Tilts",
                   "url": "https://behnkeenterprises.com/trailers/24-30k-flatbed-tilts-2/",
+                  "image": "/data/images/categories/construction/tiltbeds/flatbed_3.jpg",
                   "gvwr": "24,000 - 30,000 lbs",
                   "features": ["GN or Pintle hitch", "Air brakes"]
                 },
                 {
                   "model": "Tag-Style Flatbed Tilts (40-50K)",
                   "url": "https://behnkeenterprises.com/trailers/40-50k-flatbed-tilts-2/",
+                  "image": "/data/images/categories/construction/tiltbeds/flatbed_4.jpg",
                   "gvwr": "40,000 - 50,000 lbs",
                   "features": ["Tag axle", "Gravity or air tilt"]
                 },
                 {
                   "model": "Step-Deck Semi Style Tilt",
                   "url": "https://behnkeenterprises.com/trailers/step-deck-semi-style-tilt-3/",
+                  "image": "/data/images/categories/construction/tiltbeds/flatbed_5.jpg",
                   "gvwr": "60,000 - 80,000 lbs",
                   "features": ["Semi hitch", "Step deck", "Power tilt"]
                 }
@@ -596,12 +672,14 @@
                 {
                   "model": "40K Tag-Style Air Tilt",
                   "url": "https://behnkeenterprises.com/trailers/40k-tag-style-air-tilt-3/",
+                  "image": "/data/images/categories/construction/tiltbeds/air_2.jpg",
                   "gvwr": "40,000 lbs",
                   "features": ["Air-powered tilt", "Lowest load angle", "Tag axle"]
                 },
                 {
                   "model": "50K Tag-Style Air Tilt",
                   "url": "https://behnkeenterprises.com/trailers/50k-tag-style-air-tilt-3/",
+                  "image": "/data/images/categories/construction/tiltbeds/air_1.jpg",
                   "gvwr": "50,000 lbs",
                   "features": ["Air-powered tilt", "Triple axle", "Lowest load angle"]
                 }
@@ -622,18 +700,21 @@
                 {
                   "model": "7,000 lb. Angle Iron Skidloader",
                   "url": "https://behnkeenterprises.com/trailers/7000-lb-angle-iron-skidloader/",
+                  "image": "/data/images/categories/construction/skidloaders/angle_3.jpg",
                   "gvwr": "7,000 lbs",
                   "features": ["Angle iron frame", "Stand-up ramps", "Compact design"]
                 },
                 {
                   "model": "10,000-12,000 Angle Iron Skidloader",
                   "url": "https://behnkeenterprises.com/trailers/10000-12000-angle-iron-skidloader/",
+                  "image": "/data/images/categories/construction/skidloaders/angle_2.jpg",
                   "gvwr": "10,000 - 12,000 lbs",
                   "features": ["Angle iron frame", "Stand-up ramps", "83\" between fenders"]
                 },
                 {
                   "model": "14,000-16,000 Angle Iron Skidloader",
                   "url": "https://behnkeenterprises.com/trailers/14000-16000-angle-iron-skidloader/",
+                  "image": "/data/images/categories/construction/skidloaders/angle_1.jpg",
                   "gvwr": "14,000 - 16,000 lbs",
                   "features": ["Angle iron frame", "Stand-up ramps", "Super single tires optional"]
                 }
@@ -647,12 +728,14 @@
                 {
                   "model": "14,000-16,000 lb Structural Channel Skidloader",
                   "url": "https://behnkeenterprises.com/trailers/14000-16000-lb-structural-channel-skidloader/",
+                  "image": "/data/images/categories/construction/skidloaders/channel_6.jpg",
                   "gvwr": "14,000 - 16,000 lbs",
                   "features": ["10\" channel frame", "Super single tires", "83\" between fenders"]
                 },
                 {
                   "model": "20,000 lb Structural Channel Skidloader",
                   "url": "https://behnkeenterprises.com/trailers/20000-lb-structural-channel-skidloader/",
+                  "image": "/data/images/categories/construction/skidloaders/channel_2.jpg",
                   "gvwr": "20,000 lbs",
                   "weight": "4,920 lbs",
                   "length": "18' bed + 2' tail w/5' HD ramps",
@@ -670,19 +753,29 @@
                 {
                   "model": "24,000 lb Structural Channel Skidloader",
                   "url": "https://behnkeenterprises.com/trailers/20000-lb-structural-channel-skidloader-3/",
+                  "image": "/data/images/categories/construction/skidloaders/channel_4.jpg",
                   "gvwr": "24,000 lbs",
                   "features": ["Heavy 10\" channel frame", "Air brakes", "Super single tires", "83\" between fenders"]
                 },
                 {
                   "model": "Directional Drill Structural Channel Skidloader",
                   "url": "https://behnkeenterprises.com/trailers/20000-lb-structural-channel-skidloader-2/",
+                  "image": "/data/images/categories/construction/skidloaders/channel_3.jpg",
                   "features": ["Directional drill configuration", "Channel frame", "Custom mounting"]
                 },
                 {
                   "model": "Tri-axle Structural Channel Skidloader",
                   "url": "https://behnkeenterprises.com/trailers/tri-axle-structural-channel-skidloader/",
+                  "image": "/data/images/categories/construction/skidloaders/channel_1.jpg",
+                  "features": ["Triple axle", "High capacity", "Channel frame construction"]
+                },
+                {
+                  "model": "Triple Axle Directional Drill Ramp Trailer",
+                  "url": "https://behnkeenterprises.com/trailers/20000-lb-structural-channel-skidloader-2-2-2-2/",
+                  "image": "/data/images/categories/construction/skidloaders/channel_5.jpg",
                   "features": ["Triple axle", "High capacity", "Channel frame construction"]
                 }
+
               ]
             }
           ]
@@ -700,12 +793,14 @@
                 {
                   "model": "Low-Pro HD Dumps 14-16K",
                   "url": "https://behnkeenterprises.com/trailers/low-pro-hd-dumps-14-16k/",
+                  "image": "/data/images/categories/construction/dump/low_1.jpg",
                   "gvwr": "14,000 - 16,000 lbs",
                   "features": ["83\" wide", "12-16 ft lengths", "2-3 ft sides", "Heavy duty scissors hoist"]
                 },
                 {
                   "model": "Low-Pro HD Dump 20K",
                   "url": "https://behnkeenterprises.com/trailers/low-pro-hd-dumps-14-16k-3/",
+                  "image": "/data/images/categories/construction/dump/low_2.jpg",
                   "gvwr": "20,000 lbs",
                   "features": ["83\" wide", "Heavy duty channel frame", "Scissors hoist", "Low profile design"]
                 }
@@ -726,6 +821,7 @@
                 {
                   "model": "6-7K Full Utility Tilt",
                   "url": "https://behnkeenterprises.com/trailers/6-7k-full-utility-tilt-3/",
+                  "image": "/data/images/categories/construction/utility/utility_1.jpg",
                   "gvwr": "6,000 - 7,000 lbs",
                   "features": ["Full tilt deck", "60-81\" widths", "8-16 ft lengths", "Great for small wheeled equipment"]
                 }
@@ -738,6 +834,7 @@
     {
       "id": "heavy_haul",
       "name": "Heavy Haul",
+      "image": "/data/images/industries/heavyhaul.webp",
       "description": "Built for rugged, heavy duty equipment. Heavy haul trailers with capacities from 40,000–110,000 GVWs, strong and durable.",
       "useCases": [
         {
@@ -753,6 +850,8 @@
                 {
                   "model": "40K Tag Trailer",
                   "url": "https://behnkeenterprises.com/trailers/40k-tag-trailer/",
+                  
+                  "image": "/data/images/categories/heavyhaul/tags/tag_1.jpg",
                   "gvwr": "40,000 lbs",
                   "weight": "10,200 lbs",
                   "length": "25' bed + 6' angle iron tail",
@@ -778,6 +877,8 @@
                 {
                   "model": "50K Tag Trailer",
                   "url": "https://behnkeenterprises.com/trailers/50k-tag-trailer/",
+                  
+                  "image": "/data/images/categories/heavyhaul/tags/tag_2.jpg",
                   "gvwr": "50,000 lbs",
                   "features": ["Triple axle", "20-32' bed lengths", "Air brakes", "Ramp options", "Low deck height"]
                 }
@@ -790,7 +891,8 @@
               "products": [
                 {
                   "model": "Paver Tag Trailer",
-                  "url": "/trailers/paver-tag-trailer",
+                  "url": "/trailers/paver-tag-trailer",                  
+                  "image": "/data/images/categories/heavyhaul/tags/tag_3.jpg",
                   "gvwr": "50,000 lbs",
                   "weight": "Varies",
                   "length": "25' bed + 6' wood tail w/hydraulic bi-folding ramps",
@@ -828,6 +930,7 @@
                   "model": "Tag-Style Flatbed Tilts (40-50K)",
                   "url": "https://behnkeenterprises.com/trailers/tag-style-flatbed-tilts-3/",
                   "gvwr": "40,000 - 50,000 lbs",
+                  "image": "/data/images/categories/construction/deckovers/flatbed_tilts_2.jpg",
                   "features": ["Gravity tilt", "Tag axle configuration", "Easy equipment loading"]
                 }
               ]
@@ -841,6 +944,7 @@
                   "model": "40-50K Tag-Style Air Tilt",
                   "url": "https://behnkeenterprises.com/trailers/40-50k-tag-style-air-tilt/",
                   "gvwr": "40,000 - 50,000 lbs",
+                  "image": "/data/images/categories/construction/deckovers/flatbed_tilts_2.jpg",
                   "features": ["Air-powered tilt", "Lowest load angle", "Tag axle"]
                 }
               ]
@@ -861,6 +965,7 @@
                   "model": "Semi-Style Ramp Trailers",
                   "url": "https://behnkeenterprises.com/trailers/semi-style-ramp-trailers/",
                   "gvwr": "60,000 - 100,000 lbs",
+                  "image": "/data/images/categories/construction/deckovers/flatbed_tilts_2.jpg",
                   "features": ["Semi-style hitch", "Ramp loading", "Multiple axle configurations"]
                 }
               ]
@@ -874,6 +979,7 @@
                   "model": "Semi-Style Tilt Trailers",
                   "url": "https://behnkeenterprises.com/trailers/semi-style-tilt-trailers/",
                   "gvwr": "60,000 - 100,000 lbs",
+                  "image": "/data/images/categories/construction/deckovers/flatbed_tilts_2.jpg",
                   "features": ["Semi-style hitch", "Power tilt", "Multiple axle configurations"]
                 }
               ]
@@ -886,6 +992,7 @@
                 {
                   "model": "Paver-Style Step Decks",
                   "url": "https://behnkeenterprises.com/trailers/paver-style-step-decks/",
+                  "image": "/data/images/categories/construction/deckovers/flatbed_tilts_2.jpg",
                   "features": ["Paver-specific design", "Semi hitch", "Step deck configuration"]
                 }
               ]
@@ -898,6 +1005,7 @@
                 {
                   "model": "Double Drop Semi Trailer",
                   "url": "https://behnkeenterprises.com/trailers/double-drop-semi-trailer/",
+                  "image": "/data/images/categories/construction/deckovers/flatbed_tilts_2.jpg",
                   "features": ["Double drop design", "Very low deck height", "Semi hitch", "Heavy equipment transport"]
                 }
               ]
@@ -917,6 +1025,7 @@
                 {
                   "model": "Hydraulic Detach - Tandem Axle",
                   "gvwr": "80,000 lbs",
+                  "image": "/data/images/categories/construction/deckovers/flatbed_tilts_2.jpg",
                   "features": ["Hydraulic detachable neck", "Low deck height", "Tandem axle configuration", "High tensile frame"]
                 }
               ]
@@ -929,6 +1038,7 @@
                 {
                   "model": "Hydraulic Detach - Triple Axle",
                   "gvwr": "102,000 - 110,000 lbs",
+                  "image": "/data/images/categories/construction/deckovers/flatbed_tilts_2.jpg",
                   "features": ["Hydraulic detachable neck", "Triple axle configuration", "Quad axle available", "Flip axle available"]
                 }
               ]
@@ -940,6 +1050,7 @@
     {
       "id": "commercial",
       "name": "Commercial",
+      "image": "/data/images/industries/commercial.webp",
       "description": "Commercial trailers are strong and light, built with the over-the-road driver in mind. Step decks, flat decks, and container trailers with multiple options.",
       "useCases": [
         {
@@ -957,6 +1068,7 @@
                   "url": "https://behnkeenterprises.com/trailers/super-low-profile-over-the-road-step-deck-semi/",
                   "gvwr": "60,000 - 80,000 lbs",
                   "deckHeight": "30\" unloaded",
+                  "image": "/data/images/categories/construction/deckovers/flatbed_tilts_2.jpg",
                   "features": ["10' upper deck", "38' or 43' lower deck", "Air ride suspension", "Apitong decking", "Tandem or triple axle", "Slide axle available"]
                 }
               ]
@@ -971,6 +1083,7 @@
                   "url": "https://behnkeenterprises.com/trailers/low-profile-over-the-road-step-deck-semi/",
                   "gvwr": "60,000 - 80,000 lbs",
                   "deckHeight": "35\" unloaded",
+                  "image": "/data/images/categories/construction/deckovers/flatbed_tilts_2.jpg",
                   "features": ["10' upper deck", "38' or 43' lower deck", "Air ride suspension", "Apitong decking"]
                 }
               ]
@@ -985,6 +1098,7 @@
                   "url": "https://behnkeenterprises.com/trailers/high-tire-over-the-road-step-deck-semi/",
                   "gvwr": "60,000 - 80,000 lbs",
                   "deckHeight": "40\" unloaded",
+                  "image": "/data/images/categories/construction/deckovers/flatbed_tilts_2.jpg",
                   "features": ["10' upper deck", "38' or 43' lower deck", "Air ride suspension", "Apitong decking"]
                 }
               ]
@@ -1005,6 +1119,7 @@
                   "model": "Over the Road Flat-Deck Semi Trailer",
                   "url": "https://behnkeenterprises.com/trailers/over-the-road-flat-deck-semi-trailer/",
                   "gvwr": "60,000 - 80,000 lbs",
+                  "image": "/data/images/categories/construction/deckovers/flatbed_tilts_2.jpg",
                   "features": ["48' and 53' standard lengths", "Air ride suspension", "Apitong decking", "Tandem or triple axle", "Slide axle available"]
                 }
               ]
@@ -1024,6 +1139,7 @@
                 {
                   "model": "Commercial Container Trailers",
                   "url": "https://behnkeenterprises.com/trailers/commerical-container-trailers/",
+                  "image": "/data/images/categories/construction/deckovers/flatbed_tilts_2.jpg",
                   "features": ["Multiple container sizes", "Twist lock corners", "DOT compliant", "Multiple axle options"]
                 }
               ]
@@ -1035,6 +1151,7 @@
     {
       "id": "utility",
       "name": "Utility / Telecom",
+      "image": "/data/images/industries/utility.webp",
       "description": "Utility and telecom trailers including directional drill trailers, pole trailers, reel trailers, and more for infrastructure work.",
       "useCases": [
         {
@@ -1049,6 +1166,7 @@
                 {
                   "model": "Directional Drill Tilt Trailer",
                   "url": "https://behnkeenterprises.com/trailers/directionalboring-2/",
+                   "image": "/data/images/categories/construction/deckovers/flatbed_tilts_2.jpg",
                   "features": ["Patented split tilt", "Safer loading solution", "Customizable to dealer specs"]
                 }
               ]
@@ -1060,11 +1178,13 @@
                 {
                   "model": "Directional Drill Ramp Trailer",
                   "url": "https://behnkeenterprises.com/trailers/20000-lb-structural-channel-skidloader-2-2/",
+                   "image": "/data/images/categories/construction/deckovers/flatbed_tilts_2.jpg",
                   "features": ["Industry standard ramp style", "Directional drill mounting", "Customizable to dealer specs"]
                 },
                 {
                   "model": "Triple Axle Directional Drill Ramp Trailer",
                   "url": "https://behnkeenterprises.com/trailers/20000-lb-structural-channel-skidloader-2-2-2/",
+                   "image": "/data/images/categories/construction/deckovers/flatbed_tilts_2.jpg",
                   "features": ["Triple axle", "Large drills", "Ramp loading"]
                 }
               ]
@@ -1076,18 +1196,21 @@
                 {
                   "model": "30K Tag Trailer (Directional Drill)",
                   "url": "https://behnkeenterprises.com/trailers/50k-tag-trailer-2-2/",
+                   "image": "/data/images/categories/construction/deckovers/flatbed_tilts_2.jpg",
                   "gvwr": "30,000 lbs",
                   "features": ["Large drill transport", "Tag axle", "Low deck height"]
                 },
                 {
                   "model": "40-50K Tag Trailer (Directional Drill)",
                   "url": "https://behnkeenterprises.com/trailers/50k-tag-trailer-2/",
+                   "image": "/data/images/categories/construction/deckovers/flatbed_tilts_2.jpg",
                   "gvwr": "40,000 - 50,000 lbs",
                   "features": ["Very large drill transport", "Tag or triple axle", "Air brakes"]
                 },
                 {
                   "model": "40-50K Tag-Style Air Tilt (Directional Drill)",
                   "url": "https://behnkeenterprises.com/trailers/40-50k-tag-style-air-tilt-2/",
+                   "image": "/data/images/categories/construction/deckovers/flatbed_tilts_2.jpg",
                   "gvwr": "40,000 - 50,000 lbs",
                   "features": ["Air tilt", "Lowest load angle", "Large drill transport"]
                 }
@@ -1107,6 +1230,7 @@
                 {
                   "model": "Telescoping Pole Trailers",
                   "url": "https://behnkeenterprises.com/trailers/telescoping-pole-trailers/",
+                   "image": "/data/images/categories/construction/deckovers/flatbed_tilts_2.jpg",
                   "gvwr": "10,000 - 40,000 lbs",
                   "features": ["Single and tandem axle models", "Heavy duty construction", "Telescoping design for long poles"]
                 }
@@ -1126,6 +1250,8 @@
                 {
                   "model": "Single Axle Reel Trailers",
                   "url": "https://behnkeenterprises.com/trailers/single-axle-reel-trailers/",
+                  "image": "/data/images/categories/construction/deckovers/flatbed_tilts_2.jpg",
+
                   "features": ["Single or tandem axle", "Single or multiple reel configurations", "Smoother ride suspension option"]
                 }
               ]
@@ -1137,6 +1263,7 @@
     {
       "id": "oem",
       "name": "OEM",
+      "image": "/data/images/industries/oem.webp",
       "description": "Custom OEM trailer manufacturing with full capability to build any trailer to manufacturer-specific configurations. Contact Behnke for volume pricing and custom builds.",
       "useCases": [
         {
@@ -1151,6 +1278,7 @@
                 {
                   "model": "Custom OEM Trailers",
                   "url": "https://behnkeenterprises.com/behnke-enterprises-trailers/oem-trailers/our-oem-trailers/",
+                  "image": "/data/images/categories/construction/deckovers/flatbed_tilts_2.jpg",
                   "features": ["Fully customizable", "All trailer types available", "Manufacturer-specific configurations", "Volume pricing available"]
                 }
               ]

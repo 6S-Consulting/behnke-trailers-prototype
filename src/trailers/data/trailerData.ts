@@ -305,9 +305,389 @@ export const paverTagTrailer: TrailerProduct = {
   resources: ["Find a Dealer", "Download Brochure", "Product Options"],
 };
 
+// Agricultural - Anhydrous Wagons
+export const tandemGooseneckWagon: TrailerProduct = {
+  slug: "tandem-gooseneck-wagon",
+  title: "Tandem Gooseneck Wagon (Twin 1450 gal. Tanks)",
+  shortDescription:
+    "One of our most popular and versatile models for anhydrous ammonia transport.",
+  description:
+    "One of our most popular and versatile models, the GN2900WG is built for durability and ease of operation. Twin 1450 gal. tanks for anhydrous ammonia transport with adjustable rear axle track from 92-120 inches.",
+  overview:
+    "Heavy-duty tandem axle gooseneck wagon designed for agricultural anhydrous ammonia transport with maximum versatility.",
+  heroImage: heroImage,
+  gallery: [heroImage, trailer03],
+  brochureFileName: "tandem-gooseneck-wagon-brochure.pdf",
+  specs: [
+    { label: "Tank Capacity", value: "Twin 1,450 gal" },
+    { label: "GVWR", value: "29,000 lbs" },
+    { label: "Axle Config", value: "Tandem" },
+    { label: "Hitch", value: "Gooseneck" },
+    { label: "Length", value: "24 ft" },
+    { label: "Width", value: "102 in" },
+    { label: "Track", value: "92-120\"  adjustable rear axle" },
+  ],
+  details: [
+    "Comes standard with (2) steps on side",
+    "Spring assist standard on tongue",
+    "Torflex front axle popular",
+    "Popular for agricultural operations",
+  ],
+  keyAdvantages: [
+    "Most popular versatile model",
+    "Adjustable rear track width",
+    "Heavy-duty construction",
+    "Proven reliability",
+  ],
+  optionalFeatures: [
+    "LED light package",
+    "Upgraded brakes",
+    "Custom configurations",
+  ],
+  resources: ["Find a Dealer", "Download Brochure", "Request Quote"],
+};
+
+// Agricultural - Sprayer Trailers
+export const sprayerTrailer40K50K: TrailerProduct = {
+  slug: "sprayer-trailer-40k-50k",
+  title: "40,000-50,000 lb. Pull-type Sprayer Trailers",
+  shortDescription:
+    "40,000 to 50,000 lb. GVW pull-type sprayer trailers for agricultural operations.",
+  description:
+    "Our 40,000 lb. to 50,000 lb. GVW pull-type sprayer trailers are built to handle the heaviest liquid fertilizer loads. Models STX22A and STX22A-EX available with options for longer tongues and heavy-duty fenders.",
+  overview:
+    "Heavy-duty pull-type sprayer trailers designed for maximum agricultural productivity.",
+  heroImage: heroImage,
+  gallery: [heroImage, trailer03, trailer04],
+  brochureFileName: "sprayer-trailer-40k-50k-brochure.pdf",
+  specs: [
+    { label: "GVW Rating", value: "40,000-50,000 lb" },
+    { label: "Tank Type", value: "Poly" },
+    { label: "Boom Width", value: "60-90 ft" },
+    { label: "Hitch", value: "Pull-type" },
+    { label: "Configuration", value: "Standard or Extended" },
+  ],
+  details: [
+    "Available with longer 10'-14' tongue",
+    "HD fenders available",
+    "Wood deck in front of outriggers available",
+    "Built for precision agricultural application",
+  ],
+  keyAdvantages: [
+    "High capacity payload",
+    "Precise spray application",
+    "Durable poly tank construction",
+    "Field-proven design",
+  ],
+  optionalFeatures: [
+    "Auto-steer ready GPS wiring",
+    "Extended tongue",
+    "HD fenders",
+    "Custom boom configurations",
+  ],
+  resources: ["Find a Dealer", "Download Brochure", "Dealer Locator"],
+};
+
+// Construction - Deckover Gooseneck
+export const deckoверGooseneck: TrailerProduct = {
+  slug: "deckover-gooseneck",
+  title: "Deckover Gooseneck",
+  shortDescription:
+    "Heavy-duty 8×30 ft deckover with gooseneck hitch for equipment hauling.",
+  description:
+    "Heavy-duty deckover trailer perfect for equipment hauling. Features 8×30 ft deck with tandem 15K axles and gooseneck hitch configuration.",
+  overview:
+    "Durable deckover gooseneck trailer for construction equipment transport.",
+  heroImage: heroImage,
+  gallery: [heroImage, trailer03, trailer04],
+  brochureFileName: "deckover-gooseneck-brochure.pdf",
+  specs: [
+    { label: "Deck", value: "8×30 ft" },
+    { label: "Axle", value: "Tandem 15K" },
+    { label: "Hitch", value: "Gooseneck" },
+    { label: "GVWR", value: "30,000 lb" },
+    { label: "Width", value: "102\" between fenders" },
+  ],
+  details: [
+    "Heavy-duty construction",
+    "Easy loading geometry",
+    "Fifth wheel ready",
+    "Versatile deck configuration",
+  ],
+  keyAdvantages: [
+    "30,000 lb GVWR capacity",
+    "Easy load angles",
+    "Durable construction",
+    "Professional appearance",
+  ],
+  optionalFeatures: [
+    "Stake pockets every 24\"",
+    "Extended tongue",
+    "Spare tire mounts",
+    "Toolbox attachments",
+  ],
+  resources: ["Find a Dealer", "Download Brochure", "Specifications"],
+};
+
+// Heavy Haul - 60-Ton Tag Trailer
+export const tagTrailer60Ton: TrailerProduct = {
+  slug: "tag-trailer-60-ton",
+  title: "Tag Trailer 60-Ton",
+  shortDescription:
+    "Heavy-duty 60-ton capacity tag trailer for the most demanding equipment hauling.",
+  description:
+    "60-ton capacity tag trailer with 8×33 ft deck and triple axle configuration. Built from premium materials to handle the heaviest loads with confidence.",
+  overview:
+    "Premium 60-ton tag trailer for serious heavy haul requirements.",
+  heroImage: heroImage,
+  gallery: [heroImage, trailer03, trailer04, trailer05],
+  brochureFileName: "tag-trailer-60-ton-brochure.pdf",
+  specs: [
+    { label: "Capacity", value: "60 ton" },
+    { label: "Deck", value: "8×33 ft" },
+    { label: "Axle Config", value: "Triple" },
+    { label: "GVWR", value: "120,000 lb" },
+    { label: "Suspension", value: "Air ride standard" },
+  ],
+  details: [
+    "Built for the toughest loads",
+    "Drop deck option available",
+    "Customizable for specific loads",
+    "Industry-leading durability",
+  ],
+  keyAdvantages: [
+    "60-ton payload capacity",
+    "Triple axle for distribution",
+    "Air ride comfort and control",
+    "Proven reliability",
+  ],
+  optionalFeatures: [
+    "Air ride suspension",
+    "Flip axle configuration",
+    "Custom swingout",
+    "Load sensors",
+  ],
+  resources: ["Find a Dealer", "Download Brochure", "Request Customization"],
+};
+
+// Utility/Telecom - Directional Drill Ramp Trailer
+export const directionalDrillRampTrailer: TrailerProduct = {
+  slug: "directional-drill-ramp-trailer",
+  title: "Directional Drill Ramp Trailer",
+  shortDescription:
+    "Complete directional drill ready system with ramps and mounts for boring equipment.",
+  description:
+    "Directional drill ramp trailers are available in 18', 20', and 24' models with HD 23\" wide tube ramps and complete boring equipment mounts.",
+  overview:
+    "Purpose-built trailer system for directional drilling equipment with integrated ramps and mounting solutions.",
+  heroImage: heroImage,
+  gallery: [heroImage, trailer03, trailer04],
+  brochureFileName: "directional-drill-ramp-brochure.pdf",
+  specs: [
+    { label: "Models", value: "18', 20', 24'" },
+    { label: "Ramp Width", value: "HD 23\" tube" },
+    { label: "GVWR", value: "20,000-24,000 lb" },
+    { label: "Deck Height", value: "Industry low on spring suspension" },
+    { label: "Customization", value: "Full dealer-specific options" },
+  ],
+  details: [
+    "HD 23\" wide tube ramps w/pin style lock",
+    "Completely drill ready with mixer, reel, and toolbox mounts",
+    "Boring rod holders and machine stops",
+    "Trailer can be customized to meet dealer mounting specs",
+    "Custom tongue, deck, and beavertail lengths available",
+  ],
+  keyAdvantages: [
+    "Fully integrated drilling system",
+    "Low deck for safe loading",
+    "Heavy-duty ramp construction",
+    "Custom support for all major manufacturers",
+  ],
+  optionalFeatures: [
+    "Mixer mount",
+    "Reel mount",
+    "Toolbox integration",
+    "Rod holder systems",
+  ],
+  resources: ["Find a Dealer", "Download Brochure", "Configure Drill Setup"],
+};
+
+// Commercial - OTR Step Deck Semi
+export const otrStepDeckSemi: TrailerProduct = {
+  slug: "otr-step-deck-semi",
+  title: "Over the Road Step-Deck Semi Trailer",
+  shortDescription:
+    "53-foot over-the-road step deck trailer for commercial freight hauling.",
+  description:
+    "Professional step deck semi trailer designed for over-the-road freight hauling. Available in multiple profiles and configurations with premium components for maximum payload and durability.",
+  overview:
+    "Commercial-grade step deck semi trailer engineered for heavy freight applications.",
+  heroImage: heroImage,
+  gallery: [heroImage, trailer03, trailer04],
+  brochureFileName: "otr-step-deck-brochure.pdf",
+  specs: [
+    { label: "Length", value: "40' - 53'" },
+    { label: "Upper Deck", value: "11 ft" },
+    { label: "Lower Deck", value: "42 ft" },
+    { label: "GVWR", value: "80,000 lb" },
+    { label: "Decking", value: "Oak or Apitong hardwood" },
+  ],
+  details: [
+    "Various overall lengths available from 40' - 53'",
+    "Air ride suspension and lightweight hardwood decking standard",
+    "Option to add a 6' beavertail w/ load ramps",
+    "Triple axle configurations available",
+    "Low profile option for maximum payload",
+  ],
+  keyAdvantages: [
+    "Maximum payload capacity",
+    "Low-profile for high-clearance routes",
+    "Premium hardwood decking",
+    "Fuel-efficient air ride suspension",
+  ],
+  optionalFeatures: [
+    "Beavertail and ramps",
+    "Triple axle configuration",
+    "Lift axles",
+    "Winch tracks",
+  ],
+  resources: ["Find a Dealer", "Download Brochure", "Freight Solutions"],
+};
+
+// Utility/Telecom - Pole Trailer
+export const poleTrailer: TrailerProduct = {
+  slug: "pole-trailer",
+  title: "Pole Trailer 60'",
+  shortDescription:
+    "Extendable pole trailer for utility poles and long materials transport.",
+  description:
+    "60-foot extendable pole trailer designed for utility companies. Features multiple bolsters and extends to accommodate poles up to 60 feet in length.",
+  overview:
+    "Specialized trailer for utility pole and infrastructure material transport.",
+  heroImage: heroImage,
+  gallery: [heroImage, trailer03],
+  brochureFileName: "pole-trailer-brochure.pdf",
+  specs: [
+    { label: "Reach", value: "45-60 ft" },
+    { label: "Bolsters", value: "2" },
+    { label: "GVWR", value: "50,000 lb" },
+    { label: "Hitch", value: "Draw bar" },
+    { label: "Load Height", value: "Adjustable" },
+  ],
+  details: [
+    "Telescoping design for different pole lengths",
+    "Manual or powered extension options",
+    "Load-holding binders included",
+    "Built for utility and telecom industries",
+  ],
+  keyAdvantages: [
+    "Up to 60' reach",
+    "Flexible load positioning",
+    "Proven utility-industry design",
+    "Easy load securement",
+  ],
+  optionalFeatures: [
+    "Powered hydraulic extending",
+    "Additional bolster options",
+    "Custom binder configuration",
+  ],
+  resources: ["Find a Dealer", "Download Brochure", "Utility Solutions"],
+};
+
+// Utility/Telecom - Reel Trailer
+export const reelTrailer: TrailerProduct = {
+  slug: "reel-trailer",
+  title: "Reel Trailer Heavy Duty",
+  shortDescription:
+    "Heavy-duty cable reel trailer for telecom and power line applications.",
+  description:
+    "Heavy-duty reel trailer designed to transport cable reels safely. Features hydraulic spindles and is purpose-built for telecom and power utilities.",
+  overview:
+    "Industrial reel trailer for telecommunications and utility cable transport.",
+  heroImage: heroImage,
+  gallery: [heroImage, trailer03],
+  brochureFileName: "reel-trailer-brochure.pdf",
+  specs: [
+    { label: "Reel Capacity", value: "3 reels" },
+    { label: "Spindles", value: "Hydraulic" },
+    { label: "GVWR", value: "41,000 lb" },
+    { label: "Hitch", value: "Draw bar" },
+    { label: "Brakes", value: "Air brakes" },
+  ],
+  details: [
+    "Hydraulic spindle system for smooth operation",
+    "Dual spindle saddles with load distribution",
+    "Heavy-duty frame construction",
+    "Integrated cable guides",
+  ],
+  keyAdvantages: [
+    "3-reel capacity",
+    "Hydraulic load distribution",
+    "Heavy-duty construction",
+    "Industry-standard design",
+  ],
+  optionalFeatures: [
+    "Electric/hydraulic combination",
+    "Load monitoring sensors",
+    "Cable guides and protective padding",
+  ],
+  resources: ["Find a Dealer", "Download Brochure", "Telecom Specialists"],
+};
+
+// Construction - Low-Pro HD Dump
+export const dumpTrailer: TrailerProduct = {
+  slug: "low-pro-hd-dump",
+  title: "Low-Pro HD Dump 20K",
+  shortDescription:
+    "Hydraulic low-profile dump trailer for construction materials.",
+  description:
+    "20,000 lb GVWR hydraulic dump trailer with champion scissors hoist and MTE hydraulic unit. Available in 14', 16' or 18' lengths with customizable side heights.",
+  overview:
+    "Heavy-duty low-profile dump trailer for construction and bulk material transport.",
+  heroImage: heroImage,
+  gallery: [heroImage, trailer03],
+  brochureFileName: "dump-trailer-brochure.pdf",
+  specs: [
+    { label: "GVWR", value: "20,000 lb" },
+    { label: "Bed Length", value: "14', 16' or 18'" },
+    { label: "Sides", value: "2-3' adjustable" },
+    { label: "Hitch", value: "Pull-type or Gooseneck" },
+    { label: "Hoist", value: "Champion scissors hoist w/ 6\" cylinder" },
+  ],
+  details: [
+    "Champion Scissors Hoist w/ 6\" cylinder",
+    "MTE hydraulic unit for raising/lowering",
+    "3-way combination gate",
+    "Available in 14', 16' or 18' lengths w/2-3' sides",
+    "Gooseneck coupler available",
+  ],
+  keyAdvantages: [
+    "Low-profile design",
+    "Quick hydraulic raise/lower",
+    "Heavy-duty steel construction",
+    "Versatile bed length options",
+  ],
+  optionalFeatures: [
+    "Gooseneck hitch",
+    "Extended sides",
+    "Tarp system",
+    "LED lighting package",
+  ],
+  resources: ["Find a Dealer", "Download Brochure", "Construction Solutions"],
+};
+
 export const trailers: TrailerProduct[] = [
   directionalDrillTiltTrailer,
   tubeTilt20K,
   paverTagTrailer,
   walkingTandemGooseneckWagon,
+  tandemGooseneckWagon,
+  sprayerTrailer40K50K,
+  deckoверGooseneck,
+  tagTrailer60Ton,
+  directionalDrillRampTrailer,
+  otrStepDeckSemi,
+  poleTrailer,
+  reelTrailer,
+  dumpTrailer,
 ];

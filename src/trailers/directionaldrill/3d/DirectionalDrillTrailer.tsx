@@ -1866,13 +1866,14 @@ export default function TrailerViewer({
   return (
     <>
       <div
-        className="relative w-full h-[700px] bg-gray-200 rounded-lg overflow-hidden border border-slate-300"
+        className="relative w-full h-[700px] bg-gray-900 rounded-lg overflow-hidden border border-slate-300"
         onMouseMove={handleMouseMove}
         onMouseLeave={handlePartLeave}
       >
         <Canvas
           camera={{ position: [360, 180, 520], fov: 40, near: 1, far: 3200 }}
           shadows
+          style={{ width: '100%', height: '100%' }}
         >
           <CameraRig cameraView={cameraView} deckLength={dims.deckLength} />
           <color attach="background" args={["#9ca3af"]} />

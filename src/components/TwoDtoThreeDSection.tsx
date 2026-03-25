@@ -37,16 +37,15 @@ export default function TwoDtoThreeDSection() {
         </div>
 
         {step === 'upload' && (
-          <div className="w-full">
-            <Card className="border-2 border-dashed shadow-sm">
-              <CardHeader>
-                <CardTitle>Upload 2D Diagram</CardTitle>
-                <CardDescription>
-                  Drag and drop your CAD file, PDF, or image here.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex flex-col items-center justify-center h-64 border-2 border-dashed border-muted-foreground/25 rounded-lg bg-muted/50 hover:bg-muted/70 transition-colors">
+          <Card className="border-2 border-dashed shadow-sm w-full min-h-[600px] flex flex-col">
+            <CardHeader>
+              <CardTitle>Upload 2D Diagram</CardTitle>
+              <CardDescription>
+                Drag and drop your CAD file, PDF, or image here.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6 flex-1 flex flex-col justify-center">
+              <div className="flex flex-col items-center justify-center h-64 border-2 border-dashed border-muted-foreground/25 rounded-lg bg-muted/50 hover:bg-muted/70 transition-colors">
                   <Input
                     type="file"
                     className="hidden"
@@ -79,11 +78,10 @@ export default function TwoDtoThreeDSection() {
                 </Button>
               </CardContent>
             </Card>
-          </div>
         )}
 
         {step === 'options' && (
-          <div className="w-full flex flex-col min-h-[600px]">
+          <div className="w-full flex flex-col min-h-[600px] border border-border rounded-lg bg-card shadow-sm p-6">
             <div className="flex items-center gap-2 mb-12">
               <Button
                 variant="outline"
@@ -141,7 +139,7 @@ export default function TwoDtoThreeDSection() {
         )}
 
         {step === 'view' && (
-          <Card className="h-full flex flex-col min-h-[700px] overflow-hidden border shadow-sm flex-1">
+          <Card className="flex flex-col min-h-[600px] overflow-hidden border shadow-sm w-full flex-1">
             <Tabs defaultValue="3d-view" className="w-full h-full flex flex-col">
               <div className="border-b px-6 py-3 bg-muted/30 flex justify-between items-center">
                 <div className="flex gap-2">
@@ -152,20 +150,13 @@ export default function TwoDtoThreeDSection() {
                   >
                     <ArrowLeft className="w-4 h-4 mr-2" /> Back
                   </Button>
-                  <Button variant="outline" size="icon" title="Reset View">
-                    <RotateCcw className="w-4 h-4" />
-                  </Button>
-                  <Button variant="default" size="sm">
-                    <Save className="w-4 h-4 mr-2" /> Save Draft
-                  </Button>
+                  
                 </div>
               </div>
 
-              <TabsContent value="3d-view" className="flex-1 p-0 m-0 relative bg-slate-900 group">
-                <div className="w-full h-full absolute inset-0">
-                <div className="w-full h-full border-0 rounded-none bg-slate-900 overflow-hidden">
+              <TabsContent value="3d-view" className="flex-1 p-0 m-0 relative bg-slate-900 group overflow-hidden">
+                <div className="w-full h-full ">
                   <TrailerViewer key="3d-model" />
-                </div>
                 </div>
 
                 {/* Overlay Controls */}

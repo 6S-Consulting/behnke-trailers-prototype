@@ -2,10 +2,13 @@ import { useParams } from "react-router-dom";
 import { DirectionalDrillTiltTrailer3DPage } from "./DirectionalDrillTiltTrailer3DPage";
 import { TubeTilt3DPage } from "./TubeTilt3DPage.tsx";
 import { PaverTag3DPage } from "./PaverTag3DPage";
+import { Trailer3DUnavailable } from "./ Trailer3DUnavailable";
 import NotFound from "@/pages/NotFound";
 
 export function Trailer3DLoader() {
   const { slug } = useParams<{ slug: string }>();
+
+  if (!slug) return <NotFound />;
 
   switch (slug) {
     case "directional-drill-tilt-trailer":
@@ -15,6 +18,6 @@ export function Trailer3DLoader() {
     case "paver-tag-trailer":
       return <PaverTag3DPage />;
     default:
-      return <NotFound />;
+      return <Trailer3DUnavailable slug={slug} />;
   }
 }
