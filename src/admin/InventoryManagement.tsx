@@ -199,7 +199,7 @@ const InventoryManagement = () => {
               { key: 'category', label: 'Category', render: (t) => <StatusBadge status={t.category} /> },
               { key: 'subType', label: 'Sub-Type', render: (t) => <span className="text-xs">{t.subType}</span> },
               { key: 'gvw', label: 'GVW', sortable: true, render: (t) => <span className="font-mono text-xs">{t.gvw.toLocaleString()} lb</span> },
-              { key: 'price', label: 'Price', sortable: true, render: (t) => <span className="font-mono text-xs">�${t.price.toLocaleString()}</span> },
+              { key: 'price', label: 'Price', sortable: true, render: (t) => <span className="font-mono text-xs">${t.price.toLocaleString()}</span> },
               { key: 'inStock', label: 'Stock', sortable: true, render: (t) => <span className={cn('font-mono text-xs font-bold', t.inStock === 0 ? 'text-danger' : t.inStock <= 3 ? 'text-warning' : 'text-success')}>{t.inStock}</span> },
               { key: 'status', label: 'Status', render: (t) => <StatusBadge status={t.status} /> },
               {
@@ -226,7 +226,7 @@ const InventoryManagement = () => {
                 <h3 className="font-display font-bold uppercase tracking-wide text-sm group-hover:text-primary transition-colors">{t.name}</h3>
                 <p className="text-xs text-muted-foreground mt-1">{t.category} — {t.subType}</p>
                 <div className="flex items-baseline justify-between mt-3">
-                  <span className="font-display text-lg font-bold">�${t.price.toLocaleString()}</span>
+                  <span className="font-display text-lg font-bold">${t.price.toLocaleString()}</span>
                   <span className={cn('font-mono text-xs', t.inStock === 0 ? 'text-danger' : t.inStock <= 3 ? 'text-warning' : 'text-success')}>{t.inStock} in stock</span>
                 </div>
               </div>
@@ -287,7 +287,7 @@ const InventoryManagement = () => {
                       { key: 'modelNumber', label: 'Model #', type: 'text' },
                       { key: 'subType', label: 'Sub-Type', type: 'text' },
                       { key: 'gvw', label: 'GVW (lb)', type: 'number' },
-                      { key: 'price', label: 'Price (�$)', type: 'number' },
+                      { key: 'price', label: 'Price ($)', type: 'number' },
                       { key: 'inStock', label: 'In Stock', type: 'number' },
                       { key: 'leadTimeDays', label: 'Lead Time (days)', type: 'number' },
                     ].map(({ key, label, type }) => (
@@ -333,7 +333,7 @@ const InventoryManagement = () => {
                   <div className="grid grid-cols-2 gap-4">
                     <Field label="Category" value={`${detailTrailer.category} — ${detailTrailer.subType}`} />
                     <Field label="GVW" value={`${detailTrailer.gvw.toLocaleString()} lb`} />
-                    <Field label="Base Price" value={<span className="font-display text-xl font-bold">�${detailTrailer.price.toLocaleString()}</span>} />
+                    <Field label="Base Price" value={<span className="font-display text-xl font-bold">${detailTrailer.price.toLocaleString()}</span>} />
                     <Field label="Lead Time" value={`${detailTrailer.leadTimeDays} days`} />
                     <Field label="In Stock" value={<span className={cn('font-bold', detailTrailer.inStock > 5 ? 'text-success' : detailTrailer.inStock > 0 ? 'text-warning' : 'text-danger')}>{detailTrailer.inStock}</span>} />
                   </div>
@@ -360,7 +360,7 @@ const InventoryManagement = () => {
                             <span className="text-sm font-medium">{o.name}</span>
                             <span className="text-xs text-muted-foreground ml-2">{o.description}</span>
                           </div>
-                          <span className="font-mono text-sm text-primary">+�${o.priceAdd.toLocaleString()}</span>
+                          <span className="font-mono text-sm text-primary">+${o.priceAdd.toLocaleString()}</span>
                         </div>
                       ))}
                     </div>
@@ -380,7 +380,7 @@ const InventoryManagement = () => {
                 { key: 'modelNumber', label: 'Model # *', type: 'text', placeholder: 'e.g. STX22A' },
                 { key: 'subType', label: 'Sub-Type', type: 'text', placeholder: 'e.g. Sprayer Trailers' },
                 { key: 'gvw', label: 'GVW (lb)', type: 'number', placeholder: '0' },
-                { key: 'price', label: 'Price (�$)', type: 'number', placeholder: '0' },
+                { key: 'price', label: 'Price ($)', type: 'number', placeholder: '0' },
                 { key: 'inStock', label: 'In Stock', type: 'number', placeholder: '0' },
                 { key: 'leadTimeDays', label: 'Lead Time (days)', type: 'number', placeholder: '21' },
               ].map(({ key, label, type, placeholder }) => (

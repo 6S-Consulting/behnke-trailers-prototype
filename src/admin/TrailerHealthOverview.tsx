@@ -178,7 +178,6 @@ const TrailerHealthOverview = () => {
                 { key: 'modelNumber', label: 'Model', sortable: true },
                 { key: 'category', label: 'Category', render: (t) => <StatusBadge status={t.category} /> },
                 { key: 'customer', label: 'Customer', render: (t) => <span className="text-xs">{state.customers.find(c => c.id === t.customerId)?.name}</span> },
-                { key: 'dealer', label: 'Dealer', render: (t) => <span className="text-xs">{state.dealers.find(d => d.id === t.dealerId)?.name}</span> },
                 { key: 'mileage', label: 'Mileage', sortable: true, render: (t) => <span className="font-mono text-xs">{t.sensorData.mileage.toLocaleString()}</span> },
                 {
                   key: 'brakes', label: 'Brakes', render: (t) => (
@@ -211,7 +210,6 @@ const TrailerHealthOverview = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
               {state.soldTrailers.map(t => {
                 const cust = state.customers.find(c => c.id === t.customerId);
-                const dealer = state.dealers.find(d => d.id === t.dealerId);
                 return (
                   <div
                     key={t.id}
@@ -225,7 +223,7 @@ const TrailerHealthOverview = () => {
                       </div>
                       <StatusBadge status={t.sensorData.overallHealth} breathing />
                     </div>
-                    <p className="text-xs text-muted-foreground">{cust?.name} · {dealer?.name}</p>
+                    <p className="text-xs text-muted-foreground">{cust?.name}</p>
                     <p className="text-xs text-muted-foreground mb-3">{t.modelNumber} · <StatusBadge status={t.category} /></p>
                     <div className="grid grid-cols-3 gap-2 pt-3 border-t border-white/5">
                       <div className="text-center">

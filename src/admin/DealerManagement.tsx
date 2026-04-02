@@ -46,7 +46,7 @@ const DealerManagement = () => {
             <MetricCard key="a" title="Active Dealers" value={active} icon={Store} />,
             <MetricCard key="t" title="Total Dealers" value={dealers.length} icon={Store} />,
             <MetricCard key="p" title="Pending" value={dealers.filter(d => d.status === 'Pending').length} icon={Clock} />,
-            <MetricCard key="s" title="Avg Sales/Dealer" value={`�$${(avgSales / 1000).toFixed(0)}K`} icon={DollarSign} />,
+            <MetricCard key="s" title="Avg Sales/Dealer" value={`$${(avgSales / 1000).toFixed(0)}K`} icon={DollarSign} />,
           ].map((card, i) => (
             <motion.div key={i} variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}>
               {card}
@@ -56,14 +56,14 @@ const DealerManagement = () => {
 
         {/* Performance Chart */}
         <div className="bg-card/60 backdrop-blur-sm border border-white/[0.08] rounded-lg p-4 hover:border-white/[0.12] transition-colors">
-          <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-3">Dealer Sales Performance (�$K)</h3>
+          <h3 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground mb-3">Dealer Sales Performance ($K)</h3>
           <ResponsiveContainer width="100%" height={200}>
             <BarChart data={perfData}>
               <CartesianGrid strokeDasharray="3 3" stroke="hsl(0 0% 100% / 0.05)" />
               <XAxis dataKey="name" tick={{ fontSize: 10, fontFamily: 'Inter', fill: 'hsl(var(--muted-foreground))' }} />
               <YAxis tick={{ fontSize: 10, fontFamily: 'Inter', fill: 'hsl(var(--muted-foreground))' }} />
               <Tooltip
-                formatter={(v: number) => `�$${v}K`}
+                formatter={(v: number) => `$${v}K`}
                 contentStyle={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))', fontSize: 12, color: '#fff' }}
                 itemStyle={{ color: '#fff' }}
               />
@@ -96,7 +96,7 @@ const DealerManagement = () => {
                       <span className="text-[9px] font-mono uppercase text-muted-foreground">Stock</span>
                     </div>
                     <div className="text-center">
-                      <span className="font-display font-bold text-sm block text-white">�${(d.totalSales / 1000).toFixed(0)}K</span>
+                      <span className="font-display font-bold text-sm block text-white">${(d.totalSales / 1000).toFixed(0)}K</span>
                       <span className="text-[9px] font-mono uppercase text-muted-foreground">Sales</span>
                     </div>
                     <div className="text-center">
@@ -121,7 +121,7 @@ const DealerManagement = () => {
               { key: 'phone', label: 'Phone' },
               { key: 'status', label: 'Status', sortable: true, render: (d) => <StatusBadge status={d.status} /> },
               { key: 'inventoryCount', label: 'Stock', sortable: true },
-              { key: 'totalSales', label: 'Sales', sortable: true, render: (d) => `�$${(d.totalSales / 1000).toFixed(0)}K` },
+              { key: 'totalSales', label: 'Sales', sortable: true, render: (d) => `$${(d.totalSales / 1000).toFixed(0)}K` },
             ]}
             data={dealers}
             onRowClick={(d) => navigate(`/admin/dealers/${d.id}`)}

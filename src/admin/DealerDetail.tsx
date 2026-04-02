@@ -56,7 +56,7 @@ const DealerDetail = () => {
             { label: 'Total Orders', value: dealerOrders.length, color: 'text-white' },
             { label: 'Active Orders', value: activeOrders.length, color: 'text-primary' },
             { label: 'Customers Served', value: dealerCustomers.length, color: 'text-white' },
-            { label: 'Revenue (Delivered)', value: `�$${(totalRevenue / 1000).toFixed(0)}K`, color: 'text-success' },
+            { label: 'Revenue (Delivered)', value: `$${(totalRevenue / 1000).toFixed(0)}K`, color: 'text-success' },
           ].map(({ label, value, color }) => (
             <motion.div key={label} variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}>
               <div className="bg-card/60 backdrop-blur-sm border border-white/[0.08] rounded-lg p-4 hover:border-white/[0.12] transition-colors">
@@ -110,7 +110,7 @@ const DealerDetail = () => {
                 <div><p className="text-[10px] text-muted-foreground uppercase tracking-widest font-mono">Joined</p><p className="font-medium">{dealer.joinDate}</p></div>
                 <div><p className="text-[10px] text-muted-foreground uppercase tracking-widest font-mono">Territory</p><p className="font-medium">{dealer.territory.join(', ')}</p></div>
                 <div><p className="text-[10px] text-muted-foreground uppercase tracking-widest font-mono">Inventory Count</p><p className="font-mono font-bold text-white">{dealer.inventoryCount}</p></div>
-                <div><p className="text-[10px] text-muted-foreground uppercase tracking-widest font-mono">Total Sales (Reported)</p><p className="font-display font-bold text-success text-lg">�${(dealer.totalSales / 1000).toFixed(0)}K</p></div>
+                <div><p className="text-[10px] text-muted-foreground uppercase tracking-widest font-mono">Total Sales (Reported)</p><p className="font-display font-bold text-success text-lg">${(dealer.totalSales / 1000).toFixed(0)}K</p></div>
               </div>
             </div>
           </div>
@@ -125,7 +125,7 @@ const DealerDetail = () => {
                 { key: 'type', label: 'Type', render: (o) => <StatusBadge status={o.type} /> },
                 { key: 'trailerName', label: 'Trailer', render: (o) => <span className="text-xs">{o.trailerName || '—'}</span> },
                 { key: 'quantity', label: 'Qty', render: (o) => <span className="font-mono text-xs">{o.quantity}</span> },
-                { key: 'totalPrice', label: 'Total', sortable: true, render: (o) => <span className="font-mono text-xs font-medium">�${o.totalPrice.toLocaleString()}</span> },
+                { key: 'totalPrice', label: 'Total', sortable: true, render: (o) => <span className="font-mono text-xs font-medium">${o.totalPrice.toLocaleString()}</span> },
                 { key: 'status', label: 'Status', render: (o) => <StatusBadge status={o.status} /> },
                 { key: 'createdDate', label: 'Date', sortable: true, render: (o) => <span className="text-xs text-muted-foreground">{o.createdDate}</span> },
               ]}

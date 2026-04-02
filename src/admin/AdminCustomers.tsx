@@ -62,7 +62,7 @@ const AdminCustomers = () => {
             <MetricCard key="cust" title="Total Customers" value={totalCustomers} icon={Users} />,
             <MetricCard key="sold" title="Sold Trailers" value={state.soldTrailers.length} icon={Truck} />,
             <MetricCard key="deal" title="Active Dealers" value={state.dealers.filter(d => d.status === 'Active').length} icon={Store} />,
-            <MetricCard key="rev" title="Cust. Revenue" value={`�$${(totalRevenue / 1000).toFixed(0)}K`} icon={Package} trendDown={false} />,
+            <MetricCard key="rev" title="Cust. Revenue" value={`$${(totalRevenue / 1000).toFixed(0)}K`} icon={Package} trendDown={false} />,
           ].map((card, i) => (
             <motion.div key={i} variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}>
               {card}
@@ -254,7 +254,7 @@ const AdminCustomers = () => {
                             {d && <p className="text-[10px] text-muted-foreground">via {d.name}</p>}
                           </div>
                           <div className="text-right">
-                            <p className="font-mono text-sm font-bold text-white">�${o.totalPrice.toLocaleString()}</p>
+                            <p className="font-mono text-sm font-bold text-white">${o.totalPrice.toLocaleString()}</p>
                             <StatusBadge status={o.status} />
                           </div>
                         </div>
