@@ -30,6 +30,7 @@ const TrailerHealthOverview = () => {
   const { state, actions } = useAppData();
   const [notifySent, setNotifySent] = useState<Record<string, boolean>>({});
   const [view, setView] = useState<'table' | 'grid'>('table');
+  const [healthFilter, setHealthFilter] = useState<'All' | 'Good' | 'Warning' | 'Critical'>('All');
 
   const healthCounts = {
     Good: state.soldTrailers.filter(t => t.sensorData.overallHealth === 'Good').length,
@@ -61,6 +62,9 @@ const TrailerHealthOverview = () => {
   ];
 
   const alertTrailers = state.soldTrailers.filter(t => t.sensorData.overallHealth !== 'Good');
+  const filteredTrailers = state.soldTrailers.filter(
+    t => healthFilter === 'All' || t.sensorData.overallHealth === healthFilter
+  );
 
   const sendNotification = (t: typeof alertTrailers[0]) => {
     const reasons = getHealthReasons(t);
@@ -178,7 +182,13 @@ const TrailerHealthOverview = () => {
                 { key: 'modelNumber', label: 'Model', sortable: true },
                 { key: 'category', label: 'Category', render: (t) => <StatusBadge status={t.category} /> },
                 { key: 'customer', label: 'Customer', render: (t) => <span className="text-xs">{state.customers.find(c => c.id === t.customerId)?.name}</span> },
-                { key: 'mileage', label: 'Mileage', sortable: true, render: (t) => <span className="font-mono text-xs">{t.sensorData.mileage.toLocaleString()}</span> },
+                {
+                  key: 'mileage',
+                  label: 'Dist Travel',
+                  sortable: true,
+                  sortValue: (t) => t.sensorData.mileage,
+                  render: (t) => <span className="font-mono text-xs">{t.sensorData.mileage.toLocaleString()}</span>
+                },
                 {
                   key: 'brakes', label: 'Brakes', render: (t) => (
                     <span className={cn('font-mono text-xs', t.sensorData.brakePadWear < 20 ? 'text-danger' : t.sensorData.brakePadWear < 35 ? 'text-warning' : 'text-success')}>
@@ -188,13 +198,13 @@ const TrailerHealthOverview = () => {
                 },
                 { key: 'health', label: 'Health', render: (t) => <StatusBadge status={t.sensorData.overallHealth} breathing /> },
                 {
-                  key: 'actions', label: '', render: (t) => (
+                  key: 'actions', label: 'Actions', render: (t) => (
                     <div className="flex gap-2">
                       <button onClick={(e) => { e.stopPropagation(); navigate(`/admin/health/${t.vin}`); }} className="text-xs text-primary hover:underline font-display uppercase tracking-wide">
                         View
                       </button>
                       {t.sensorData.overallHealth !== 'Good' && !notifySent[t.id] && (
-                        <button onClick={(e) => { e.stopPropagation(); sendNotification(t); }} className="text-xs text-warning hover:underline font-display uppercase tracking-wide flex items-center gap-0.5">
+                        <button onClick={(e) => { e.stopPropagation(); sendNotification(t); }} className="px-2 py-1 rounded-sm text-[10px] text-warning bg-warning/10 border border-warning/20 hover:bg-warning/20 font-display uppercase tracking-wide flex items-center gap-0.5">
                           <Bell size={10} /> Notify
                         </button>
                       )}
@@ -202,8 +212,21 @@ const TrailerHealthOverview = () => {
                   )
                 },
               ]}
-              data={state.soldTrailers}
+              data={filteredTrailers}
               searchable
+              toolbarContent={(
+                <select
+                  value={healthFilter}
+                  onChange={(e) => setHealthFilter(e.target.value as 'All' | 'Good' | 'Warning' | 'Critical')}
+                  className="h-[42px] px-3 text-xs rounded-lg text-foreground border border-white/[0.06] focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/30"
+                  style={{ background: 'hsl(220 16% 10%)' }}
+                >
+                  <option value="All">Health: All</option>
+                  <option value="Good">Health: Good</option>
+                  <option value="Warning">Health: Warning</option>
+                  <option value="Critical">Health: Critical</option>
+                </select>
+              )}
               onRowClick={(t) => navigate(`/admin/health/${t.vin}`)}
             />
           ) : (
@@ -228,7 +251,7 @@ const TrailerHealthOverview = () => {
                     <div className="grid grid-cols-3 gap-2 pt-3 border-t border-white/5">
                       <div className="text-center">
                         <span className="font-mono text-sm font-bold text-white">{t.sensorData.mileage.toLocaleString()}</span>
-                        <span className="text-[9px] font-mono uppercase text-muted-foreground block">Miles</span>
+                        <span className="text-[9px] font-mono uppercase text-muted-foreground block">Dist Travel</span>
                       </div>
                       <div className="text-center">
                         <span className={cn('font-mono text-sm font-bold', t.sensorData.brakePadWear < 20 ? 'text-danger' : t.sensorData.brakePadWear < 35 ? 'text-warning' : 'text-success')}>{t.sensorData.brakePadWear}%</span>

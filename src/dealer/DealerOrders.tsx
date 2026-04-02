@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { DataTable } from '@/components/shared/DataTable';
 import { StatusBadge } from '@/components/shared/StatusBadge';
@@ -9,6 +9,7 @@ import { useAuth } from '@/context/AuthContext';
 import { useAppData } from '@/context/AppDataContext';
 import { Order } from '@/types';
 import { LayoutGrid, List, ChevronRight } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 const STATUS_STEPS: Order['status'][] = [
   'Draft', 'Submitted', 'Under Review', 'Approved', 'In Production', 'Shipped', 'Delivered',
@@ -17,6 +18,8 @@ const STATUS_STEPS: Order['status'][] = [
 const DealerOrders = () => {
   const { user } = useAuth();
   const { state, actions } = useAppData();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [tab, setTab] = useState<'behnke' | 'customer'>('behnke');
   const [view, setView] = useState<'table' | 'grid'>('table');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
@@ -32,6 +35,22 @@ const DealerOrders = () => {
   const myOrders = state.orders.filter(o => o.fromId === dealerId && o.fromType === 'Dealer');
   const custOrders = state.orders.filter(o => o.toId === dealerId && o.toType === 'Dealer');
   const displayOrders = tab === 'behnke' ? myOrders : custOrders;
+
+  useEffect(() => {
+    const shouldOpenRestockWizard = searchParams.get('restock') === '1';
+    const trailerIdFromQuery = searchParams.get('trailerId');
+
+    if (shouldOpenRestockWizard) {
+      setTab('behnke');
+      setWizardOpen(true);
+      setWizardStep(1);
+      setSelectedTrailer(trailerIdFromQuery ?? null);
+      setQuantity(1);
+      setOrderNotes('Restock requested from inventory page.');
+
+      navigate('/dealer/orders', { replace: true });
+    }
+  }, [navigate, searchParams]);
 
   const columns = [
     {
@@ -69,17 +88,9 @@ const DealerOrders = () => {
         {/* Header */}
         <div className="flex items-center justify-between">
           <h1 className="font-display text-2xl font-bold uppercase tracking-wide">Order Management</h1>
-          <div className="flex gap-2">
-            <button
-              onClick={() => { setWizardOpen(true); setWizardStep(1); }}
-              className="px-3 py-1.5 bg-primary text-primary-foreground rounded-sm text-xs font-display uppercase tracking-wide hover:opacity-90 transition-opacity"
-            >
-              + New Order to Behnke
-            </button>
-            <button onClick={() => setView(view === 'table' ? 'grid' : 'table')} className="p-1.5 border border-border rounded-sm hover:bg-muted">
-              {view === 'table' ? <LayoutGrid size={14} /> : <List size={14} />}
-            </button>
-          </div>
+          <button onClick={() => setView(view === 'table' ? 'grid' : 'table')} className="p-1.5 border border-border rounded-sm hover:bg-muted">
+            {view === 'table' ? <LayoutGrid size={14} /> : <List size={14} />}
+          </button>
         </div>
 
         {/* Tabs with counts */}
@@ -88,13 +99,13 @@ const DealerOrders = () => {
             onClick={() => setTab('behnke')}
             className={cn('px-3 py-1.5 rounded-sm text-xs font-display uppercase tracking-wide', tab === 'behnke' ? 'bg-primary text-primary-foreground' : 'bg-muted')}
           >
-            My Orders to Behnke ({myOrders.length})
+            Outbound Orders ({myOrders.length})
           </button>
           <button
             onClick={() => setTab('customer')}
             className={cn('px-3 py-1.5 rounded-sm text-xs font-display uppercase tracking-wide', tab === 'customer' ? 'bg-primary text-primary-foreground' : 'bg-muted')}
           >
-            Customer Orders to Me ({custOrders.length})
+            Inbound Orders ({custOrders.length})
           </button>
         </div>
         {/* Table view */}

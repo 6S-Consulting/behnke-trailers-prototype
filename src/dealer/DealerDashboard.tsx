@@ -72,15 +72,11 @@ const DealerDashboard = () => {
             </div>
             <h1 className="font-display text-2xl font-bold tracking-tight text-foreground">Sales Pipeline</h1>
           </div>
-          <div className="flex gap-2">
-            <button onClick={() => navigate('/dealer/quotes')} className="px-4 py-2 rounded-lg text-xs font-semibold text-white transition-all active:scale-95 hover:shadow-[0_0_20px_hsl(0_72%_51%/0.3)]" style={{ background: 'linear-gradient(135deg, hsl(0 72% 51%), hsl(0 72% 41%))' }}>Manage Quotes</button>
-            <button onClick={() => navigate('/dealer/orders')} className="px-4 py-2 rounded-lg text-xs font-semibold border border-white/[0.08] text-steel hover:text-foreground hover:border-primary/30 transition-all active:scale-95" style={{ background: 'hsl(220 16% 10%)' }}>View Orders</button>
-          </div>
         </div>
 
         {/* KPI Grid */}
         <motion.div
-          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3"
+          className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3"
           initial="hidden"
           animate="show"
           variants={{ hidden: {}, show: { transition: { staggerChildren: 0.06 } } }}
@@ -91,7 +87,6 @@ const DealerDashboard = () => {
             <MetricCard key="orders" title="Pending Orders" value={pendingOrders.length} icon={ShoppingCart} href="/dealer/orders" />,
             <MetricCard key="rev" title="Revenue" value={`$${(totalRevenue / 1000).toFixed(0)}K`} icon={DollarSign} />,
             <MetricCard key="cust" title="Customers" value={myCustomers.length} icon={Users} />,
-            <MetricCard key="del" title="Delivered" value={deliveredOrders.length} icon={TrendingUp} trend={deliveredOrders.length > 0 ? `$${(totalRevenue / 1000).toFixed(0)}K` : undefined} />,
           ].map((card, i) => (
             <motion.div key={i} className="h-full" variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } }}>
               {card}
@@ -213,7 +208,7 @@ const DealerDashboard = () => {
           >
             <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: 'linear-gradient(90deg, hsl(0 72% 51%), hsl(32 95% 52%), transparent)' }} />
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-[10px] font-mono uppercase tracking-[0.15em] text-steel">My Orders to Behnke</h3>
+              <h3 className="text-[10px] font-mono uppercase tracking-[0.15em] text-steel">Outbound Orders</h3>
               <button onClick={() => navigate('/dealer/orders')} className="text-[10px] font-semibold uppercase tracking-wide text-primary hover:text-primary/80 transition-colors">View All</button>
             </div>
             <DataTable<Order>

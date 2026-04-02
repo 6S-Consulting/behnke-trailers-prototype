@@ -6,6 +6,7 @@ export interface Column<T> {
   key: string;
   label: string;
   sortable?: boolean;
+  sortValue?: (item: T) => string | number;
   render?: (item: T) => React.ReactNode;
   className?: string;
 }
@@ -17,10 +18,11 @@ interface DataTableProps<T> {
   searchable?: boolean;
   searchPlaceholder?: string;
   pageSize?: number;
+  toolbarContent?: React.ReactNode;
 }
 
 export function DataTable<T extends object>({
-  columns, data, onRowClick, searchable = false, searchPlaceholder = 'Search...', pageSize = 10
+  columns, data, onRowClick, searchable = false, searchPlaceholder = 'Search...', pageSize = 10, toolbarContent
 }: DataTableProps<T>) {
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('asc');
@@ -35,8 +37,9 @@ export function DataTable<T extends object>({
 
   const sorted = sortKey
     ? [...filtered].sort((a, b) => {
-      const av = (a as Record<string, unknown>)[sortKey];
-      const bv = (b as Record<string, unknown>)[sortKey];
+      const sortColumn = columns.find(c => c.key === sortKey);
+      const av = sortColumn?.sortValue ? sortColumn.sortValue(a) : (a as Record<string, unknown>)[sortKey];
+      const bv = sortColumn?.sortValue ? sortColumn.sortValue(b) : (b as Record<string, unknown>)[sortKey];
       const cmp =
         typeof av === 'number' && typeof bv === 'number'
           ? av - bv
@@ -57,16 +60,19 @@ export function DataTable<T extends object>({
     <div>
       {/* ── Search ── */}
       {searchable && (
-        <div className="relative mb-4">
-          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-steel" />
-          <input
-            type="text"
-            value={search}
-            onChange={e => { setSearch(e.target.value); setPage(0); }}
-            placeholder={searchPlaceholder}
-            className="w-full pl-9 pr-3 py-2.5 text-sm rounded-lg text-foreground placeholder:text-steel/60 border border-white/[0.06] focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/30 transition-all"
-            style={{ background: 'hsl(220 16% 10%)' }}
-          />
+        <div className="mb-4 flex flex-col md:flex-row md:items-center gap-2">
+          <div className="relative flex-1">
+            <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-steel" />
+            <input
+              type="text"
+              value={search}
+              onChange={e => { setSearch(e.target.value); setPage(0); }}
+              placeholder={searchPlaceholder}
+              className="w-full pl-9 pr-3 py-2.5 text-sm rounded-lg text-foreground placeholder:text-steel/60 border border-white/[0.06] focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/30 transition-all"
+              style={{ background: 'hsl(220 16% 10%)' }}
+            />
+          </div>
+          {toolbarContent}
         </div>
       )}
 
