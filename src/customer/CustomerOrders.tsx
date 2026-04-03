@@ -49,70 +49,100 @@ const CustomerOrders = () => {
                     </button>
                 </div>
 
-                {/* Active Orders — visual tracker */}
+                {/* Active Orders — visual tracker or table view */}
                 {activeOrders.length > 0 && (
                     <div className="space-y-3">
                         <h2 className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">Active Orders</h2>
-                        {activeOrders.map(order => {
-                            const currentStep = statusStepIndex(order.status);
-                            return (
-                                <div
-                                    key={order.id}
-                                    className="bg-card border border-white/5 rounded-lg shadow-industrial p-5 cursor-pointer hover:border-primary/30 transition-all"
-                                    onClick={() => setDetail(order)}
-                                >
-                                    <div className="flex items-center justify-between mb-4">
-                                        <div>
-                                            <span className="font-mono text-xs text-muted-foreground">{order.orderNumber}</span>
-                                            <h3 className="font-display font-bold uppercase tracking-wide text-sm text-white">
-                                                {order.trailerName || order.modelNumber || 'Custom Order'}
-                                            </h3>
-                                        </div>
-                                        <div className="text-right">
-                                            <span className="font-mono text-sm font-bold text-white">${order.totalPrice.toLocaleString()}</span>
-                                            {order.estimatedDelivery && (
-                                                <p className="text-[10px] text-muted-foreground mt-0.5">Est. delivery: {order.estimatedDelivery}</p>
-                                            )}
-                                        </div>
-                                    </div>
-
-                                    {/* Pipeline tracker */}
-                                    <div className="flex items-center gap-1">
-                                        {PIPELINE_STAGES.map((stage, i) => {
-                                            const isCompleted = i < currentStep;
-                                            const isCurrent = i === currentStep;
-                                            const Icon = stage.icon;
-                                            return (
-                                                <div key={stage.status} className="flex items-center flex-1 last:flex-initial">
-                                                    <div className="flex flex-col items-center flex-1 min-w-0">
-                                                        <div className={cn(
-                                                            'w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all',
-                                                            isCompleted ? 'bg-success/20 border-success text-success' :
-                                                                isCurrent ? 'bg-primary/20 border-primary text-primary animate-pulse' :
-                                                                    'bg-muted/30 border-white/10 text-muted-foreground'
-                                                        )}>
-                                                            <Icon size={14} />
-                                                        </div>
-                                                        <span className={cn(
-                                                            'text-[8px] font-mono uppercase tracking-widest mt-1 text-center',
-                                                            isCompleted ? 'text-success' : isCurrent ? 'text-primary' : 'text-muted-foreground/50'
-                                                        )}>
-                                                            {stage.label}
-                                                        </span>
-                                                    </div>
-                                                    {i < PIPELINE_STAGES.length - 1 && (
-                                                        <div className={cn(
-                                                            'h-0.5 w-full mx-1 mt-[-14px]',
-                                                            isCompleted ? 'bg-success/40' : 'bg-white/5'
-                                                        )} />
+                        {view === 'grid' ? (
+                            <div className="space-y-3">
+                                {activeOrders.map(order => {
+                                    const currentStep = statusStepIndex(order.status);
+                                    return (
+                                        <div
+                                            key={order.id}
+                                            className="bg-card border border-white/5 rounded-lg shadow-industrial p-5 cursor-pointer hover:border-primary/30 transition-all"
+                                            onClick={() => setDetail(order)}
+                                        >
+                                            <div className="flex items-center justify-between mb-4">
+                                                <div>
+                                                    <span className="font-mono text-xs text-muted-foreground">{order.orderNumber}</span>
+                                                    <h3 className="font-display font-bold uppercase tracking-wide text-sm text-white">
+                                                        {order.trailerName || order.modelNumber || 'Custom Order'}
+                                                    </h3>
+                                                </div>
+                                                <div className="text-right">
+                                                    <span className="font-mono text-sm font-bold text-white">${order.totalPrice.toLocaleString()}</span>
+                                                    {order.estimatedDelivery && (
+                                                        <p className="text-[10px] text-muted-foreground mt-0.5">Est. delivery: {order.estimatedDelivery}</p>
                                                     )}
                                                 </div>
-                                            );
-                                        })}
-                                    </div>
-                                </div>
-                            );
-                        })}
+                                            </div>
+
+                                            {/* Pipeline tracker */}
+                                            <div className="flex items-center gap-1">
+                                                {PIPELINE_STAGES.map((stage, i) => {
+                                                    const isCompleted = i < currentStep;
+                                                    const isCurrent = i === currentStep;
+                                                    const Icon = stage.icon;
+                                                    return (
+                                                        <div key={stage.status} className="flex items-center flex-1 last:flex-initial">
+                                                            <div className="flex flex-col items-center flex-1 min-w-0">
+                                                                <div className={cn(
+                                                                    'w-8 h-8 rounded-full flex items-center justify-center border-2 transition-all',
+                                                                    isCompleted ? 'bg-success/20 border-success text-success' :
+                                                                        isCurrent ? 'bg-primary/20 border-primary text-primary animate-pulse' :
+                                                                            'bg-muted/30 border-white/10 text-muted-foreground'
+                                                                )}>
+                                                                    <Icon size={14} />
+                                                                </div>
+                                                                <span className={cn(
+                                                                    'text-[8px] font-mono uppercase tracking-widest mt-1 text-center',
+                                                                    isCompleted ? 'text-success' : isCurrent ? 'text-primary' : 'text-muted-foreground/50'
+                                                                )}>
+                                                                    {stage.label}
+                                                                </span>
+                                                            </div>
+                                                            {i < PIPELINE_STAGES.length - 1 && (
+                                                                <div className={cn(
+                                                                    'h-0.5 w-full mx-1 mt-[-14px]',
+                                                                    isCompleted ? 'bg-success/40' : 'bg-white/5'
+                                                                )} />
+                                                            )}
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    );
+                                })}
+                            </div>
+                        ) : (
+                            <div className="bg-card rounded-lg shadow-industrial p-4 overflow-hidden">
+                                <DataTable<Order>
+                                    columns={[
+                                        { 
+                                            key: 'orderNumber', 
+                                            label: 'Order #', 
+                                            sortable: true, 
+                                            render: (o) => (
+                                                <div className="flex items-center gap-2">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                                                    <span className="font-mono text-xs">{o.orderNumber}</span>
+                                                </div>
+                                            )
+                                        },
+                                        { key: 'trailerName', label: 'Trailer', render: (o) => <span className="text-xs">{o.trailerName || o.modelNumber || '—'}</span> },
+                                        { key: 'quantity', label: 'Qty', render: (o) => <span className="font-mono text-xs">{o.quantity}</span> },
+                                        { key: 'totalPrice', label: 'Total', sortable: true, render: (o) => <span className="font-mono text-xs font-medium">${o.totalPrice.toLocaleString()}</span> },
+                                        { key: 'status', label: 'Status', render: (o) => <StatusBadge status={o.status} /> },
+                                        { key: 'estimatedDelivery', label: 'Est. Delivery', render: (o) => <span className="text-xs text-muted-foreground">{o.estimatedDelivery || '—'}</span> },
+                                    ]}
+                                    data={activeOrders}
+                                    onRowClick={(o) => setDetail(o)}
+                                    pageSize={5}
+                                />
+                            </div>
+                        )}
                     </div>
                 )}
 
