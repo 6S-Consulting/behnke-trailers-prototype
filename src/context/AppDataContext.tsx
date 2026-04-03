@@ -417,10 +417,10 @@ const AppDataProviderImpl = ({ children }: { children: React.ReactNode }) => {
           orderNumber,
           type: 'Standard',
           status: 'Submitted',
-          fromId: dealerId,
-          fromType: 'Dealer',
-          toId: 'admin',
-          toType: 'Admin',
+          fromId: customerId,
+          fromType: 'Customer',
+          toId: dealerId,
+          toType: 'Dealer',
           trailerId: firstItem.trailerId,
           modelNumber: firstItem.modelNumber,
           trailerName: firstItem.name,
@@ -437,12 +437,12 @@ const AppDataProviderImpl = ({ children }: { children: React.ReactNode }) => {
 
         setState(s => ({ ...s, orders: [order, ...s.orders] }));
         pushNotification({
-          recipientId: 'admin',
-          recipientType: 'Admin',
+          recipientId: dealerId,
+          recipientType: 'Dealer',
           type: 'OrderUpdate',
-          title: 'New Order Submitted',
-          message: `${order.orderNumber} submitted by ${state.dealers.find(d => d.id === dealerId)?.name ?? 'dealer'}: ${order.quantity} × ${order.modelNumber}.`,
-          actionUrl: '/admin/orders',
+          title: 'New Customer Order',
+          message: `Quote ${quote.quoteNumber} has been converted to order ${order.orderNumber} for ${firstItem.name}.`,
+          actionUrl: '/dealer/orders',
         });
         // Notify the customer their order is being processed
         pushNotification({

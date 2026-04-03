@@ -30,13 +30,15 @@ const DealerDashboard = () => {
 
   const dealerId = user?.id ?? '';
   const myOrders = state.orders.filter(o => o.fromId === dealerId && o.fromType === 'Dealer');
+  const myInboundOrders = state.orders.filter(o => o.toId === dealerId && o.toType === 'Dealer');
   const myQuotes = state.quotes.filter(q => q.toId === dealerId);
   const myCustomers = state.customers.filter(c => c.assignedDealerId === dealerId);
 
   const openQuotes = myQuotes.filter(q => q.status === 'Sent' || q.status === 'Viewed');
   const acceptedQuotes = myQuotes.filter(q => q.status === 'Accepted');
-  const pendingOrders = myOrders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled');
-  const deliveredOrders = myOrders.filter(o => o.status === 'Delivered');
+  const allDealerOrders = [...myOrders, ...myInboundOrders];
+  const pendingOrders = allDealerOrders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled');
+  const deliveredOrders = allDealerOrders.filter(o => o.status === 'Delivered');
   const totalRevenue = deliveredOrders.reduce((s, o) => s + o.totalPrice, 0);
   const stockCount = state.trailers.slice(0, 12).reduce((s, t) => s + t.inStock, 0);
   const returningCustomers = Object.values(
@@ -191,19 +193,18 @@ const DealerDashboard = () => {
             className="relative overflow-hidden rounded-xl p-5 border border-white/[0.06]"
             style={{ background: 'linear-gradient(145deg, hsl(220 16% 9%), hsl(220 16% 7%))' }}
           >
-            <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: 'linear-gradient(90deg, hsl(200 80% 55%), transparent)' }} />
+            <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: 'linear-gradient(90deg, hsl(152 69% 53%), transparent)' }} />
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-[10px] font-mono uppercase tracking-[0.15em] text-steel">Pending Customer Quotes</h3>
-              <button onClick={() => navigate('/dealer/quotes')} className="text-[10px] font-semibold uppercase tracking-wide text-primary hover:text-primary/80 transition-colors">View All</button>
+              <h3 className="text-[10px] font-mono uppercase tracking-[0.15em] text-steel">Inbound Customer Orders</h3>
+              <button onClick={() => navigate('/dealer/orders')} className="text-[10px] font-semibold uppercase tracking-wide text-primary hover:text-primary/80 transition-colors">View All</button>
             </div>
-            <DataTable<Quote>
+            <DataTable<Order>
               columns={[
-                { key: 'quoteNumber', label: 'Quote #', render: (q) => <span className="font-mono text-xs text-foreground">{q.quoteNumber}</span> },
-                { key: 'customer', label: 'Customer', render: (q) => <span className="text-xs text-steel">{state.customers.find(c => c.id === q.fromId)?.name}</span> },
-                { key: 'total', label: 'Value', render: (q) => <span className="font-mono text-xs text-foreground">${q.total.toLocaleString()}</span> },
-                { key: 'status', label: 'Status', render: (q) => <StatusBadge status={q.status} /> },
+                { key: 'orderNumber', label: 'Order #', render: (o) => <span className="font-mono text-xs text-foreground">{o.orderNumber}</span> },
+                { key: 'customer', label: 'Customer', render: (o) => <span className="text-xs text-steel">{state.customers.find(c => c.id === o.fromId)?.name || 'Guest'}</span> },
+                { key: 'status', label: 'Status', render: (o) => <StatusBadge status={o.status} /> },
               ]}
-              data={myQuotes.filter(q => q.status !== 'Accepted' && q.status !== 'Rejected' && q.status !== 'Expired')}
+              data={myInboundOrders}
               pageSize={5}
             />
           </motion.div>
@@ -216,7 +217,7 @@ const DealerDashboard = () => {
           >
             <div className="absolute top-0 left-0 right-0 h-[2px]" style={{ background: 'linear-gradient(90deg, hsl(0 72% 51%), hsl(32 95% 52%), transparent)' }} />
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-[10px] font-mono uppercase tracking-[0.15em] text-steel">Outbound Orders</h3>
+              <h3 className="text-[10px] font-mono uppercase tracking-[0.15em] text-steel">Outbound Orders (To Behnke)</h3>
               <button onClick={() => navigate('/dealer/orders')} className="text-[10px] font-semibold uppercase tracking-wide text-primary hover:text-primary/80 transition-colors">View All</button>
             </div>
             <DataTable<Order>
