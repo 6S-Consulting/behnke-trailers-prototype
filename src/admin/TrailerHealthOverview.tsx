@@ -4,7 +4,7 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { MetricCard } from '@/components/shared/MetricCard';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { DataTable } from '@/components/shared/DataTable';
-import { CheckCircle, AlertTriangle, XCircle, Calendar, Bell, Wrench, LayoutGrid, List } from 'lucide-react';
+import { CheckCircle, AlertTriangle, XCircle, Bell, Wrench, LayoutGrid, List } from 'lucide-react';
 import { RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer } from 'recharts';
 import { useAppData } from '@/context/AppDataContext';
 import { toast } from 'sonner';
@@ -38,12 +38,9 @@ const TrailerHealthOverview = () => {
     Critical: state.soldTrailers.filter(t => t.sensorData.overallHealth === 'Critical').length,
   };
 
-  const dueSoonCount = state.soldTrailers.filter(st => {
-    const due = new Date(st.nextMaintenanceDue + 'T00:00:00').getTime();
-    const now = Date.now();
-    const diffDays = (due - now) / (1000 * 60 * 60 * 24);
-    return diffDays >= 0 && diffDays <= 30;
-  }).length;
+  const unnotifiedCriticalUnits = state.soldTrailers.filter(
+    t => t.sensorData.overallHealth === 'Critical' && !notifySent[t.id]
+  ).length;
 
   // Fleet radar from actual data
   const fleetAvg = state.soldTrailers.length > 0 ? {
@@ -96,7 +93,14 @@ const TrailerHealthOverview = () => {
             <MetricCard key="h" title="Healthy" value={healthCounts.Good} icon={CheckCircle} />,
             <MetricCard key="w" title="Warning" value={healthCounts.Warning} icon={AlertTriangle} trendDown={healthCounts.Warning > 0} />,
             <MetricCard key="c" title="Critical" value={healthCounts.Critical} icon={XCircle} trendDown={healthCounts.Critical > 0} />,
-            <MetricCard key="m" title="Maint. Due Soon" value={dueSoonCount} icon={Calendar} />,
+            <MetricCard
+              key="m"
+              title="Unnotified Critical Units"
+              value={unnotifiedCriticalUnits}
+              icon={Wrench}
+              subtitle={unnotifiedCriticalUnits > 0 ? 'Pending notification' : 'All critical units acknowledged'}
+              trendDown={unnotifiedCriticalUnits > 0}
+            />,
           ].map((card, i) => (
             <motion.div key={i} variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}>
               {card}

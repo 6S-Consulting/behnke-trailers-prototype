@@ -46,7 +46,7 @@ const DealerManagement = () => {
             <MetricCard key="a" title="Active Dealers" value={active} icon={Store} />,
             <MetricCard key="t" title="Total Dealers" value={dealers.length} icon={Store} />,
             <MetricCard key="p" title="Pending" value={dealers.filter(d => d.status === 'Pending').length} icon={Clock} />,
-            <MetricCard key="s" title="Avg Sales/Dealer" value={`$${(avgSales / 1000).toFixed(0)}K`} icon={DollarSign} />,
+            <MetricCard key="s" title="Avg Sales/Dealer" value={`$${(avgSales / 1000).toFixed(0)}K`} subtitle="Quarterly average" icon={DollarSign} />,
           ].map((card, i) => (
             <motion.div key={i} variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}>
               {card}

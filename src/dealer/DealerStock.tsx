@@ -63,22 +63,21 @@ const DealerStock = () => {
 
         {/* Analytical Data Cards */}
         <motion.div
-            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3"
-            initial="hidden"
-            animate="show"
-            variants={{ hidden: {}, show: { transition: { staggerChildren: 0.05 } } }}
+          className="flex flex-row gap-3 w-full"
+          initial="hidden"
+          animate="show"
+          variants={{ hidden: {}, show: { transition: { staggerChildren: 0.05 } } }}
         >
-            {[
-                <MetricCard key="total" title="Total Restocks" value={myOrders.length} icon={ShoppingCart} />,
-                <MetricCard key="units" title="Units Requested" value={totalStockRequested} icon={Boxes} />,
-                <MetricCard key="pending" title="In Pipeline" value={pendingOrders.length} icon={Clock} />,
-                <MetricCard key="completed" title="Restocked" value={completedOrders.length} icon={CheckCircle2} />,
-                <MetricCard key="low" title="Low Stock Items" value={lowStockItems} icon={AlertTriangle} trendDown={lowStockItems > 0} />,
-            ].map((card, i) => (
-                <motion.div key={i} variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}>
-                    {card}
-                </motion.div>
-            ))}
+          {[
+            <MetricCard key="total" title="Total Restocks" value={myOrders.length} icon={ShoppingCart} />,
+            <MetricCard key="units" title="Units Requested" value={totalStockRequested} icon={Boxes} />,
+            <MetricCard key="completed" title="Restocked" value={completedOrders.length} icon={CheckCircle2} />,
+            <MetricCard key="low" title="Low Stock Items" value={lowStockItems} icon={AlertTriangle} trendDown={lowStockItems > 0} />,
+          ].map((card, i) => (
+            <motion.div key={i} className="flex-1" variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}>
+              {card}
+            </motion.div>
+          ))}
         </motion.div>
 
         {view === 'table' ? (

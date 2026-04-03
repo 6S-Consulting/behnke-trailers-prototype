@@ -39,6 +39,14 @@ const DealerDashboard = () => {
   const deliveredOrders = myOrders.filter(o => o.status === 'Delivered');
   const totalRevenue = deliveredOrders.reduce((s, o) => s + o.totalPrice, 0);
   const stockCount = state.trailers.slice(0, 12).reduce((s, t) => s + t.inStock, 0);
+  const returningCustomers = Object.values(
+    myOrders.reduce<Record<string, number>>((acc, o) => {
+      const customerId = o.customerId ?? o.fromId;
+      if (!customerId) return acc;
+      acc[customerId] = (acc[customerId] || 0) + 1;
+      return acc;
+    }, {})
+  ).filter(count => count >= 2).length;
 
   const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const revenueByMonth: Record<string, number> = {};
@@ -85,8 +93,8 @@ const DealerDashboard = () => {
             <MetricCard key="stock" title="My Stock" value={stockCount} icon={Boxes} href="/dealer/stock" />,
             <MetricCard key="quotes" title="Open Quotes" value={openQuotes.length} icon={MessageSquare} href="/dealer/quotes" />,
             <MetricCard key="orders" title="Pending Orders" value={pendingOrders.length} icon={ShoppingCart} href="/dealer/orders" />,
-            <MetricCard key="rev" title="Revenue" value={`$${(totalRevenue / 1000).toFixed(0)}K`} icon={DollarSign} />,
-            <MetricCard key="cust" title="Customers" value={myCustomers.length} icon={Users} />,
+            <MetricCard key="rev" title="Revenue" value={`$${(totalRevenue / 1000).toFixed(0)}K`} subtitle='Quarterly total' icon={DollarSign} />,
+            <MetricCard key="cust" title="Returning Customers" value={returningCustomers} icon={Users}/>,
           ].map((card, i) => (
             <motion.div key={i} className="h-full" variants={{ hidden: { opacity: 0, y: 16 }, show: { opacity: 1, y: 0 } }}>
               {card}

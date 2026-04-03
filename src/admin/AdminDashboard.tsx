@@ -94,9 +94,9 @@ const AdminDashboard = () => {
         >
           {[
             <MetricCard key="inv" title="Total Inventory" value={totalInventory} icon={Package} subtitle={`${state.trailers.length} models`} href="/admin/inventory" />,
-            <MetricCard key="deal" title="Active Dealers" value={activeDealers} icon={Store} subtitle={pendingDealers > 0 ? `+${pendingDealers} pending` : undefined} href="/admin/dealers" />,
-            <MetricCard key="sold" title="Sold Trailers" value={state.soldTrailers.length} icon={TrendingUp} href="/admin/health" />,
-            <MetricCard key="rev" title="Revenue" value={`$${(totalRevenue / 1000).toFixed(0)}K`} icon={DollarSign} trend={deliveredOrders.length > 0 ? `${deliveredOrders.length} delivered` : undefined} href="/admin/orders" />,
+            <MetricCard key="deal" title="Active Dealers" value={activeDealers} icon={Store} href="/admin/dealers" />,
+            <MetricCard key="sold" title="Sold Trailers" value={state.soldTrailers.length} icon={TrendingUp} subtitle="Quarterly total" href="/admin/health" />,
+            <MetricCard key="rev" title="Revenue" value={`$${(totalRevenue / 1000).toFixed(0)}K`} icon={DollarSign} subtitle="Quarterly total" href="/admin/orders" />,
             <MetricCard key="alert" title="Health Alerts" value={criticalTrailers.length} icon={AlertTriangle} subtitle={`${state.soldTrailers.filter(t => t.sensorData.overallHealth === 'Critical').length} Critical`} href="/admin/health" trendDown={criticalTrailers.length > 3} />,
             <MetricCard key="maint" title="Pending Maint." value={pendingMaintCount} icon={Wrench} href="/admin/maintenance" />,
           ].map((card, i) => (

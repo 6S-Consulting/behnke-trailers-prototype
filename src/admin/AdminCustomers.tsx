@@ -34,9 +34,7 @@ const AdminCustomers = () => {
   const getOrders = (c: Customer) => state.orders.filter(o => o.fromId === c.id || o.customerId === c.id);
 
   const totalCustomers = state.customers.length;
-  const totalRevenue = state.orders
-    .filter(o => o.fromType === 'Customer' && o.status === 'Delivered')
-    .reduce((s, o) => s + o.totalPrice, 0);
+
   const criticalCount = state.soldTrailers.filter(st => {
     const c = state.customers.find(c2 => c2.id === st.customerId);
     return c && st.sensorData.overallHealth === 'Critical';
@@ -62,7 +60,7 @@ const AdminCustomers = () => {
             <MetricCard key="cust" title="Total Customers" value={totalCustomers} icon={Users} />,
             <MetricCard key="sold" title="Sold Trailers" value={state.soldTrailers.length} icon={Truck} />,
             <MetricCard key="deal" title="Active Dealers" value={state.dealers.filter(d => d.status === 'Active').length} icon={Store} />,
-            <MetricCard key="rev" title="Cust. Revenue" value={`$${(totalRevenue / 1000).toFixed(0)}K`} icon={Package} trendDown={false} />,
+            <MetricCard key="repeat" title="Returning Customers" value={2} icon={Package}  />,
           ].map((card, i) => (
             <motion.div key={i} variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}>
               {card}
