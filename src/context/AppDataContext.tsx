@@ -78,7 +78,7 @@ type AppDataContextType = {
     markNotificationRead: (id: string) => void;
     markAllNotificationsRead: () => void;
     requestQuoteFromCustomer: (input: RequestQuoteFromCustomerInput) => Quote;
-    respondToQuoteRequest: (quoteId: string, dealerNotes?: string) => Quote | null;
+    respondToQuoteRequest: (quoteId: string, dealerNotes?: string, updatedPrice?: number, updatedTax?: number, updatedTotal?: number) => Quote | null;
     updateQuoteStatus: (quoteId: string, status: Quote['status']) => Quote | null;
     convertQuoteToOrder: (input: ConvertQuoteToOrderInput) => Order | null;
     submitDealerOrderToBehnke: (input: SubmitDealerOrderToBehnkeInput) => Order;
@@ -316,7 +316,7 @@ const AppDataProviderImpl = ({ children }: { children: React.ReactNode }) => {
         return quote;
       },
 
-      respondToQuoteRequest: (quoteId: string, dealerNotes?: string) => {
+      respondToQuoteRequest: (quoteId: string, dealerNotes?: string, updatedPrice?: number, updatedTax?: number, updatedTotal?: number) => {
         const existing = state.quotes.find(q => q.id === quoteId);
         if (!existing || existing.status !== 'Requested') return null;
 
@@ -324,6 +324,9 @@ const AppDataProviderImpl = ({ children }: { children: React.ReactNode }) => {
           ...existing,
           status: 'Sent',
           notes: dealerNotes ?? existing.notes,
+          subtotal: updatedPrice ?? existing.subtotal,
+          tax: updatedTax ?? existing.tax,
+          total: updatedTotal ?? existing.total,
           validUntil: addDaysISO(todayISO(), 30),
         };
         setState(s => ({

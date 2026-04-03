@@ -7,12 +7,15 @@ import { Quote } from '@/types';
 import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
 import { useAppData } from '@/context/AppDataContext';
-import { LayoutGrid, List } from 'lucide-react';
+import { LayoutGrid, List, DollarSign, Calendar, FileText } from 'lucide-react';
+import { Input } from '@/components/ui/input';
 
 const DealerQuotes = () => {
   const [detailQuote, setDetailQuote] = useState<Quote | null>(null);
   const [view, setView] = useState<'table' | 'grid'>('table');
   const [respondNotes, setRespondNotes] = useState('');
+  const [editPrice, setEditPrice] = useState<number>(0);
+  const [editTax, setEditTax] = useState<number>(0);
   const { user } = useAuth();
   const { state, actions } = useAppData();
 
@@ -21,6 +24,13 @@ const DealerQuotes = () => {
 
   const getCustomerForQuote = (q: Quote) => {
     return state.customers.find(c => c.id === q.fromId);
+  };
+
+  const handleOpenDetail = (q: Quote) => {
+    setDetailQuote(q);
+    setRespondNotes(q.notes || '');
+    setEditPrice(q.subtotal);
+    setEditTax(q.tax);
   };
 
   return (
@@ -46,7 +56,7 @@ const DealerQuotes = () => {
               ]}
               data={myQuotes}
               searchable
-              onRowClick={(q) => setDetailQuote(q)}
+              onRowClick={handleOpenDetail}
             />
           </div>
         ) : (
@@ -56,7 +66,7 @@ const DealerQuotes = () => {
               return (
                 <div
                   key={q.id}
-                  onClick={() => setDetailQuote(q)}
+                  onClick={() => handleOpenDetail(q)}
                   className="bg-card/60 border border-white/5 rounded-lg p-4 cursor-pointer hover:border-primary/30 transition-all group"
                 >
                   <div className="flex justify-between items-start mb-2">
@@ -152,41 +162,98 @@ const DealerQuotes = () => {
                   </table>
 
                   <div className="flex justify-end">
-                    <div className="w-48 space-y-1 text-sm">
-                      <div className="flex justify-between"><span className="text-muted-foreground">Subtotal</span><span className="font-mono">${detailQuote.subtotal.toLocaleString()}</span></div>
-                      <div className="flex justify-between"><span className="text-muted-foreground">Tax</span><span className="font-mono">${detailQuote.tax.toLocaleString()}</span></div>
-                      <div className="flex justify-between font-bold border-t border-border pt-1"><span>Total</span><span className="font-mono text-primary">${detailQuote.total.toLocaleString()}</span></div>
+                    <div className="w-64 space-y-2 text-sm">
+                      <div className="flex justify-between items-center group">
+                        <span className="text-muted-foreground flex items-center gap-1.5"><DollarSign size={12} /> Subtotal</span>
+                        {detailQuote.status === 'Requested' ? (
+                          <div className="relative">
+                            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground font-mono">$</span>
+                            <input
+                              type="number"
+                              value={editPrice}
+                              onChange={(e) => setEditPrice(Number(e.target.value))}
+                              className="w-32 bg-background/50 border border-border rounded px-5 py-1 text-right font-mono text-xs focus:ring-1 focus:ring-primary outline-none transition-all"
+                            />
+                          </div>
+                        ) : (
+                          <span className="font-mono">${detailQuote.subtotal.toLocaleString()}</span>
+                        )}
+                      </div>
+                      <div className="flex justify-between items-center group">
+                        <span className="text-muted-foreground flex items-center gap-1.5"><FileText size={12} /> Estimated Tax</span>
+                        {detailQuote.status === 'Requested' ? (
+                          <div className="relative">
+                            <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-muted-foreground font-mono">$</span>
+                            <input
+                              type="number"
+                              value={editTax}
+                              onChange={(e) => setEditTax(Number(e.target.value))}
+                              className="w-32 bg-background/50 border border-border rounded px-5 py-1 text-right font-mono text-xs focus:ring-1 focus:ring-primary outline-none transition-all"
+                            />
+                          </div>
+                        ) : (
+                          <span className="font-mono">${detailQuote.tax.toLocaleString()}</span>
+                        )}
+                      </div>
+                      <div className="flex justify-between items-center font-bold border-t border-border pt-2 mt-2">
+                        <span className="text-foreground uppercase text-[10px] tracking-wider">Total Amount</span>
+                        <span className="font-mono text-lg text-primary">
+                          ${(detailQuote.status === 'Requested' ? (editPrice + editTax) : detailQuote.total).toLocaleString()}
+                        </span>
+                      </div>
                     </div>
                   </div>
 
-                  {detailQuote.notes && <p className="text-xs text-muted-foreground mt-4 italic">"{detailQuote.notes}"</p>}
+                  {detailQuote.notes && !respondNotes && (
+                    <div className="mt-6 p-3 rounded bg-muted/30 border border-border/50">
+                      <span className="block text-[10px] font-mono uppercase text-muted-foreground mb-1">Customer Note</span>
+                      <p className="text-xs text-muted-foreground italic">"{detailQuote.notes}"</p>
+                    </div>
+                  )}
                 </div>
 
                 {/* Actions based on status */}
-                <div className="flex flex-col gap-3">
+                <div className="flex flex-col gap-4 mt-4">
                   {/* Respond to customer request */}
                   {detailQuote.status === 'Requested' && (
-                    <div className="space-y-2">
-                      <label className="text-[10px] font-mono uppercase text-muted-foreground block">Response Notes (optional)</label>
-                      <textarea
-                        rows={2}
-                        value={respondNotes}
-                        onChange={e => setRespondNotes(e.target.value)}
-                        className="w-full border border-border rounded-md p-2 text-sm bg-card"
-                        placeholder="Add pricing details, availability, lead times..."
-                      />
-                      <button
-                        onClick={() => {
-                          if (!detailQuote) return;
-                          actions.respondToQuoteRequest(detailQuote.id, respondNotes || undefined);
-                          setDetailQuote(null);
-                          setRespondNotes('');
-                          toast.success('Quote sent to customer');
-                        }}
-                        className="px-4 py-2 bg-primary text-primary-foreground rounded-sm text-xs font-display uppercase tracking-wide"
-                      >
-                        Respond with Quote
-                      </button>
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <label className="text-[10px] font-mono uppercase text-muted-foreground flex items-center gap-1.5">
+                            <FileText size={12} /> Dealer Response Notes
+                          </label>
+                          <span className="text-[9px] text-muted-foreground">Visible to customer</span>
+                        </div>
+                        <textarea
+                          rows={3}
+                          value={respondNotes}
+                          onChange={e => setRespondNotes(e.target.value)}
+                          className="w-full border border-border rounded-md p-3 text-sm bg-background/50 focus:ring-1 focus:ring-primary outline-none transition-all"
+                          placeholder="Include pricing details, availability, and lead times..."
+                        />
+                      </div>
+                      
+                      <div className="grid grid-cols-2 gap-3">
+                        <button
+                          onClick={() => { setDetailQuote(null); setRespondNotes(''); }}
+                          className="px-4 py-2.5 border border-border rounded hover:bg-muted text-xs font-display uppercase tracking-wider transition-colors"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (!detailQuote) return;
+                            const finalTotal = editPrice + editTax;
+                            actions.respondToQuoteRequest(detailQuote.id, respondNotes || undefined, editPrice, editTax, finalTotal);
+                            setDetailQuote(null);
+                            setRespondNotes('');
+                            toast.success('Quote sent to customer');
+                          }}
+                          className="px-4 py-2.5 bg-primary text-primary-foreground rounded hover:bg-primary/90 text-xs font-display uppercase tracking-wider transition-all active:scale-[0.98]"
+                        >
+                          Send Final Quote
+                        </button>
+                      </div>
                     </div>
                   )}
 
