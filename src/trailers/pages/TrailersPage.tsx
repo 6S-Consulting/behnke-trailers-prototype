@@ -1,70 +1,129 @@
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { trailers } from "@/trailers/data/trailerData";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { motion } from "framer-motion";
+import { Search } from "lucide-react";
 
 export function TrailersPage() {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [activeCategory, setActiveCategory] = useState("Agricultural");
+  const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
+
   // Group trailers by category for better organization
-  const categories = [
-    {
-      name: "Agricultural",
-      description: "Wagons, sprayers, tenders, and liquid transport",
-      trailers: trailers.filter(
-        (t) =>
+  const categories = useMemo(
+    () => [
+      {
+        id: "Agricultural",
+        name: "Agricultural",
+        description: "Wagons, sprayers, tenders, and liquid transport",
+        trailers: trailers.filter((t) =>
           [
             "walking-tandem-gooseneck-wagon",
             "tandem-gooseneck-wagon",
             "sprayer-trailer-40k-50k",
             "single-cone-trailer",
-          ].includes(t.slug)
-      ),
-    },
-    {
-      name: "Construction",
-      description: "Deckovers, tilts, and utility trailers",
-      trailers: trailers.filter(
-        (t) =>
+          ].includes(t.slug),
+        ),
+      },
+      {
+        id: "Construction",
+        name: "Construction",
+        description: "Deckovers, tilts, and utility trailers",
+        trailers: trailers.filter((t) =>
           [
             "directional-drill-tilt-trailer",
             "20k-hd-tube-tilt",
             "deckover-gooseneck",
             "low-pro-hd-dump",
-          ].includes(t.slug)
-      ),
-    },
-    {
-      name: "Heavy Haul",
-      description: "Tag trailers and specialized high-capacity equipment",
-      trailers: trailers.filter(
-        (t) =>
-          [
-            "paver-tag-trailer",
-            "tag-trailer-60-ton",
-          ].includes(t.slug)
-      ),
-    },
-    {
-      name: "Utility & Telecom",
-      description: "Directional drill, pole, and reel trailers",
-      trailers: trailers.filter(
-        (t) =>
+          ].includes(t.slug),
+        ),
+      },
+      {
+        id: "Heavy-Haul",
+        name: "Heavy Haul",
+        description: "Tag trailers and specialized high-capacity equipment",
+        trailers: trailers.filter((t) =>
+          ["paver-tag-trailer", "tag-trailer-60-ton"].includes(t.slug),
+        ),
+      },
+      {
+        id: "Utility-Telecom",
+        name: "Utility & Telecom",
+        description: "Directional drill, pole, and reel trailers",
+        trailers: trailers.filter((t) =>
           [
             "directional-drill-ramp-trailer",
             "pole-trailer",
             "reel-trailer",
-          ].includes(t.slug)
-      ),
-    },
-    {
-      name: "Commercial",
-      description: "Over-the-road freight and container trailers",
-      trailers: trailers.filter(
-        (t) =>
-          ["otr-step-deck-semi"].includes(t.slug)
-      ),
-    },
-  ];
+          ].includes(t.slug),
+        ),
+      },
+      {
+        id: "Commercial",
+        name: "Commercial",
+        description: "Over-the-road freight and container trailers",
+        trailers: trailers.filter((t) =>
+          ["otr-step-deck-semi"].includes(t.slug),
+        ),
+      },
+    ],
+    [],
+  );
+
+  const filteredCategories = useMemo(
+    () =>
+      categories
+        .map((category) => ({
+          ...category,
+          trailers: category.trailers.filter((trailer) => {
+            const query = searchTerm.trim().toLowerCase();
+            if (!query) return true;
+
+            return (
+              trailer.title.toLowerCase().includes(query) ||
+              trailer.shortDescription.toLowerCase().includes(query) ||
+              trailer.description.toLowerCase().includes(query)
+            );
+          }),
+        }))
+        .filter((category) => category.trailers.length > 0),
+    [categories, searchTerm],
+  );
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+
+        if (visible?.target.id) {
+          setActiveCategory(visible.target.id);
+        }
+      },
+      {
+        root: null,
+        threshold: [0.2, 0.35, 0.5, 0.65],
+        rootMargin: "-20% 0px -55% 0px",
+      },
+    );
+
+    categories.forEach((category) => {
+      const element = sectionRefs.current[category.id];
+      if (element) observer.observe(element);
+    });
+
+    return () => observer.disconnect();
+  }, [categories]);
+
+  const scrollToCategory = (categoryId: string) => {
+    const element = sectionRefs.current[categoryId];
+    if (!element) return;
+
+    element.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   return (
     <div className="bg-background min-h-screen">
@@ -78,139 +137,151 @@ export function TrailersPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
+            className="flex flex-col gap-4"
           >
-            <h1 className="font-display text-5xl lg:text-7xl font-black text-foreground mb-6">
-              Our Trailers
-            </h1>
-            <p className="font-body text-lg text-muted-foreground max-w-2xl leading-relaxed">
-              Behnke Enterprises offers heavy-equipment transport trailers across agricultural, construction, 
-              heavy haul, utility, and commercial categories. Explore our complete lineup with detailed 
-              specifications, gallery views, and options for customization.
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <h1 className="font-display text-5xl lg:text-7xl font-black text-foreground">
+                Our Trailers
+              </h1>
+
+              <div className="relative w-full lg:w-[360px] lg:shrink-0">
+                <Search
+                  className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"
+                  size={18}
+                />
+                <input
+                  value={searchTerm}
+                  onChange={(event) => setSearchTerm(event.target.value)}
+                  placeholder="Search trailers"
+                  className="w-full h-12 rounded-full border border-border bg-background/90 pl-11 pr-4 text-sm text-foreground shadow-sm outline-none transition-colors focus:border-primary"
+                />
+              </div>
+            </div>
+
+            <p className="font-body text-base text-muted-foreground">
+              Heavy-duty trailers for agriculture, construction, heavy haul,
+              utility, and commercial work.
             </p>
           </motion.div>
         </div>
       </section>
 
       {/* Categories and Trailers */}
-      {categories.map((category, categoryIdx) => (
-        category.trailers.length > 0 && (
-          <section key={category.name} className="py-12 px-6 bg-card/30">
-            <div className="container mx-auto max-w-6xl">
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6 }}
-                className="mb-10"
-              >
-                <h2 className="font-display text-4xl font-black text-[#bf1e2e] mb-2">
-                  {category.name}
-                </h2>
-                <p className="font-body text-muted-foreground text-lg">
-                  {category.description}
-                </p>
-              </motion.div>
-
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {category.trailers.map((trailer, idx) => (
-                  <motion.article
-                    key={trailer.slug}
-                    initial={{ opacity: 0, y: 30 }}
+      <section className="px-6 pb-12">
+        <div className="container mx-auto max-w-6xl">
+          <div className="grid gap-8">
+            <div className="space-y-12">
+              {filteredCategories.map((category) => (
+                <section
+                  key={category.name}
+                  id={category.id}
+                  ref={(element) => {
+                    sectionRefs.current[category.id] = element;
+                  }}
+                  className="scroll-mt-28"
+                >
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: idx * 0.1 }}
-                    className="group bg-background border border-border rounded-lg overflow-hidden hover:border-primary/50 transition-all duration-300 hover:shadow-xl"
+                    transition={{ duration: 0.6 }}
+                    className="mb-8"
                   >
-                    <div className="relative overflow-hidden aspect-[4/3]">
-                      <img
-                        src={trailer.heroImage}
-                        alt={trailer.title}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        loading="lazy"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    </div>
+                    <h2 className="font-display text-3xl font-black text-[#bf1e2e] mb-2">
+                      {category.name}
+                    </h2>
+                    <p className="font-body text-muted-foreground text-lg">
+                      {category.description}
+                    </p>
+                  </motion.div>
 
-                    <div className="p-6">
-                      <h3 className="font-display text-lg font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
-                        {trailer.title}
-                      </h3>
-                      <p className="font-body text-sm text-muted-foreground leading-relaxed mb-4 line-clamp-2">
-                        {trailer.shortDescription}
-                      </p>
-
-                      <Link
-                        to={`/trailers/${trailer.slug}`}
-                        className="inline-flex items-center justify-center px-5 py-2.5 bg-primary text-primary-foreground font-display text-sm font-semibold rounded-sm hover:brightness-110 transition-all duration-300 w-full"
+                  <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+                    {category.trailers.map((trailer, idx) => (
+                      <motion.article
+                        key={trailer.slug}
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.6, delay: idx * 0.08 }}
+                        className="group bg-background border border-border rounded-lg overflow-hidden hover:border-primary/50 transition-all duration-300 hover:shadow-xl"
                       >
-                        View Details
-                      </Link>
-                    </div>
-                  </motion.article>
-                ))}
-              </div>
+                        <div className="relative overflow-hidden aspect-[4/3]">
+                          <img
+                            src={trailer.heroImage}
+                            alt={trailer.title}
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                            loading="lazy"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        </div>
+
+                        <div className="p-5">
+                          <h3 className="font-display text-base font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
+                            {trailer.title}
+                          </h3>
+                          <p className="font-body text-sm text-muted-foreground leading-relaxed mb-4 line-clamp-2">
+                            {trailer.shortDescription}
+                          </p>
+
+                          <Link
+                            to={`/trailers/${trailer.slug}`}
+                            className="inline-flex items-center justify-center px-5 py-2.5 bg-primary text-primary-foreground font-display text-sm font-semibold rounded-sm hover:brightness-110 transition-all duration-300 w-full"
+                          >
+                            View Details
+                          </Link>
+                        </div>
+                      </motion.article>
+                    ))}
+                  </div>
+                </section>
+              ))}
             </div>
-          </section>
-        )
-      ))}
-
-      {/* All Trailers Grid (Alternative View) */}
-      <section className="py-12 px-6">
-        <div className="container mx-auto max-w-6xl">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="mb-10"
-          >
-            <h2 className="font-display text-3xl font-bold text-foreground mb-2">
-              Complete Trailer Lineup
-            </h2>
-            <p className="font-body text-muted-foreground">
-              Browse all available trailers
-            </p>
-          </motion.div>
-
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {trailers.map((trailer, idx) => (
-              <motion.article
-                key={trailer.slug}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: (idx % 6) * 0.05 }}
-                className="group bg-card border border-border rounded-lg overflow-hidden hover:border-primary/50 transition-all duration-300 hover:shadow-lg"
-              >
-                <div className="relative overflow-hidden aspect-[4/3]">
-                  <img
-                    src={trailer.heroImage}
-                    alt={trailer.title}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                    loading="lazy"
-                  />
-                </div>
-
-                <div className="p-5">
-                  <h3 className="font-display text-base font-bold text-foreground mb-1 group-hover:text-primary transition-colors">
-                    {trailer.title}
-                  </h3>
-                  <p className="font-body text-xs text-muted-foreground leading-relaxed mb-3 line-clamp-2">
-                    {trailer.shortDescription}
-                  </p>
-
-                  <Link
-                    to={`/trailers/${trailer.slug}`}
-                    className="inline-flex items-center justify-center px-4 py-2 bg-primary text-primary-foreground font-display text-xs font-semibold rounded-sm hover:brightness-110 transition-all duration-300 w-full"
-                  >
-                    View Details
-                  </Link>
-                </div>
-              </motion.article>
-            ))}
           </div>
         </div>
       </section>
+
+      <aside className="hidden xl:block fixed right-3 top-1/2 -translate-y-1/2 z-40">
+        <div className="flex flex-col items-end gap-5 px-3 py-4">
+          {categories.map((category) => {
+            const isActive = activeCategory === category.id;
+
+            return (
+              <button
+                key={category.id}
+                type="button"
+                onClick={() => scrollToCategory(category.id)}
+                className="group flex items-center justify-end gap-3"
+                aria-label={`Scroll to ${category.name}`}
+              >
+                <span
+                  className={`whitespace-nowrap text-xs font-medium tracking-wide transition-all duration-200 ${
+                    isActive
+                      ? "text-foreground opacity-100"
+                      : "text-muted-foreground opacity-0 group-hover:opacity-100"
+                  }`}
+                >
+                  {category.name}
+                </span>
+                <span
+                  className={`block h-[3px] w-12 rounded-full transition-all duration-300 ${
+                    isActive
+                      ? "bg-primary"
+                      : "bg-border group-hover:bg-primary/70"
+                  }`}
+                />
+              </button>
+            );
+          })}
+        </div>
+      </aside>
+
+      {searchTerm.trim() && filteredCategories.length === 0 && (
+        <div className="container mx-auto max-w-6xl px-6 pb-8">
+          <p className="text-muted-foreground">
+            No trailers match your search.
+          </p>
+        </div>
+      )}
 
       <Footer />
     </div>

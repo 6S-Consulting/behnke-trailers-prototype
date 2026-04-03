@@ -9,8 +9,12 @@ const Index = () => {
     <div className="bg-background min-h-screen">
       <Header />
       <HeroSection />
-      <DiscoverySection />
-      <TwoDtoThreeDSection />
+      <div id="industries">
+        <DiscoverySection />
+      </div>
+      <div id="custom-builds">
+        <TwoDtoThreeDSection />
+      </div>
       <Footer />
     </div>
   );

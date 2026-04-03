@@ -1,33 +1,40 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Menu, X } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import logo from "@/assets/logo/logo.png";
 
 const navLinks = [
-  { label: "Industries", href: "#industries" },
-  { label: "Trailers", href: "/trailers", isRoute: true },
-  { label: "Custom Builds", href: "#custom-builds" },
-  { label: "Dealers", href: "#dealers" },
-  { label: "Contact", href: "#contact" },
-  { label: "Partner Portal", href: "/login", isRoute: true },
+  { label: "Home", href: "/" },
+  { label: "Industries", href: "/#industries" },
+  { label: "Customer Build", href: "/#custom-builds" },
+  { label: "Trailers", href: "/trailers" },
+  { label: "Dealers", href: "/#dealers" },
+  { label: "Contact", href: "/#contact" },
 ];
 
 const Header = () => {
+  const { pathname } = useLocation();
+  const isHomePage = pathname === "/";
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 50);
+    onScroll();
     window.addEventListener("scroll", onScroll);
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   return (
     <motion.header
-      initial={{ y: -100 }}
+      initial={isHomePage ? { y: -100 } : false}
       animate={{ y: 0 }}
-      transition={{ duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }}
+      transition={
+        isHomePage
+          ? { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] }
+          : { duration: 0 }
+      }
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
         scrolled
           ? "bg-background/95 backdrop-blur-md border-b border-border"
@@ -40,40 +47,24 @@ const Header = () => {
         </Link>
 
         <nav className="hidden md:flex items-center gap-8">
-          {navLinks.map((link) =>
-            link.isRoute ? (
-              <Link
-                key={link.label}
-                to={link.href}
-                className="text-sm font-body text-muted-foreground hover:text-foreground transition-colors duration-300"
-              >
-                {link.label}
-              </Link>
-            ) : (
-              <a
-                key={link.label}
-                href={link.href}
-                className="text-sm font-body text-muted-foreground hover:text-foreground transition-colors duration-300"
-              >
-                {link.label}
-              </a>
-            ),
-          )}
+          {navLinks.map((link) => (
+            <Link
+              key={link.label}
+              to={link.href}
+              className="text-sm font-body text-muted-foreground hover:text-foreground transition-colors duration-300"
+            >
+              {link.label}
+            </Link>
+          ))}
         </nav>
 
         <div className="hidden md:flex items-center gap-4">
           <Link
             to="/login"
-            className="text-sm font-body text-foreground hover:text-primary transition-colors duration-300"
-          >
-            Portal Login
-          </Link>
-          <a
-            href="#contact"
             className="inline-flex items-center px-5 py-2.5 bg-primary text-primary-foreground font-display text-sm font-semibold rounded-sm hover:brightness-110 transition-all duration-300"
           >
-            Get Quote
-          </a>
+            Login
+          </Link>
         </div>
 
         <button
@@ -90,41 +81,23 @@ const Header = () => {
           animate={{ opacity: 1, y: 0 }}
           className="md:hidden bg-background/98 backdrop-blur-md border-b border-border px-6 pb-6"
         >
-          {navLinks.map((link) =>
-            link.isRoute ? (
-              <Link
-                key={link.label}
-                to={link.href}
-                onClick={() => setMobileOpen(false)}
-                className="block py-3 text-muted-foreground hover:text-foreground transition-colors font-body"
-              >
-                {link.label}
-              </Link>
-            ) : (
-              <a
-                key={link.label}
-                href={link.href}
-                onClick={() => setMobileOpen(false)}
-                className="block py-3 text-muted-foreground hover:text-foreground transition-colors font-body"
-              >
-                {link.label}
-              </a>
-            ),
-          )}
+          {navLinks.map((link) => (
+            <Link
+              key={link.label}
+              to={link.href}
+              onClick={() => setMobileOpen(false)}
+              className="block py-3 text-muted-foreground hover:text-foreground transition-colors font-body"
+            >
+              {link.label}
+            </Link>
+          ))}
           <Link
             to="/login"
             onClick={() => setMobileOpen(false)}
-            className="block mt-4 text-center px-5 py-2.5 border border-primary text-primary font-display text-sm font-semibold rounded-sm"
-          >
-            Portal Login
-          </Link>
-          <a
-            href="#contact"
-            onClick={() => setMobileOpen(false)}
             className="block mt-2 text-center px-5 py-2.5 bg-primary text-primary-foreground font-display text-sm font-semibold rounded-sm"
           >
-            Get Quote
-          </a>
+            Login
+          </Link>
         </motion.div>
       )}
     </motion.header>

@@ -1,5 +1,12 @@
+import { useEffect } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { HashRouter, Route, Routes, Navigate } from "react-router-dom";
+import {
+  HashRouter,
+  Navigate,
+  Route,
+  Routes,
+  useLocation,
+} from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -44,6 +51,29 @@ import ContactDealer from "./customer/ContactDealer";
 
 const queryClient = new QueryClient();
 
+const ScrollToTop = () => {
+  const { pathname, hash } = useLocation();
+
+  useEffect(() => {
+    if (hash) {
+      const id = hash.slice(1);
+      requestAnimationFrame(() => {
+        const target = document.getElementById(id);
+        if (target) {
+          target.scrollIntoView({ behavior: "auto", block: "start" });
+          return;
+        }
+        window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+      });
+      return;
+    }
+
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  }, [pathname, hash]);
+
+  return null;
+};
+
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" replace />;
@@ -59,7 +89,8 @@ const ProtectedRoleRoute = ({
 }) => {
   const { user } = useAuth();
   if (!user) return <Navigate to="/login" replace />;
-  if (user.role !== requiredRole) return <Navigate to={`/${user.role}`} replace />;
+  if (user.role !== requiredRole)
+    return <Navigate to={`/${user.role}`} replace />;
   return <>{children}</>;
 };
 
@@ -72,45 +103,228 @@ const AppRoutes = () => {
       <Route path="/" element={<Index />} />
       <Route path="/trailers" element={<TrailersPage />} />
       {/* Specific trailer routes (must come before :slug routes) */}
-      <Route path="/trailers/walking-tandem-gooseneck-wagon" element={<WalkingTandemGooseneckWagonDetails />} />
-      <Route path="/trailers/walking-tandem-gooseneck-wagon/3d" element={<WalkingTandemGooseneckWagon3DPage />} />
-      <Route path="/trailers/single-cone-trailer" element={<SingleConeTrailerDetails />} />
-      <Route path="/trailers/single-cone-trailer/3d" element={<SingleConeTrailer3DPage />} />
+      <Route
+        path="/trailers/walking-tandem-gooseneck-wagon"
+        element={<WalkingTandemGooseneckWagonDetails />}
+      />
+      <Route
+        path="/trailers/walking-tandem-gooseneck-wagon/3d"
+        element={<WalkingTandemGooseneckWagon3DPage />}
+      />
+      <Route
+        path="/trailers/single-cone-trailer"
+        element={<SingleConeTrailerDetails />}
+      />
+      <Route
+        path="/trailers/single-cone-trailer/3d"
+        element={<SingleConeTrailer3DPage />}
+      />
       {/* Generic trailer routes */}
       <Route path="/trailers/:slug" element={<TrailerDetailLoader />} />
       <Route path="/trailers/:slug/3d" element={<Trailer3DLoader />} />
       {/* Auth */}
-      <Route path="/login" element={user ? <Navigate to={`/${user.role}`} replace /> : <Login />} />
+      <Route
+        path="/login"
+        element={user ? <Navigate to={`/${user.role}`} replace /> : <Login />}
+      />
 
       {/* Admin */}
-      <Route path="/admin" element={<ProtectedRoleRoute requiredRole="admin"><AdminDashboard /></ProtectedRoleRoute>} />
-      <Route path="/admin/inventory" element={<ProtectedRoleRoute requiredRole="admin"><InventoryManagement /></ProtectedRoleRoute>} />
-      <Route path="/admin/dealers" element={<ProtectedRoleRoute requiredRole="admin"><DealerManagement /></ProtectedRoleRoute>} />
-      <Route path="/admin/dealers/:id" element={<ProtectedRoleRoute requiredRole="admin"><DealerDetail /></ProtectedRoleRoute>} />
-      <Route path="/admin/customers" element={<ProtectedRoleRoute requiredRole="admin"><AdminCustomers /></ProtectedRoleRoute>} />
-      <Route path="/admin/health" element={<ProtectedRoleRoute requiredRole="admin"><TrailerHealthOverview /></ProtectedRoleRoute>} />
-      <Route path="/admin/health/:vin" element={<ProtectedRoleRoute requiredRole="admin"><SensorDataDetail /></ProtectedRoleRoute>} />
-      <Route path="/admin/maintenance" element={<ProtectedRoleRoute requiredRole="admin"><MaintenanceSlotManager /></ProtectedRoleRoute>} />
-      <Route path="/admin/orders" element={<ProtectedRoleRoute requiredRole="admin"><AdminOrders /></ProtectedRoleRoute>} />
-      <Route path="/admin/notifications" element={<ProtectedRoleRoute requiredRole="admin"><NotificationsPage /></ProtectedRoleRoute>} />
-      <Route path="/admin/settings" element={<ProtectedRoleRoute requiredRole="admin"><SettingsPage /></ProtectedRoleRoute>} />
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoleRoute requiredRole="admin">
+            <AdminDashboard />
+          </ProtectedRoleRoute>
+        }
+      />
+      <Route
+        path="/admin/inventory"
+        element={
+          <ProtectedRoleRoute requiredRole="admin">
+            <InventoryManagement />
+          </ProtectedRoleRoute>
+        }
+      />
+      <Route
+        path="/admin/dealers"
+        element={
+          <ProtectedRoleRoute requiredRole="admin">
+            <DealerManagement />
+          </ProtectedRoleRoute>
+        }
+      />
+      <Route
+        path="/admin/dealers/:id"
+        element={
+          <ProtectedRoleRoute requiredRole="admin">
+            <DealerDetail />
+          </ProtectedRoleRoute>
+        }
+      />
+      <Route
+        path="/admin/customers"
+        element={
+          <ProtectedRoleRoute requiredRole="admin">
+            <AdminCustomers />
+          </ProtectedRoleRoute>
+        }
+      />
+      <Route
+        path="/admin/health"
+        element={
+          <ProtectedRoleRoute requiredRole="admin">
+            <TrailerHealthOverview />
+          </ProtectedRoleRoute>
+        }
+      />
+      <Route
+        path="/admin/health/:vin"
+        element={
+          <ProtectedRoleRoute requiredRole="admin">
+            <SensorDataDetail />
+          </ProtectedRoleRoute>
+        }
+      />
+      <Route
+        path="/admin/maintenance"
+        element={
+          <ProtectedRoleRoute requiredRole="admin">
+            <MaintenanceSlotManager />
+          </ProtectedRoleRoute>
+        }
+      />
+      <Route
+        path="/admin/orders"
+        element={
+          <ProtectedRoleRoute requiredRole="admin">
+            <AdminOrders />
+          </ProtectedRoleRoute>
+        }
+      />
+      <Route
+        path="/admin/notifications"
+        element={
+          <ProtectedRoleRoute requiredRole="admin">
+            <NotificationsPage />
+          </ProtectedRoleRoute>
+        }
+      />
+      <Route
+        path="/admin/settings"
+        element={
+          <ProtectedRoleRoute requiredRole="admin">
+            <SettingsPage />
+          </ProtectedRoleRoute>
+        }
+      />
 
       {/* Dealer */}
-      <Route path="/dealer" element={<ProtectedRoleRoute requiredRole="dealer"><DealerDashboard /></ProtectedRoleRoute>} />
-      <Route path="/dealer/orders" element={<ProtectedRoleRoute requiredRole="dealer"><DealerOrders /></ProtectedRoleRoute>} />
-      <Route path="/dealer/quotes" element={<ProtectedRoleRoute requiredRole="dealer"><DealerQuotes /></ProtectedRoleRoute>} />
-      <Route path="/dealer/stock" element={<ProtectedRoleRoute requiredRole="dealer"><DealerStock /></ProtectedRoleRoute>} />
-      <Route path="/dealer/notifications" element={<ProtectedRoleRoute requiredRole="dealer"><NotificationsPage /></ProtectedRoleRoute>} />
-      <Route path="/dealer/settings" element={<ProtectedRoleRoute requiredRole="dealer"><SettingsPage /></ProtectedRoleRoute>} />
+      <Route
+        path="/dealer"
+        element={
+          <ProtectedRoleRoute requiredRole="dealer">
+            <DealerDashboard />
+          </ProtectedRoleRoute>
+        }
+      />
+      <Route
+        path="/dealer/orders"
+        element={
+          <ProtectedRoleRoute requiredRole="dealer">
+            <DealerOrders />
+          </ProtectedRoleRoute>
+        }
+      />
+      <Route
+        path="/dealer/quotes"
+        element={
+          <ProtectedRoleRoute requiredRole="dealer">
+            <DealerQuotes />
+          </ProtectedRoleRoute>
+        }
+      />
+      <Route
+        path="/dealer/stock"
+        element={
+          <ProtectedRoleRoute requiredRole="dealer">
+            <DealerStock />
+          </ProtectedRoleRoute>
+        }
+      />
+      <Route
+        path="/dealer/notifications"
+        element={
+          <ProtectedRoleRoute requiredRole="dealer">
+            <NotificationsPage />
+          </ProtectedRoleRoute>
+        }
+      />
+      <Route
+        path="/dealer/settings"
+        element={
+          <ProtectedRoleRoute requiredRole="dealer">
+            <SettingsPage />
+          </ProtectedRoleRoute>
+        }
+      />
 
       {/* Customer */}
-      <Route path="/customer" element={<ProtectedRoleRoute requiredRole="customer"><CustomerDashboard /></ProtectedRoleRoute>} />
-      <Route path="/customer/health" element={<ProtectedRoleRoute requiredRole="customer"><CustomerHealth /></ProtectedRoleRoute>} />
-      <Route path="/customer/orders" element={<ProtectedRoleRoute requiredRole="customer"><CustomerOrders /></ProtectedRoleRoute>} />
-      <Route path="/customer/quotes" element={<ProtectedRoleRoute requiredRole="customer"><CustomerQuotes /></ProtectedRoleRoute>} />
-      <Route path="/customer/contact" element={<ProtectedRoleRoute requiredRole="customer"><ContactDealer /></ProtectedRoleRoute>} />
-      <Route path="/customer/notifications" element={<ProtectedRoleRoute requiredRole="customer"><NotificationsPage /></ProtectedRoleRoute>} />
-      <Route path="/customer/settings" element={<ProtectedRoleRoute requiredRole="customer"><SettingsPage /></ProtectedRoleRoute>} />
+      <Route
+        path="/customer"
+        element={
+          <ProtectedRoleRoute requiredRole="customer">
+            <CustomerDashboard />
+          </ProtectedRoleRoute>
+        }
+      />
+      <Route
+        path="/customer/health"
+        element={
+          <ProtectedRoleRoute requiredRole="customer">
+            <CustomerHealth />
+          </ProtectedRoleRoute>
+        }
+      />
+      <Route
+        path="/customer/orders"
+        element={
+          <ProtectedRoleRoute requiredRole="customer">
+            <CustomerOrders />
+          </ProtectedRoleRoute>
+        }
+      />
+      <Route
+        path="/customer/quotes"
+        element={
+          <ProtectedRoleRoute requiredRole="customer">
+            <CustomerQuotes />
+          </ProtectedRoleRoute>
+        }
+      />
+      <Route
+        path="/customer/contact"
+        element={
+          <ProtectedRoleRoute requiredRole="customer">
+            <ContactDealer />
+          </ProtectedRoleRoute>
+        }
+      />
+      <Route
+        path="/customer/notifications"
+        element={
+          <ProtectedRoleRoute requiredRole="customer">
+            <NotificationsPage />
+          </ProtectedRoleRoute>
+        }
+      />
+      <Route
+        path="/customer/settings"
+        element={
+          <ProtectedRoleRoute requiredRole="customer">
+            <SettingsPage />
+          </ProtectedRoleRoute>
+        }
+      />
 
       <Route path="*" element={<NotFound />} />
     </Routes>
@@ -125,6 +339,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <HashRouter>
+            <ScrollToTop />
             <AppRoutes />
           </HashRouter>
         </TooltipProvider>
@@ -134,4 +349,3 @@ const App = () => (
 );
 
 export default App;
-
