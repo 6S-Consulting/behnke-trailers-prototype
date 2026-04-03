@@ -4,12 +4,30 @@ import { trailers } from "@/trailers/data/trailerData";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { motion } from "framer-motion";
-import { Search } from "lucide-react";
+import { ArrowUpRight, Search } from "lucide-react";
+import agricultural4050 from "@/trailers/images/agricultural/40-50.png";
+import commercialOver from "@/trailers/images/commercial/over.png";
+import constructionDeckover from "@/trailers/images/construction/deckover.png";
+import heavyTag from "@/trailers/images/heavy/tag.png";
+import utilityDirectional from "@/trailers/images/utility/directional.png";
+import utilityPole from "@/trailers/images/utility/pool.png";
+import utilityRamp from "@/trailers/images/utility/ramp.png";
+import utilityReel from "@/trailers/images/utility/reel.png";
 
 export function TrailersPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeCategory, setActiveCategory] = useState("Agricultural");
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
+  const trailerImageOverrides: Record<string, string> = {
+    "sprayer-trailer-40k-50k": agricultural4050,
+    "otr-step-deck-semi": commercialOver,
+    "deckover-gooseneck": constructionDeckover,
+    "tag-trailer-60-ton": heavyTag,
+    "pole-trailer": utilityPole,
+    "directional-drill-ramp-trailer": utilityRamp,
+    "directional-drill-tilt-trailer": utilityDirectional,
+    "reel-trailer": utilityReel,
+  };
 
   // Group trailers by category for better organization
   const categories = useMemo(
@@ -19,12 +37,9 @@ export function TrailersPage() {
         name: "Agricultural",
         description: "Wagons, sprayers, tenders, and liquid transport",
         trailers: trailers.filter((t) =>
-          [
-            "walking-tandem-gooseneck-wagon",
-            "tandem-gooseneck-wagon",
-            "sprayer-trailer-40k-50k",
-            "single-cone-trailer",
-          ].includes(t.slug),
+          ["walking-tandem-gooseneck-wagon", "single-cone-trailer"].includes(
+            t.slug,
+          ),
         ),
       },
       {
@@ -32,12 +47,7 @@ export function TrailersPage() {
         name: "Construction",
         description: "Deckovers, tilts, and utility trailers",
         trailers: trailers.filter((t) =>
-          [
-            "directional-drill-tilt-trailer",
-            "20k-hd-tube-tilt",
-            "deckover-gooseneck",
-            "low-pro-hd-dump",
-          ].includes(t.slug),
+          ["20k-hd-tube-tilt", "deckover-gooseneck"].includes(t.slug),
         ),
       },
       {
@@ -54,6 +64,7 @@ export function TrailersPage() {
         description: "Directional drill, pole, and reel trailers",
         trailers: trailers.filter((t) =>
           [
+            "directional-drill-tilt-trailer",
             "directional-drill-ramp-trailer",
             "pole-trailer",
             "reel-trailer",
@@ -197,40 +208,48 @@ export function TrailersPage() {
 
                   <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
                     {category.trailers.map((trailer, idx) => (
-                      <motion.article
+                      <Link
                         key={trailer.slug}
-                        initial={{ opacity: 0, y: 30 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6, delay: idx * 0.08 }}
-                        className="group bg-background border border-border rounded-lg overflow-hidden hover:border-primary/50 transition-all duration-300 hover:shadow-xl"
+                        to={`/trailers/${trailer.slug}`}
+                        className="group block"
+                        aria-label={`Open ${trailer.title}`}
                       >
-                        <div className="relative overflow-hidden aspect-[4/3]">
-                          <img
-                            src={trailer.heroImage}
-                            alt={trailer.title}
-                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                            loading="lazy"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                        </div>
+                        <motion.article
+                          initial={{ opacity: 0, y: 30 }}
+                          whileInView={{ opacity: 1, y: 0 }}
+                          viewport={{ once: true }}
+                          transition={{ duration: 0.6, delay: idx * 0.08 }}
+                          className="bg-background border border-border rounded-lg overflow-hidden hover:border-primary/50 transition-all duration-300 hover:shadow-xl"
+                        >
+                          <div className="relative overflow-hidden aspect-[4/3]">
+                            {/** Keep paver tag image from trailerData; override others when custom folder images exist. */}
+                            <img
+                              src={
+                                trailerImageOverrides[trailer.slug] ??
+                                trailer.heroImage
+                              }
+                              alt={trailer.title}
+                              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                              loading="lazy"
+                            />
+                            <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                          </div>
 
-                        <div className="p-5">
-                          <h3 className="font-display text-base font-bold text-foreground mb-2 group-hover:text-primary transition-colors">
-                            {trailer.title}
-                          </h3>
-                          <p className="font-body text-sm text-muted-foreground leading-relaxed mb-4 line-clamp-2">
-                            {trailer.shortDescription}
-                          </p>
-
-                          <Link
-                            to={`/trailers/${trailer.slug}`}
-                            className="inline-flex items-center justify-center px-5 py-2.5 bg-primary text-primary-foreground font-display text-sm font-semibold rounded-sm hover:brightness-110 transition-all duration-300 w-full"
-                          >
-                            View Details
-                          </Link>
-                        </div>
-                      </motion.article>
+                          <div className="p-5">
+                            <div className="mb-2 flex items-start justify-between gap-3">
+                              <h3 className="font-display text-base font-bold text-foreground group-hover:text-primary transition-colors">
+                                {trailer.title}
+                              </h3>
+                              <span className="mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-border text-muted-foreground group-hover:border-primary/50 group-hover:text-primary transition-colors">
+                                <ArrowUpRight size={14} />
+                              </span>
+                            </div>
+                            <p className="font-body text-sm text-muted-foreground leading-relaxed line-clamp-2">
+                              {trailer.shortDescription}
+                            </p>
+                          </div>
+                        </motion.article>
+                      </Link>
                     ))}
                   </div>
                 </section>
