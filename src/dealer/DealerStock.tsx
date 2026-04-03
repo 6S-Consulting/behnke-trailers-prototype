@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { MetricCard } from '@/components/shared/MetricCard';
 import { DataTable } from '@/components/shared/DataTable';
 import { StatusBadge } from '@/components/shared/StatusBadge';
 import { Modal } from '@/components/shared/Modal';
@@ -7,8 +8,9 @@ import { toast } from 'sonner';
 import { useAuth } from '@/context/AuthContext';
 import { useAppData } from '@/context/AppDataContext';
 import { Trailer } from '@/types';
-import { LayoutGrid, List } from 'lucide-react';
+import { LayoutGrid, List, ShoppingCart, Clock, CheckCircle2, AlertTriangle, Boxes } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
 
 const DealerStock = () => {
   const { user } = useAuth();
@@ -19,6 +21,13 @@ const DealerStock = () => {
   const [selectedTrailer, setSelectedTrailer] = useState<string | null>(null);
   const [quantity, setQuantity] = useState(1);
   const [orderNotes, setOrderNotes] = useState('Restock requested from inventory page.');
+
+  const dealerId = user?.id ?? '';
+  const myOrders = state.orders.filter(o => o.fromId === dealerId && o.fromType === 'Dealer');
+  const pendingOrders = myOrders.filter(o => o.status !== 'Delivered' && o.status !== 'Cancelled');
+  const completedOrders = myOrders.filter(o => o.status === 'Delivered');
+  const lowStockItems = state.trailers.slice(0, 12).filter(t => t.inStock < 3).length;
+  const totalStockRequested = myOrders.reduce((sum, o) => sum + o.quantity, 0);
 
   const openRestockWizard = (trailerId?: string) => {
     setWizardOpen(true);
@@ -36,7 +45,7 @@ const DealerStock = () => {
 
   return (
     <DashboardLayout>
-      <div className="space-y-4">
+      <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="font-display text-2xl font-bold uppercase tracking-wide">My Inventory</h1>
           <div className="flex gap-2">
@@ -51,6 +60,27 @@ const DealerStock = () => {
             </button>
           </div>
         </div>
+
+        {/* Analytical Data Cards */}
+        <motion.div
+            className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3"
+            initial="hidden"
+            animate="show"
+            variants={{ hidden: {}, show: { transition: { staggerChildren: 0.05 } } }}
+        >
+            {[
+                <MetricCard key="total" title="Total Restocks" value={myOrders.length} icon={ShoppingCart} />,
+                <MetricCard key="units" title="Units Requested" value={totalStockRequested} icon={Boxes} />,
+                <MetricCard key="pending" title="In Pipeline" value={pendingOrders.length} icon={Clock} />,
+                <MetricCard key="completed" title="Restocked" value={completedOrders.length} icon={CheckCircle2} />,
+                <MetricCard key="low" title="Low Stock Items" value={lowStockItems} icon={AlertTriangle} trendDown={lowStockItems > 0} />,
+            ].map((card, i) => (
+                <motion.div key={i} variants={{ hidden: { opacity: 0, y: 12 }, show: { opacity: 1, y: 0 } }}>
+                    {card}
+                </motion.div>
+            ))}
+        </motion.div>
+
         {view === 'table' ? (
           <div className="bg-card rounded-lg shadow-industrial p-4">
             <DataTable<Trailer & { dealerQty: number; dealerStatus: string }>
